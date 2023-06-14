@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="OneOf" Version="3.0.223" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\AppCliTools\CliParametersApiClientsEdit\CliParametersApiClientsEdit.csproj" />
+      <ProjectReference Include="..\..\AppCliTools\CliParametersEdit\CliParametersEdit.csproj" />
+      <ProjectReference Include="..\..\AppCliTools\DatabaseApiClients\DatabaseApiClients.csproj" />
+      <ProjectReference Include="..\..\AppCliTools\DatabaseManagementClients\DatabaseManagementClients.csproj" />
+      <ProjectReference Include="..\..\SystemTools\SystemToolsShared\SystemToolsShared.csproj" />
+      <ProjectReference Include="..\LibWebAgentData\LibWebAgentData.csproj" />
+    </ItemGroup>
+
+</Project>

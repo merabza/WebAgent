@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.5.2" />
+    <PackageReference Include="OneOf" Version="3.0.243" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\ToolsManagement\DatabaseApiClients\DatabaseApiClients.csproj" />
+    <ProjectReference Include="..\..\ToolsManagement\FileManagersMain\FileManagersMain.csproj" />
+    <ProjectReference Include="..\..\WebAgentContracts\WebAgentDbContracts\WebAgentDbContracts.csproj" />
+    <ProjectReference Include="..\..\WebAgentShared\LibProjectsMini\LibProjectsMini.csproj" />
+    <ProjectReference Include="..\..\WebAgentShared\LibWebAgentData\LibWebAgentData.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\ApiToolsShared\ApiToolsShared.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebInstallers\WebInstallers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+  </ItemGroup>
+
+</Project>

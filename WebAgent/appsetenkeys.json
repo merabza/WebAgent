@@ -1,0 +1,22 @@
+{
+    "Keys": [
+        "Serilog:WriteTo:1:Args:path",
+        "AppSettings:BaseBackupsLocalPatch",
+        "AppSettings:DatabaseServerConnections:*:ServerAddress",
+        "AppSettings:DatabaseServerConnections:*:ServerUser",
+        "AppSettings:DatabaseServerConnections:*:ServerPass",
+        "AppSettings:DatabaseServerConnections:*:BackupFolderName",
+        "AppSettings:DatabaseServerConnections:*:DataFolderName",
+        "AppSettings:DatabaseServerConnections:*:DataLogFolderName",
+        "ApiKeys:AppSettingsByApiKey",
+        "InstallerSettings:InstallerWorkFolder",
+        "InstallerSettings:InstallFolder",
+        "InstallerSettings:DotnetRunner",
+        "InstallerSettings:ServiceUserName",
+        "InstallerSettings:FilesUserName",
+        "InstallerSettings:FilesUsersGroupName",
+        "FileStorages:*:FileStoragePath",
+        "FileStorages:*:UserName",
+        "FileStorages:*:Password"
+    ]
+}
