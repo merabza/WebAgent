@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using SystemToolsShared;
 using WebInstallers;
-using AssemblyReference = TestToolsMini.AssemblyReference;
 
 //პროგრამის ატრიბუტების დაყენება 
 ProgramAttributes.Instance.SetAttribute("AppName", "WebAgent");
@@ -21,9 +20,9 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 });
 
 builder.InstallServices(args,
-    AssemblyReference.Assembly,
-    LibProjectsMini.AssemblyReference.Assembly,
-    LibDatabasesMini.AssemblyReference.Assembly,
+    TestToolsApi.AssemblyReference.Assembly,
+    LibProjectsApi.AssemblyReference.Assembly,
+    LibDatabasesApi.AssemblyReference.Assembly,
     ConfigurationEncrypt.AssemblyReference.Assembly,
     SerilogLogger.AssemblyReference.Assembly,
     WindowsServiceTools.AssemblyReference.Assembly,
@@ -33,12 +32,12 @@ builder.InstallServices(args,
 
 builder.Services.AddMediatR(cfg =>
 {
-    cfg.RegisterServicesFromAssembly(LibProjectsMini.AssemblyReference.Assembly);
-    cfg.RegisterServicesFromAssembly(LibDatabasesMini.AssemblyReference.Assembly);
+    cfg.RegisterServicesFromAssembly(LibProjectsApi.AssemblyReference.Assembly);
+    cfg.RegisterServicesFromAssembly(LibDatabasesApi.AssemblyReference.Assembly);
 });
 
 // FluentValidationInstaller
-builder.Services.InstallValidation(LibProjectsMini.AssemblyReference.Assembly);
+builder.Services.InstallValidation(LibProjectsApi.AssemblyReference.Assembly);
 
 var app = builder.Build();
 

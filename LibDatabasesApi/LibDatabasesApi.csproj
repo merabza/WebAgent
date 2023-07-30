@@ -2,19 +2,21 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>disable</ImplicitUsings>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.6.0" />
-    <PackageReference Include="OneOf" Version="3.0.255" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\DatabaseTools\DbTools\DbTools.csproj" />
+    <ProjectReference Include="..\..\ParametersManagement\LibDatabaseParameters\LibDatabaseParameters.csproj" />
     <ProjectReference Include="..\..\SystemTools\MessagingAbstractions\MessagingAbstractions.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\DatabaseApiClients\DatabaseApiClients.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\FileManagersMain\FileManagersMain.csproj" />
+    <ProjectReference Include="..\..\WebAgentContracts\WebAgentContracts\WebAgentContracts.csproj" />
     <ProjectReference Include="..\..\WebAgentContracts\WebAgentDbContracts\WebAgentDbContracts.csproj" />
     <ProjectReference Include="..\..\WebAgentShared\LibProjectsApi\LibProjectsApi.csproj" />
     <ProjectReference Include="..\..\WebAgentShared\LibWebAgentData\LibWebAgentData.csproj" />
