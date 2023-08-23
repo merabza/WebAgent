@@ -8,13 +8,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using WebAgentContracts.V1.Requests;
-using WebAgentDbContracts.V1.Requests;
-using WebAgentDbContracts.V1.Routes;
+using WebAgentDatabasesApiContracts.V1.Requests;
+using WebAgentDatabasesApiContracts.V1.Routes;
+using WebAgentProjectsApiContracts.V1.Requests;
 using WebInstallers;
 
 namespace LibDatabasesApi.Endpoints.V1;
 
+// ReSharper disable once UnusedType.Global
 public sealed class DatabasesEndpoints : IInstaller
 {
     public int InstallPriority => 50;

@@ -1,5 +1,5 @@
 ﻿using LibDatabasesApi.CommandRequests;
-using WebAgentDbContracts.V1.Requests;
+using WebAgentDatabasesApiContracts.V1.Requests;
 
 namespace LibDatabasesApi.Mappers;
 

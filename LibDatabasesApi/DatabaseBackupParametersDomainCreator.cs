@@ -4,7 +4,7 @@ using LibDatabaseParameters;
 using LibDatabasesApi.CommandRequests;
 using OneOf;
 using SystemToolsShared;
-using WebAgentDbContracts.V1.Requests;
+using WebAgentDatabasesApiContracts.V1.Requests;
 
 namespace LibDatabasesApi;
 
