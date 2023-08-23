@@ -1,7 +1,4 @@
-﻿
-
-
-using MessagingAbstractions;
+﻿using MessagingAbstractions;
 
 namespace LibDatabasesApi.CommandRequests;
 
