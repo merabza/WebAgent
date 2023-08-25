@@ -20,14 +20,18 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 });
 
 builder.InstallServices(args,
-    TestToolsApi.AssemblyReference.Assembly,
-    LibProjectsApi.AssemblyReference.Assembly,
-    LibDatabasesApi.AssemblyReference.Assembly,
+    //WebSystemTools
+    ApiExceptionHandler.AssemblyReference.Assembly,
     ConfigurationEncrypt.AssemblyReference.Assembly,
     SerilogLogger.AssemblyReference.Assembly,
-    WindowsServiceTools.AssemblyReference.Assembly,
     SwaggerTools.AssemblyReference.Assembly,
-    ApiExceptionHandler.AssemblyReference.Assembly
+    TestToolsApi.AssemblyReference.Assembly,
+    WindowsServiceTools.AssemblyReference.Assembly,
+    //WebAgentShared
+    LibProjectsApi.AssemblyReference.Assembly,
+    LibWebAgentMessages.AssemblyReference.Assembly,
+    //WebAgent
+    LibDatabasesApi.AssemblyReference.Assembly
 );
 
 builder.Services.AddMediatR(cfg =>
