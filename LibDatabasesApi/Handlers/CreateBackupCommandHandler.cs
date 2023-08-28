@@ -26,15 +26,13 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
     private readonly IConfiguration _config;
     private readonly ILogger<CreateBackupCommandHandler> _logger;
     private readonly IMessagesDataManager? _messagesDataManager;
-    private readonly string? _userName;
 
     public CreateBackupCommandHandler(IConfiguration config, ILogger<CreateBackupCommandHandler> logger,
-        IMessagesDataManager? messagesDataManager, string? userName)
+        IMessagesDataManager? messagesDataManager)
     {
         _config = config;
         _logger = logger;
         _messagesDataManager = messagesDataManager;
-        _userName = userName;
     }
 
     public async Task<OneOf<BackupFileParameters, IEnumerable<Err>>> Handle(CreateBackupCommandRequest request,
@@ -82,7 +80,7 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         var databaseManagementClient = DatabaseAgentClientsFabric.CreateDatabaseManagementClient(false, _logger,
             databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
             databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
-            _messagesDataManager, _userName);
+            _messagesDataManager, request.UserName);
 
         if (databaseManagementClient is null)
             return new[] { DbApiErrors.DatabaseManagementClientDoesNotCreated };
@@ -105,7 +103,7 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
             return new[] { DbApiErrors.BackupDoesNotCreated };
 
         var needDownloadFromSource = !FileStorageData.IsSameToLocal(databaseBackupsFileStorage,
-            appSettings.BaseBackupsLocalPatch, _messagesDataManager, _userName);
+            appSettings.BaseBackupsLocalPatch, _messagesDataManager, request.UserName);
 
         SmartSchemas smartSchemas = new(appSettings.SmartSchemas);
 
@@ -137,7 +135,7 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         //   მაშინ მოქაჩვა საჭირო აღარ არის
         var needUploadToExchange = exchangeFileManager is not null && exchangeFileStorage is not null &&
                                    !FileStorageData.IsSameToLocal(exchangeFileStorage,
-                                       appSettings.BaseBackupsLocalPatch, _messagesDataManager, _userName) &&
+                                       appSettings.BaseBackupsLocalPatch, _messagesDataManager, request.UserName) &&
                                    exchangeFileStorageName != databaseBackupsFileStorageName;
 
         if (!needUploadToExchange)

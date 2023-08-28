@@ -27,15 +27,13 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
     private readonly IConfiguration _config;
     private readonly ILogger<RestoreBackupCommandHandler> _logger;
     private readonly IMessagesDataManager? _messagesDataManager;
-    private readonly string? _userName;
 
     public RestoreBackupCommandHandler(IConfiguration config, ILogger<RestoreBackupCommandHandler> logger,
-        IMessagesDataManager? messagesDataManager, string? userName)
+        IMessagesDataManager? messagesDataManager)
     {
         _config = config;
         _logger = logger;
         _messagesDataManager = messagesDataManager;
-        _userName = userName;
     }
 
     public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(RestoreBackupCommandRequest request,
@@ -64,7 +62,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         var databaseManagementClient = DatabaseAgentClientsFabric.CreateDatabaseManagementClient(false, _logger,
             databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
             databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
-            _messagesDataManager, _userName);
+            _messagesDataManager, request.UserName);
 
         if (databaseManagementClient is null)
             return new[] { DbApiErrors.DatabaseManagementClientDoesNotCreated };
@@ -95,7 +93,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
 
         var needDownloadFromExchange = exchangeFileStorage != null &&
                                        !FileStorageData.IsSameToLocal(exchangeFileStorage,
-                                           appSettings.BaseBackupsLocalPatch, _messagesDataManager, _userName);
+                                           appSettings.BaseBackupsLocalPatch, _messagesDataManager, request.UserName);
 
         if (needDownloadFromExchange)
         {
@@ -129,7 +127,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         }
 
         var needUploadDatabaseBackupsStorage = !FileStorageData.IsSameToLocal(databaseBackupsFileStorage,
-            appSettings.BaseBackupsLocalPatch, _messagesDataManager, _userName);
+            appSettings.BaseBackupsLocalPatch, _messagesDataManager, request.UserName);
 
         if (needUploadDatabaseBackupsStorage)
         {
