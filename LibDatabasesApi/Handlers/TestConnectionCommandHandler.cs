@@ -11,25 +11,29 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
+using WebAgentMessagesContracts;
 
 namespace LibDatabasesApi.Handlers;
 
-// ReSharper disable once UnusedType.Global
+// ReSharper disable once ClassNeverInstantiated.Global
 public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectionCommandRequest>
 {
     private readonly IConfiguration _config;
     private readonly ILogger<TestConnectionCommandHandler> _logger;
+    private readonly IMessagesDataManager? _messagesDataManager;
 
-    public TestConnectionCommandHandler(IConfiguration config, ILogger<TestConnectionCommandHandler> logger)
+    public TestConnectionCommandHandler(IConfiguration config, ILogger<TestConnectionCommandHandler> logger,
+        IMessagesDataManager? messagesDataManager)
     {
         _config = config;
         _logger = logger;
+        _messagesDataManager = messagesDataManager;
     }
 
     public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(TestConnectionCommandRequest request,
         CancellationToken cancellationToken)
     {
-        var result = DatabaseClientCreator.Create(_config, _logger);
+        var result = DatabaseClientCreator.Create(_config, _logger, _messagesDataManager, request.UserName);
         if (result.IsT1)
             return result.AsT1.ToArray();
         var databaseManagementClient = result.AsT0;

@@ -1,15 +1,16 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using ApiToolsShared;
 using LibDatabasesApi.CommandRequests;
+using LibDatabasesApi.Handlers;
 using LibDatabasesApi.Mappers;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using WebAgentDatabasesApiContracts.V1.Requests;
 using WebAgentDatabasesApiContracts.V1.Routes;
+using WebAgentMessagesContracts;
 using WebAgentProjectsApiContracts.V1.Requests;
 using WebInstallers;
 
@@ -27,129 +28,165 @@ public sealed class DatabasesEndpoints : IInstaller
 
     public void UseServices(WebApplication app)
     {
-        app.MapPost(DatabaseApiRoutes.Database.CheckRepairDatabase, CheckRepairDatabase)
-            .AddEndpointFilter<ApiKeysChecker>();
-        app.MapPost(DatabaseApiRoutes.Database.CreateBackup, CreateBackup)
-            .AddEndpointFilter<ApiKeysChecker>();
-        app.MapPost(DatabaseApiRoutes.Database.ExecuteCommand, ExecuteCommand).AddEndpointFilter<ApiKeysChecker>();
-        app.MapGet(DatabaseApiRoutes.Database.GetDatabaseNames, GetDatabaseNames).AddEndpointFilter<ApiKeysChecker>();
-        app.MapGet(DatabaseApiRoutes.Database.IsDatabaseExists, IsDatabaseExists).AddEndpointFilter<ApiKeysChecker>();
-        app.MapPut(DatabaseApiRoutes.Database.RestoreBackup, RestoreBackup).AddEndpointFilter<ApiKeysChecker>();
-        app.MapPost(DatabaseApiRoutes.Database.RecompileProcedures, RecompileProcedures)
-            .AddEndpointFilter<ApiKeysChecker>();
-        app.MapGet(DatabaseApiRoutes.Database.TestConnection, TestConnection).AddEndpointFilter<ApiKeysChecker>();
-        app.MapPost(DatabaseApiRoutes.Database.UpdateStatistics, UpdateStatistics).AddEndpointFilter<ApiKeysChecker>();
+        var group = app.MapGroup(DatabaseApiRoutes.Database.DatabaseBase).RequireAuthorization();
+
+        group.MapPost(DatabaseApiRoutes.Database.CheckRepairDatabase, CheckRepairDatabase);
+        group.MapPost(DatabaseApiRoutes.Database.CreateBackup, CreateBackup);
+        group.MapPost(DatabaseApiRoutes.Database.ExecuteCommand, ExecuteCommand);
+        group.MapGet(DatabaseApiRoutes.Database.GetDatabaseNames, GetDatabaseNames);
+        group.MapGet(DatabaseApiRoutes.Database.IsDatabaseExists, IsDatabaseExists);
+        group.MapPut(DatabaseApiRoutes.Database.RestoreBackup, RestoreBackup);
+        group.MapPost(DatabaseApiRoutes.Database.RecompileProcedures, RecompileProcedures);
+        group.MapGet(DatabaseApiRoutes.Database.TestConnection, TestConnection);
+        group.MapPost(DatabaseApiRoutes.Database.UpdateStatistics, UpdateStatistics);
     }
 
-    private static async Task<IResult> CheckRepairDatabase(ILogger<DatabasesEndpoints> logger, IConfiguration config,
-        string databaseName,
-        [FromQuery] string? apiKey, HttpRequest httpRequest, IMediator mediator)
+    // POST api/database/checkrepairdatabase/{databaseName}
+    private static async Task<IResult> CheckRepairDatabase([FromRoute] string databaseName, HttpRequest httpRequest,
+        IMediator mediator, IMessagesDataManager messagesDataManager)
     {
-        var command = CheckRepairDatabaseCommandRequest.Create(databaseName);
+        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        await messagesDataManager.SendMessage(userName, $"{nameof(CheckRepairDatabase)} started");
+        Debug.WriteLine($"Call {nameof(CheckRepairDatabaseCommandHandler)} from {nameof(CheckRepairDatabase)}");
+
+        var command = CheckRepairDatabaseCommandRequest.Create(databaseName, userName);
         var result = await mediator.Send(command);
+
+        await messagesDataManager.SendMessage(userName, $"{nameof(CheckRepairDatabase)} finished");
         return result.Match(_ => Results.Ok(), Results.BadRequest);
     }
 
-    //// POST api/database/createbackup
-    //[HttpPost(ApiRoutes.Database.CreateBackup)]
-    private static async Task<IResult> CreateBackup(ILogger<DatabasesEndpoints> logger, IConfiguration config,
-        string databaseName,
-        [FromQuery] string apiKey, HttpRequest httpRequest, [FromBody] CreateBackupRequest? request, IMediator mediator)
+    // POST api/database/createbackup/{databaseName}
+    private static async Task<IResult> CreateBackup([FromRoute] string databaseName, HttpRequest httpRequest,
+        [FromBody] CreateBackupRequest? request, IMediator mediator, IMessagesDataManager messagesDataManager)
     {
+        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        await messagesDataManager.SendMessage(userName, $"{nameof(CreateBackup)} started");
+        Debug.WriteLine($"Call {nameof(CreateBackupCommandHandler)} from {nameof(CreateBackup)}");
+
         if (request is null)
             return Results.BadRequest(ApiErrors.RequestIsEmpty);
-        var command = request.AdaptTo(databaseName);
+        var command = request.AdaptTo(databaseName, userName);
         var result = await mediator.Send(command);
+
+        await messagesDataManager.SendMessage(userName, $"{nameof(CreateBackup)} finished");
         return result.Match(Results.Ok, Results.BadRequest);
     }
 
-    //// POST api/database/executecommand
-    //[HttpPost(ApiRoutes.Database.ExecuteCommand)]
-    private static async Task<IResult> ExecuteCommand(ILogger<DatabasesEndpoints> logger, IConfiguration config,
-        string databaseName,
-        [FromQuery] string apiKey, HttpRequest httpRequest, [FromBody] string? commandText, IMediator mediator)
+    // POST api/database/executecommand/{databaseName}
+    private static async Task<IResult> ExecuteCommand([FromRoute] string databaseName, HttpRequest httpRequest,
+        [FromBody] string? commandText, IMediator mediator, IMessagesDataManager messagesDataManager)
     {
+        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        await messagesDataManager.SendMessage(userName, $"{nameof(ExecuteCommand)} started");
+        Debug.WriteLine($"Call {nameof(ExecuteCommandCommandHandler)} from {nameof(ExecuteCommand)}");
+
         //ExecuteCommandCommandRequest
-        var command = ExecuteCommandCommandRequest.Create(databaseName, commandText);
+        var command = ExecuteCommandCommandRequest.Create(databaseName, commandText, userName);
         var result = await mediator.Send(command);
+
+        await messagesDataManager.SendMessage(userName, $"{nameof(ExecuteCommand)} finished");
         return result.Match(_ => Results.Ok(), Results.BadRequest);
     }
 
-    //// GET api/database/getdatabasenames
-    //[HttpGet(ApiRoutes.Database.GetDatabaseNames)]
-    private static async Task<IResult> GetDatabaseNames(ILogger<DatabasesEndpoints> logger, IConfiguration config,
-        [FromQuery] string apiKey, HttpRequest httpRequest, IMediator mediator)
+    // GET api/database/getdatabasenames
+    private static async Task<IResult> GetDatabaseNames(HttpRequest httpRequest, IMediator mediator,
+        IMessagesDataManager messagesDataManager)
     {
+        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseNames)} started");
+        Debug.WriteLine($"Call {nameof(GetDatabaseNamesCommandHandler)} from {nameof(GetDatabaseNames)}");
+
         //GetDatabaseNamesCommandRequest
-        var command = GetDatabaseNamesCommandRequest.Create();
+        var command = GetDatabaseNamesCommandRequest.Create(userName);
         var result = await mediator.Send(command);
+
+        await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseNames)} finished");
         return result.Match(Results.Ok, Results.BadRequest);
     }
 
-    //// GET api/database/isdatabaseexists
-    //[HttpGet(ApiRoutes.Database.IsDatabaseExists)]
-    private static async Task<IResult> IsDatabaseExists(ILogger<DatabasesEndpoints> logger, IConfiguration config,
-        string databaseName, [FromQuery] string apiKey, HttpRequest httpRequest, IMediator mediator)
+    // GET api/database/isdatabaseexists/{databaseName}
+    private static async Task<IResult> IsDatabaseExists([FromRoute] string databaseName, HttpRequest httpRequest,
+        IMediator mediator, IMessagesDataManager messagesDataManager)
     {
+        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        await messagesDataManager.SendMessage(userName, $"{nameof(IsDatabaseExists)} started");
+        Debug.WriteLine($"Call {nameof(IsDatabaseExistsCommandHandler)} from {nameof(IsDatabaseExists)}");
+
         //IsDatabaseExistsCommandRequest
 
-        var command = IsDatabaseExistsCommandRequest.Create(databaseName);
+        var command = IsDatabaseExistsCommandRequest.Create(databaseName, userName);
         var result = await mediator.Send(command);
+
+        await messagesDataManager.SendMessage(userName, $"{nameof(IsDatabaseExists)} finished");
         return result.Match(Results.Ok, Results.BadRequest);
     }
 
-    //[HttpPut(ApiRoutes.Database.RestoreBackup)]
-    private static async Task<IResult> RestoreBackup(ILogger<DatabasesEndpoints> logger, IConfiguration config,
-        string databaseName,
-        [FromQuery] string apiKey, HttpRequest httpRequest, [FromBody] RestoreBackupRequest? request,
-        IMediator mediator)
+    // POST api/database/recompileprocedures/{databaseName}
+    private static async Task<IResult> RecompileProcedures([FromRoute] string databaseName, HttpRequest httpRequest,
+        IMediator mediator, IMessagesDataManager messagesDataManager)
     {
-        if (request is null)
-            return Results.BadRequest(ApiErrors.RequestIsEmpty);
-        var command = request.AdaptTo(databaseName);
-        var result = await mediator.Send(command);
-        return result.Match(_ => Results.Ok(), Results.BadRequest);
-    }
+        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        await messagesDataManager.SendMessage(userName, $"{nameof(RecompileProcedures)} started");
+        Debug.WriteLine($"Call {nameof(RecompileProceduresCommandHandler)} from {nameof(RecompileProcedures)}");
 
-
-    //// POST api/database/recompileprocedures
-    //[HttpPost(ApiRoutes.Database.RecompileProcedures)]
-    private static async Task<IResult> RecompileProcedures(ILogger<DatabasesEndpoints> logger, IConfiguration config,
-        string databaseName,
-        [FromQuery] string apiKey, HttpRequest httpRequest, IMediator mediator)
-    {
         //RecompileProceduresCommandRequest
 
-        var command = RecompileProceduresCommandRequest.Create(databaseName);
+        var command = RecompileProceduresCommandRequest.Create(databaseName, userName);
         var result = await mediator.Send(command);
+
+        await messagesDataManager.SendMessage(userName, $"{nameof(RecompileProcedures)} finished");
         return result.Match(_ => Results.Ok(), Results.BadRequest);
     }
 
-
-    //// GET api/database/testconnection
-    //[HttpGet(ApiRoutes.Database.TestConnection)]
-    private static async Task<IResult> TestConnection(ILogger<DatabasesEndpoints> logger, IConfiguration config,
-        string? databaseName,
-        [FromQuery] string apiKey, HttpRequest httpRequest, IMediator mediator)
+    // PUT restorebackup/{databaseName}
+    private static async Task<IResult> RestoreBackup([FromRoute] string databaseName, HttpRequest httpRequest,
+        [FromBody] RestoreBackupRequest? request, IMediator mediator, IMessagesDataManager messagesDataManager)
     {
+        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        await messagesDataManager.SendMessage(userName, $"{nameof(RestoreBackup)} started");
+        Debug.WriteLine($"Call {nameof(RestoreBackupCommandHandler)} from {nameof(RestoreBackup)}");
+
+        if (request is null)
+            return Results.BadRequest(ApiErrors.RequestIsEmpty);
+        var command = request.AdaptTo(databaseName, userName);
+        var result = await mediator.Send(command);
+
+        await messagesDataManager.SendMessage(userName, $"{nameof(RestoreBackup)} finished");
+        return result.Match(_ => Results.Ok(), Results.BadRequest);
+    }
+
+    // GET api/database/testconnection/{databaseName?}
+    private static async Task<IResult> TestConnection([FromRoute] string? databaseName, HttpRequest httpRequest,
+        IMediator mediator, IMessagesDataManager messagesDataManager)
+    {
+        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        await messagesDataManager.SendMessage(userName, $"{nameof(TestConnection)} started");
+        Debug.WriteLine($"Call {nameof(TestConnectionCommandHandler)} from {nameof(TestConnection)}");
+
         //TestConnectionCommandRequest
 
-        var command = TestConnectionCommandRequest.Create(databaseName);
+        var command = TestConnectionCommandRequest.Create(databaseName, userName);
         var result = await mediator.Send(command);
+
+        await messagesDataManager.SendMessage(userName, $"{nameof(TestConnection)} finished");
         return result.Match(_ => Results.Ok(), Results.BadRequest);
     }
 
-
-    //// POST api/database/updatestatistics
-    //[HttpPost(ApiRoutes.Database.UpdateStatistics)]
-    private static async Task<IResult> UpdateStatistics(ILogger<DatabasesEndpoints> logger, IConfiguration config,
-        string databaseName,
-        [FromQuery] string apiKey, HttpRequest httpRequest, IMediator mediator)
+    // POST api/database/updatestatistics/{databaseName}
+    private static async Task<IResult> UpdateStatistics([FromRoute] string databaseName, HttpRequest httpRequest,
+        IMediator mediator, IMessagesDataManager messagesDataManager)
     {
+        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        await messagesDataManager.SendMessage(userName, $"{nameof(UpdateStatistics)} started");
+        Debug.WriteLine($"Call {nameof(UpdateStatisticsCommandHandler)} from {nameof(UpdateStatistics)}");
+
         //UpdateStatisticsCommandRequest
 
-        var command = UpdateStatisticsCommandRequest.Create(databaseName);
+        var command = UpdateStatisticsCommandRequest.Create(databaseName, userName);
         var result = await mediator.Send(command);
+
+        await messagesDataManager.SendMessage(userName, $"{nameof(UpdateStatistics)} finished");
         return result.Match(_ => Results.Ok(), Results.BadRequest);
     }
 }

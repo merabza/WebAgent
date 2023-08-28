@@ -6,8 +6,15 @@ namespace LibDatabasesApi.CommandRequests;
 
 public sealed class GetDatabaseNamesCommandRequest : ICommand<IEnumerable<DatabaseInfoModel>>
 {
-    public static GetDatabaseNamesCommandRequest Create()
+    public GetDatabaseNamesCommandRequest(string? userName)
     {
-        return new GetDatabaseNamesCommandRequest();
+        UserName = userName;
+    }
+
+    public string? UserName { get; set; }
+
+    public static GetDatabaseNamesCommandRequest Create(string? userName)
+    {
+        return new GetDatabaseNamesCommandRequest(userName);
     }
 }

@@ -10,12 +10,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
+using WebAgentMessagesContracts;
 
 namespace LibDatabasesApi.Helpers;
 
 public static class DatabaseClientCreator
 {
-    public static OneOf<DatabaseManagementClient, IEnumerable<Err>> Create(IConfiguration config, ILogger logger)
+    public static OneOf<DatabaseManagementClient, IEnumerable<Err>> Create(IConfiguration config, ILogger logger,
+        IMessagesDataManager? messagesDataManager, string? userName)
     {
         var appSettings = AppSettings.Create(config);
 
@@ -28,7 +30,8 @@ public static class DatabaseClientCreator
 
         var dbServerData = appSettings.DatabaseServerData;
 
-        var databaseManagementClient = GetDatabaseConnectionSettings(logger, config, dbServerData);
+        var databaseManagementClient =
+            GetDatabaseConnectionSettings(logger, config, dbServerData, messagesDataManager, userName);
         if (databaseManagementClient is null)
             return new[] { DbApiErrors.ErrorCreateDatabaseConnection };
 
@@ -37,8 +40,8 @@ public static class DatabaseClientCreator
     }
 
 
-    private static DatabaseManagementClient? GetDatabaseConnectionSettings(ILogger logger,
-        IConfiguration config, DatabaseServerData databaseServerData)
+    private static DatabaseManagementClient? GetDatabaseConnectionSettings(ILogger logger, IConfiguration config,
+        DatabaseServerData databaseServerData, IMessagesDataManager? messagesDataManager, string? userName)
     {
         var appSettings = AppSettings.Create(config);
 
@@ -46,10 +49,9 @@ public static class DatabaseClientCreator
             return null;
 
         var databaseManagementClient =
-            DatabaseAgentClientsFabric.CreateDatabaseManagementClient(false, logger,
-                databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
-                databaseServerData.DbConnectionName,
-                new DatabaseServerConnections(appSettings.DatabaseServerConnections));
+            DatabaseAgentClientsFabric.CreateDatabaseManagementClient(false, logger, databaseServerData.DbWebAgentName,
+                new ApiClients(appSettings.ApiClients), databaseServerData.DbConnectionName,
+                new DatabaseServerConnections(appSettings.DatabaseServerConnections), messagesDataManager, userName);
         return databaseManagementClient;
     }
 }

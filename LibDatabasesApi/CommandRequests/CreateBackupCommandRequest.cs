@@ -8,7 +8,7 @@ public sealed class CreateBackupCommandRequest : ICommand<BackupFileParameters>
 {
     public CreateBackupCommandRequest(string databaseName, string? backupNamePrefix,
         string? dateMask, string? backupFileExtension, string? backupNameMiddlePart, bool compress, bool verify,
-        EBackupType backupType, string? dbServerSideBackupPath)
+        EBackupType backupType, string? dbServerSideBackupPath, string? userName)
     {
         DatabaseName = databaseName;
         BackupNamePrefix = backupNamePrefix;
@@ -19,6 +19,7 @@ public sealed class CreateBackupCommandRequest : ICommand<BackupFileParameters>
         Verify = verify;
         BackupType = backupType;
         DbServerSideBackupPath = dbServerSideBackupPath;
+        UserName = userName;
     }
 
     public string DatabaseName { get; set; }
@@ -30,6 +31,6 @@ public sealed class CreateBackupCommandRequest : ICommand<BackupFileParameters>
     public bool Compress { get; set; }
     public bool Verify { get; set; }
     public EBackupType BackupType { get; set; }
-
     public string? DbServerSideBackupPath { get; set; }
+    public string? UserName { get; set; }
 }

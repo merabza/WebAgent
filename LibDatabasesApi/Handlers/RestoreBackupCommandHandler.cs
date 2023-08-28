@@ -16,20 +16,26 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
+using WebAgentMessagesContracts;
 using WebAgentProjectsApiContracts.V1.Responses;
 
 namespace LibDatabasesApi.Handlers;
 
-// ReSharper disable once UnusedType.Global
+// ReSharper disable once ClassNeverInstantiated.Global
 public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupCommandRequest>
 {
     private readonly IConfiguration _config;
     private readonly ILogger<RestoreBackupCommandHandler> _logger;
+    private readonly IMessagesDataManager? _messagesDataManager;
+    private readonly string? _userName;
 
-    public RestoreBackupCommandHandler(IConfiguration config, ILogger<RestoreBackupCommandHandler> logger)
+    public RestoreBackupCommandHandler(IConfiguration config, ILogger<RestoreBackupCommandHandler> logger,
+        IMessagesDataManager? messagesDataManager, string? userName)
     {
         _config = config;
         _logger = logger;
+        _messagesDataManager = messagesDataManager;
+        _userName = userName;
     }
 
     public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(RestoreBackupCommandRequest request,
@@ -57,8 +63,8 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
 
         var databaseManagementClient = DatabaseAgentClientsFabric.CreateDatabaseManagementClient(false, _logger,
             databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
-            databaseServerData.DbConnectionName,
-            new DatabaseServerConnections(appSettings.DatabaseServerConnections));
+            databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
+            _messagesDataManager, _userName);
 
         if (databaseManagementClient is null)
             return new[] { DbApiErrors.DatabaseManagementClientDoesNotCreated };
@@ -68,13 +74,15 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         var exchangeFileStorageName = appSettings.BackupsExchangeStorage;
         var (exchangeFileStorage, exchangeFileManager) =
             FileManagersFabricExt.CreateFileStorageAndFileManager(false, _logger,
-                appSettings.BaseBackupsLocalPatch, exchangeFileStorageName, fileStorages);
+                appSettings.BaseBackupsLocalPatch, exchangeFileStorageName, fileStorages, _messagesDataManager,
+                request.UserName);
 
         //წყაროს ფაილსაცავი
         var databaseBackupsFileStorageName = databaseServerData.DatabaseBackupsFileStorageName;
         var (databaseBackupsFileStorage, databaseBackupsFileManager) =
             FileManagersFabricExt.CreateFileStorageAndFileManager(false, _logger,
-                appSettings.BaseBackupsLocalPatch, databaseBackupsFileStorageName, fileStorages);
+                appSettings.BaseBackupsLocalPatch, databaseBackupsFileStorageName, fileStorages, _messagesDataManager,
+                request.UserName);
 
         if (databaseBackupsFileStorage is null)
             return new[] { DbApiErrors.DatabaseBackupsFileManagerDoesNotCreated };
@@ -87,7 +95,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
 
         var needDownloadFromExchange = exchangeFileStorage != null &&
                                        !FileStorageData.IsSameToLocal(exchangeFileStorage,
-                                           appSettings.BaseBackupsLocalPatch);
+                                           appSettings.BaseBackupsLocalPatch, _messagesDataManager, _userName);
 
         if (needDownloadFromExchange)
         {
@@ -120,8 +128,8 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
                 request.Suffix, localSmartSchema);
         }
 
-        var needUploadDatabaseBackupsStorage =
-            !FileStorageData.IsSameToLocal(databaseBackupsFileStorage, appSettings.BaseBackupsLocalPatch);
+        var needUploadDatabaseBackupsStorage = !FileStorageData.IsSameToLocal(databaseBackupsFileStorage,
+            appSettings.BaseBackupsLocalPatch, _messagesDataManager, _userName);
 
         if (needUploadDatabaseBackupsStorage)
         {

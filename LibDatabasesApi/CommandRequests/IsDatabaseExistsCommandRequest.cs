@@ -4,17 +4,17 @@ namespace LibDatabasesApi.CommandRequests;
 
 public sealed class IsDatabaseExistsCommandRequest : ICommand<bool>
 {
-    public IsDatabaseExistsCommandRequest(string databaseName)
+    public IsDatabaseExistsCommandRequest(string databaseName, string? userName)
     {
-        //ServerName = serverName;
         DatabaseName = databaseName;
+        UserName = userName;
     }
 
-    //public string ServerName { get; set; }
     public string DatabaseName { get; set; }
+    public string? UserName { get; set; }
 
-    public static IsDatabaseExistsCommandRequest Create(string databaseName)
+    public static IsDatabaseExistsCommandRequest Create(string databaseName, string? userName)
     {
-        return new IsDatabaseExistsCommandRequest(databaseName);
+        return new IsDatabaseExistsCommandRequest(databaseName, userName);
     }
 }
