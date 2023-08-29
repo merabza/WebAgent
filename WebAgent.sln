@@ -83,13 +83,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibProjectsApi", "..\WebAge
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibDatabasesApi", "LibDatabasesApi\LibDatabasesApi.csproj", "{72D9DBF6-AE13-4D29-AD01-481ECBD5D085}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibWebAgentMessages", "..\WebAgentShared\LibWebAgentMessages\LibWebAgentMessages.csproj", "{7E71545D-A580-4E6E-BF33-7EA009D26106}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibWebAgentMessages", "..\WebAgentShared\LibWebAgentMessages\LibWebAgentMessages.csproj", "{7E71545D-A580-4E6E-BF33-7EA009D26106}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAgentProjectsApiContracts", "..\WebAgentContracts\WebAgentProjectsApiContracts\WebAgentProjectsApiContracts.csproj", "{3AEDDCC8-0E32-43E2-9B69-2D23EF40A300}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAgentProjectsApiContracts", "..\WebAgentContracts\WebAgentProjectsApiContracts\WebAgentProjectsApiContracts.csproj", "{3AEDDCC8-0E32-43E2-9B69-2D23EF40A300}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAgentDatabasesApiContracts", "..\WebAgentContracts\WebAgentDatabasesApiContracts\WebAgentDatabasesApiContracts.csproj", "{BEC5D2F1-0114-4245-BDE4-6083234D6160}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAgentDatabasesApiContracts", "..\WebAgentContracts\WebAgentDatabasesApiContracts\WebAgentDatabasesApiContracts.csproj", "{BEC5D2F1-0114-4245-BDE4-6083234D6160}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAgentMessagesContracts", "..\WebAgentContracts\WebAgentMessagesContracts\WebAgentMessagesContracts.csproj", "{AFE59F9F-8FE1-4110-AA9F-0119D47D0DAA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAgentMessagesContracts", "..\WebAgentContracts\WebAgentMessagesContracts\WebAgentMessagesContracts.csproj", "{AFE59F9F-8FE1-4110-AA9F-0119D47D0DAA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalRClient", "..\SystemTools\SignalRClient\SignalRClient.csproj", "{B55796CC-A213-46A5-96F5-BEDA77548C65}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -241,6 +243,10 @@ Global
 		{AFE59F9F-8FE1-4110-AA9F-0119D47D0DAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFE59F9F-8FE1-4110-AA9F-0119D47D0DAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFE59F9F-8FE1-4110-AA9F-0119D47D0DAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B55796CC-A213-46A5-96F5-BEDA77548C65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B55796CC-A213-46A5-96F5-BEDA77548C65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B55796CC-A213-46A5-96F5-BEDA77548C65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B55796CC-A213-46A5-96F5-BEDA77548C65}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -280,6 +286,7 @@ Global
 		{3AEDDCC8-0E32-43E2-9B69-2D23EF40A300} = {26F98FD0-E304-463F-A209-14114B3C4C04}
 		{BEC5D2F1-0114-4245-BDE4-6083234D6160} = {26F98FD0-E304-463F-A209-14114B3C4C04}
 		{AFE59F9F-8FE1-4110-AA9F-0119D47D0DAA} = {26F98FD0-E304-463F-A209-14114B3C4C04}
+		{B55796CC-A213-46A5-96F5-BEDA77548C65} = {E4A8CC3C-E55D-41D5-921B-C38863EA3D24}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7198439C-4E0D-4A00-BFDC-564A1BD501EA}
