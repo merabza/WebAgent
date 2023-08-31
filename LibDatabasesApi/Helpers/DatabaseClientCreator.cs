@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using DatabaseApiClients;
-using DatabaseManagementClients;
+using DatabasesManagement;
 using LibApiClientParameters;
 using LibDatabaseParameters;
 using LibWebAgentData;
@@ -10,13 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
-using WebAgentMessagesContracts;
 
 namespace LibDatabasesApi.Helpers;
 
 public static class DatabaseClientCreator
 {
-    public static OneOf<DatabaseManagementClient, IEnumerable<Err>> Create(IConfiguration config, ILogger logger,
+    public static OneOf<IDatabaseApiClient, IEnumerable<Err>> Create(IConfiguration config, ILogger logger,
         IMessagesDataManager? messagesDataManager, string? userName)
     {
         var appSettings = AppSettings.Create(config);
@@ -32,15 +30,14 @@ public static class DatabaseClientCreator
 
         var databaseManagementClient =
             GetDatabaseConnectionSettings(logger, config, dbServerData, messagesDataManager, userName);
-        if (databaseManagementClient is null)
-            return new[] { DbApiErrors.ErrorCreateDatabaseConnection };
 
-
-        return databaseManagementClient;
+        return databaseManagementClient is null
+            ? new[] { DbApiErrors.ErrorCreateDatabaseConnection }
+            : OneOf<IDatabaseApiClient, IEnumerable<Err>>.FromT0(databaseManagementClient);
     }
 
 
-    private static DatabaseManagementClient? GetDatabaseConnectionSettings(ILogger logger, IConfiguration config,
+    private static IDatabaseApiClient? GetDatabaseConnectionSettings(ILogger logger, IConfiguration config,
         DatabaseServerData databaseServerData, IMessagesDataManager? messagesDataManager, string? userName)
     {
         var appSettings = AppSettings.Create(config);
