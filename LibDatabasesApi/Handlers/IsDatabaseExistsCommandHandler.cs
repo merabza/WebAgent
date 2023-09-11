@@ -35,6 +35,6 @@ public sealed class IsDatabaseExistsCommandHandler : ICommandHandler<IsDatabaseE
             return result.AsT1.ToArray();
         var databaseManagementClient = result.AsT0;
 
-        return await databaseManagementClient.IsDatabaseExists(request.DatabaseName);
+        return await databaseManagementClient.IsDatabaseExists(request.DatabaseName, cancellationToken);
     }
 }

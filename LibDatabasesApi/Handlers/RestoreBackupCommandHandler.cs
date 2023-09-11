@@ -149,7 +149,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
 
         var success = await databaseManagementClient.RestoreDatabaseFromBackup(
             new BackupFileParameters(request.Name, request.Prefix,
-                request.Suffix, request.DateMask), request.DatabaseName);
+                request.Suffix, request.DateMask), request.DatabaseName, cancellationToken);
         return success ? new Unit() : new[] { DbApiErrors.CannotRestoreDatabase(request.DatabaseName, request.Name) };
     }
 }

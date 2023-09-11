@@ -37,7 +37,7 @@ public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectio
             return result.AsT1.ToArray();
         var databaseManagementClient = result.AsT0;
 
-        if (await databaseManagementClient.TestConnection(request.DatabaseName))
+        if (await databaseManagementClient.TestConnection(request.DatabaseName, cancellationToken))
             return new Unit();
 
         var err = DbApiErrors.TestConnectionFailed(request.DatabaseName);

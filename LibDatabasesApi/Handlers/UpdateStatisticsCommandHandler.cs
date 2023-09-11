@@ -37,7 +37,7 @@ public sealed class UpdateStatisticsCommandHandler : ICommandHandler<UpdateStati
             return result.AsT1.ToArray();
         var databaseManagementClient = result.AsT0;
 
-        if (await databaseManagementClient.UpdateStatistics(request.DatabaseName))
+        if (await databaseManagementClient.UpdateStatistics(request.DatabaseName, cancellationToken))
             return new Unit();
 
         var err = DbApiErrors.CannotCheckAndRepairDatabase(request.DatabaseName);

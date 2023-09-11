@@ -37,7 +37,7 @@ public sealed class
             return result.AsT1.ToArray();
         var databaseManagementClient = result.AsT0;
 
-        return await databaseManagementClient.GetDatabaseNames();
+        return await databaseManagementClient.GetDatabaseNames(cancellationToken);
 
         //ასეთი კონსტრუქცია ვერ გავმართე
         //return await Task.FromResult(result.Match(x => x.GetDatabaseNames(request.ServerName).Result, er => er.ToArray()));

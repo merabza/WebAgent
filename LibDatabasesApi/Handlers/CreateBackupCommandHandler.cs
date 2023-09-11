@@ -96,7 +96,8 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
             return new[] { DbApiErrors.CreateBackupRequestIsInvalid };
 
         var backupFileParameters =
-            await databaseManagementClient.CreateBackup(databaseBackupParametersDomain, request.DatabaseName);
+            await databaseManagementClient.CreateBackup(databaseBackupParametersDomain, request.DatabaseName,
+                cancellationToken);
 
         if (backupFileParameters == null)
             return new[] { DbApiErrors.BackupDoesNotCreated };

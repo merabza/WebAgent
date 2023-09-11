@@ -37,7 +37,7 @@ public sealed class RecompileProceduresCommandHandler : ICommandHandler<Recompil
             return result.AsT1.ToArray();
         var databaseManagementClient = result.AsT0;
 
-        if (await databaseManagementClient.RecompileProcedures(request.DatabaseName))
+        if (await databaseManagementClient.RecompileProcedures(request.DatabaseName, cancellationToken))
             return new Unit();
 
         var err = DbApiErrors.CannotRecompileProcedures(request.DatabaseName);

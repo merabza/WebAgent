@@ -40,7 +40,7 @@ public sealed class ExecuteCommandCommandHandler : ICommandHandler<ExecuteComman
             return result.AsT1.ToArray();
         var databaseManagementClient = result.AsT0;
 
-        if (await databaseManagementClient.ExecuteCommand(request.CommandText, request.DatabaseName))
+        if (await databaseManagementClient.ExecuteCommand(request.CommandText, cancellationToken, request.DatabaseName))
             return new Unit();
 
         var err = DbApiErrors.CouldNotExecuteCommand(request.DatabaseName);

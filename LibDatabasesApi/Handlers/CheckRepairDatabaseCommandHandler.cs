@@ -37,7 +37,7 @@ public sealed class CheckRepairDatabaseCommandHandler : ICommandHandler<CheckRep
             return result.AsT1.ToArray();
         var databaseManagementClient = result.AsT0;
 
-        if (await databaseManagementClient.CheckRepairDatabase(request.DatabaseName))
+        if (await databaseManagementClient.CheckRepairDatabase(request.DatabaseName, cancellationToken))
             return new Unit();
 
         var err = DbApiErrors.CannotCheckAndRepairDatabase(request.DatabaseName);
