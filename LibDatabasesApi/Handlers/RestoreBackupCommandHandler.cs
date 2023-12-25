@@ -90,9 +90,10 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         var localFileManager =
             FileManagersFabric.CreateFileManager(false, _logger, appSettings.BaseBackupsLocalPatch);
 
+        //, _messagesDataManager, request.UserName
         var needDownloadFromExchange = exchangeFileStorage != null &&
                                        !FileStorageData.IsSameToLocal(exchangeFileStorage,
-                                           appSettings.BaseBackupsLocalPatch, _messagesDataManager, request.UserName);
+                                           appSettings.BaseBackupsLocalPatch);
 
         if (needDownloadFromExchange)
         {
@@ -125,8 +126,9 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
                 request.Suffix, localSmartSchema);
         }
 
-        var needUploadDatabaseBackupsStorage = !FileStorageData.IsSameToLocal(databaseBackupsFileStorage,
-            appSettings.BaseBackupsLocalPatch, _messagesDataManager, request.UserName);
+        //, _messagesDataManager, request.UserName
+        var needUploadDatabaseBackupsStorage =
+            !FileStorageData.IsSameToLocal(databaseBackupsFileStorage, appSettings.BaseBackupsLocalPatch);
 
         if (needUploadDatabaseBackupsStorage)
         {

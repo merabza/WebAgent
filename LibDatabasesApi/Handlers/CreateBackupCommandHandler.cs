@@ -103,7 +103,7 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
             return new[] { DbApiErrors.BackupDoesNotCreated };
 
         var needDownloadFromSource = !FileStorageData.IsSameToLocal(databaseBackupsFileStorage,
-            appSettings.BaseBackupsLocalPatch, _messagesDataManager, request.UserName);
+            appSettings.BaseBackupsLocalPatch);//, _messagesDataManager, request.UserName
 
         SmartSchemas smartSchemas = new(appSettings.SmartSchemas);
 
@@ -133,10 +133,12 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
 
         //ან თუ გაცვლის ფაილსაცავი არ გვაქვს, ან ლოკალურია და მისი ფოლდერი ემთხვევა პარამეტრების ლოკალურ ფოლდერს.
         //   მაშინ მოქაჩვა საჭირო აღარ არის
+        //, _messagesDataManager, request.UserName
         var needUploadToExchange = exchangeFileManager is not null && exchangeFileStorage is not null &&
                                    !FileStorageData.IsSameToLocal(exchangeFileStorage,
-                                       appSettings.BaseBackupsLocalPatch, _messagesDataManager, request.UserName) &&
+                                       appSettings.BaseBackupsLocalPatch) &&
                                    exchangeFileStorageName != databaseBackupsFileStorageName;
+
 
         if (!needUploadToExchange)
             return backupFileParameters;
