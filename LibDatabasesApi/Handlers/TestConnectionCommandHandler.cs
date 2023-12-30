@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibDatabasesApi.Handlers;
 
@@ -32,16 +33,18 @@ public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectio
     public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(TestConnectionCommandRequest request,
         CancellationToken cancellationToken)
     {
-        var result = DatabaseClientCreator.Create(_config, _logger, _messagesDataManager, request.UserName);
-        if (result.IsT1)
-            return result.AsT1.ToArray();
-        var databaseManagementClient = result.AsT0;
+        var databaseClientCreatorResult = await DatabaseClientCreator.Create(_config, _logger, _messagesDataManager,
+            request.UserName, cancellationToken);
+        if (databaseClientCreatorResult.IsT1)
+            return databaseClientCreatorResult.AsT1.ToArray();
+        var databaseManagementClient = databaseClientCreatorResult.AsT0;
 
-        if (await databaseManagementClient.TestConnection(request.DatabaseName, cancellationToken))
+        var testResult = await databaseManagementClient.TestConnection(request.DatabaseName, cancellationToken);
+        if (testResult.IsNone)
             return new Unit();
 
         var err = DbApiErrors.TestConnectionFailed(request.DatabaseName);
         _logger.LogError(err.ErrorMessage);
-        return new[] { err };
+        return await Task.FromResult(Err.RecreateErrors((Err[])testResult, err));
     }
 }

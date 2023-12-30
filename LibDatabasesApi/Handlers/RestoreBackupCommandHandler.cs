@@ -17,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
 using WebAgentProjectsApiContracts.V1.Responses;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibDatabasesApi.Handlers;
 
@@ -58,10 +59,10 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
 
         var fileStorages = FileStorages.Create(_config);
 
-        var databaseManagementClient = DatabaseAgentClientsFabric.CreateDatabaseManagementClient(false, _logger,
+        var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManagementClient(false, _logger,
             databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
             databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
-            _messagesDataManager, request.UserName);
+            _messagesDataManager, request.UserName, cancellationToken);
 
         if (databaseManagementClient is null)
             return new[] { DbApiErrors.DatabaseManagementClientDoesNotCreated };
@@ -69,17 +70,16 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         //თუ გაცვლის სერვერის პარამეტრები გვაქვს,
         //შევქმნათ შესაბამისი ფაილმენეჯერი
         var exchangeFileStorageName = appSettings.BackupsExchangeStorage;
-        var (exchangeFileStorage, exchangeFileManager) =
-            FileManagersFabricExt.CreateFileStorageAndFileManager(false, _logger,
-                appSettings.BaseBackupsLocalPatch, exchangeFileStorageName, fileStorages, _messagesDataManager,
-                request.UserName);
+        var (exchangeFileStorage, exchangeFileManager) = await FileManagersFabricExt.CreateFileStorageAndFileManager(
+            false, _logger, appSettings.BaseBackupsLocalPatch, exchangeFileStorageName, fileStorages,
+            _messagesDataManager, request.UserName, cancellationToken);
 
         //წყაროს ფაილსაცავი
         var databaseBackupsFileStorageName = databaseServerData.DatabaseBackupsFileStorageName;
         var (databaseBackupsFileStorage, databaseBackupsFileManager) =
-            FileManagersFabricExt.CreateFileStorageAndFileManager(false, _logger,
+            await FileManagersFabricExt.CreateFileStorageAndFileManager(false, _logger,
                 appSettings.BaseBackupsLocalPatch, databaseBackupsFileStorageName, fileStorages, _messagesDataManager,
-                request.UserName);
+                request.UserName, cancellationToken);
 
         if (databaseBackupsFileStorage is null)
             return new[] { DbApiErrors.DatabaseBackupsFileManagerDoesNotCreated };

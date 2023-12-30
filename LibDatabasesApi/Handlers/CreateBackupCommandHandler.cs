@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
 using WebAgentProjectsApiContracts.V1.Responses;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibDatabasesApi.Handlers;
 
@@ -58,17 +59,16 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         //შევქმნათ შესაბამისი ფაილმენეჯერი
 
         var exchangeFileStorageName = appSettings.BackupsExchangeStorage;
-        var (exchangeFileStorage, exchangeFileManager) =
-            FileManagersFabricExt.CreateFileStorageAndFileManager(false, _logger,
-                appSettings.BaseBackupsLocalPatch, exchangeFileStorageName, fileStorages, _messagesDataManager,
-                request.UserName);
+        var (exchangeFileStorage, exchangeFileManager) = await FileManagersFabricExt.CreateFileStorageAndFileManager(
+            false, _logger, appSettings.BaseBackupsLocalPatch, exchangeFileStorageName, fileStorages,
+            _messagesDataManager, request.UserName, cancellationToken);
 
         //წყაროს ფაილსაცავი
         var databaseBackupsFileStorageName = databaseServerData.DatabaseBackupsFileStorageName;
         var (databaseBackupsFileStorage, databaseBackupsFileManager) =
-            FileManagersFabricExt.CreateFileStorageAndFileManager(false, _logger,
+            await FileManagersFabricExt.CreateFileStorageAndFileManager(false, _logger,
                 appSettings.BaseBackupsLocalPatch, databaseBackupsFileStorageName, fileStorages, _messagesDataManager,
-                request.UserName);
+                request.UserName, cancellationToken);
 
         if (databaseBackupsFileManager == null)
             return new[] { DbApiErrors.DatabaseBackupsFileManagerDoesNotCreated };
@@ -76,10 +76,10 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         if (databaseBackupsFileStorage == null)
             return new[] { DbApiErrors.DatabaseBackupsFileStorageDoesNotCreated };
 
-        var databaseManagementClient = DatabaseAgentClientsFabric.CreateDatabaseManagementClient(false, _logger,
+        var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManagementClient(false, _logger,
             databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
             databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
-            _messagesDataManager, request.UserName);
+            _messagesDataManager, request.UserName, cancellationToken);
 
         if (databaseManagementClient is null)
             return new[] { DbApiErrors.DatabaseManagementClientDoesNotCreated };
@@ -95,12 +95,14 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         if (databaseBackupParametersDomain is null)
             return new[] { DbApiErrors.CreateBackupRequestIsInvalid };
 
-        var backupFileParameters =
+        var backupFileParametersResult =
             await databaseManagementClient.CreateBackup(databaseBackupParametersDomain, request.DatabaseName,
                 cancellationToken);
 
-        if (backupFileParameters == null)
-            return new[] { DbApiErrors.BackupDoesNotCreated };
+        if (backupFileParametersResult.IsT1)
+            return Err.RecreateErrors(backupFileParametersResult.AsT1, DbApiErrors.BackupDoesNotCreated);
+
+        var backupFileParameters = backupFileParametersResult.AsT0;
 
         var needDownloadFromSource = !FileStorageData.IsSameToLocal(databaseBackupsFileStorage,
             appSettings.BaseBackupsLocalPatch);//, _messagesDataManager, request.UserName

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibDatabasesApi.Handlers;
 
@@ -32,12 +33,16 @@ public sealed class
     public async Task<OneOf<IEnumerable<DatabaseInfoModel>, IEnumerable<Err>>> Handle(
         GetDatabaseNamesCommandRequest request, CancellationToken cancellationToken)
     {
-        var result = DatabaseClientCreator.Create(_config, _logger, _messagesDataManager, request.UserName);
+        var result = await DatabaseClientCreator.Create(_config, _logger, _messagesDataManager, request.UserName,
+            cancellationToken);
         if (result.IsT1)
             return result.AsT1.ToArray();
         var databaseManagementClient = result.AsT0;
 
-        return await databaseManagementClient.GetDatabaseNames(cancellationToken);
+        var getDatabaseNamesResult = await databaseManagementClient.GetDatabaseNames(cancellationToken);
+        return getDatabaseNamesResult
+            .Match<OneOf<IEnumerable<DatabaseInfoModel>, IEnumerable<Err>>>(f0 => f0, f1 => f1);
+
 
         //ასეთი კონსტრუქცია ვერ გავმართე
         //return await Task.FromResult(result.Match(x => x.GetDatabaseNames(request.ServerName).Result, er => er.ToArray()));

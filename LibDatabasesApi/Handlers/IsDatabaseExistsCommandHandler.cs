@@ -31,11 +31,15 @@ public sealed class IsDatabaseExistsCommandHandler : ICommandHandler<IsDatabaseE
     public async Task<OneOf<bool, IEnumerable<Err>>> Handle(IsDatabaseExistsCommandRequest request,
         CancellationToken cancellationToken)
     {
-        var result = DatabaseClientCreator.Create(_config, _logger, _messagesDataManager, request.UserName);
+        var result = await DatabaseClientCreator.Create(_config, _logger, _messagesDataManager, request.UserName,
+            cancellationToken);
         if (result.IsT1)
             return result.AsT1.ToArray();
         var databaseManagementClient = result.AsT0;
 
-        return await databaseManagementClient.IsDatabaseExists(request.DatabaseName, cancellationToken);
+        var isDatabaseExistsResult =
+            await databaseManagementClient.IsDatabaseExists(request.DatabaseName, cancellationToken);
+
+        return isDatabaseExistsResult.Match<OneOf<bool, IEnumerable<Err>>>(f0 => f0, f1 => f1);
     }
 }

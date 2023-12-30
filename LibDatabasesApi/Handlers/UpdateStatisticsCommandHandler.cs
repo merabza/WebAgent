@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibDatabasesApi.Handlers;
 
@@ -32,7 +33,8 @@ public sealed class UpdateStatisticsCommandHandler : ICommandHandler<UpdateStati
     public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(UpdateStatisticsCommandRequest request,
         CancellationToken cancellationToken)
     {
-        var result = DatabaseClientCreator.Create(_config, _logger, _messagesDataManager, request.UserName);
+        var result = await DatabaseClientCreator.Create(_config, _logger, _messagesDataManager, request.UserName,
+            cancellationToken);
         if (result.IsT1)
             return result.AsT1.ToArray();
         var databaseManagementClient = result.AsT0;
