@@ -1,4 +1,5 @@
 ﻿using MessagingAbstractions;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibDatabasesApi.CommandRequests;
 

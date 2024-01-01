@@ -67,7 +67,8 @@ public sealed class DatabasesEndpoints : IInstaller
         Debug.WriteLine($"Call {nameof(CreateBackupCommandHandler)} from {nameof(CreateBackup)}");
 
         if (request is null)
-            return Results.BadRequest(ApiErrors.RequestIsEmpty);
+            return Results.BadRequest(new[] { ApiErrors.RequestIsEmpty });
+
         var command = request.AdaptTo(databaseName, userName);
         var result = await mediator.Send(command, cancellationToken);
 
@@ -152,7 +153,7 @@ public sealed class DatabasesEndpoints : IInstaller
         Debug.WriteLine($"Call {nameof(RestoreBackupCommandHandler)} from {nameof(RestoreBackup)}");
 
         if (request is null)
-            return Results.BadRequest(ApiErrors.RequestIsEmpty);
+            return Results.BadRequest(new[] { ApiErrors.RequestIsEmpty });
         var command = request.AdaptTo(databaseName, userName);
         var result = await mediator.Send(command, cancellationToken);
 
