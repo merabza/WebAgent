@@ -20,10 +20,10 @@ public sealed class UpdateStatisticsCommandHandler : ICommandHandler<UpdateStati
 {
     private readonly IConfiguration _config;
     private readonly ILogger<UpdateStatisticsCommandHandler> _logger;
-    private readonly IMessagesDataManager? _messagesDataManager;
+    private readonly IMessagesDataManager _messagesDataManager;
 
     public UpdateStatisticsCommandHandler(IConfiguration config, ILogger<UpdateStatisticsCommandHandler> logger,
-        IMessagesDataManager? messagesDataManager)
+        IMessagesDataManager messagesDataManager)
     {
         _config = config;
         _logger = logger;

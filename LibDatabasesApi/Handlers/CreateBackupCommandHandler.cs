@@ -25,10 +25,10 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
 {
     private readonly IConfiguration _config;
     private readonly ILogger<CreateBackupCommandHandler> _logger;
-    private readonly IMessagesDataManager? _messagesDataManager;
+    private readonly IMessagesDataManager _messagesDataManager;
 
     public CreateBackupCommandHandler(IConfiguration config, ILogger<CreateBackupCommandHandler> logger,
-        IMessagesDataManager? messagesDataManager)
+        IMessagesDataManager messagesDataManager)
     {
         _config = config;
         _logger = logger;

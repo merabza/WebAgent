@@ -20,10 +20,10 @@ public sealed class RecompileProceduresCommandHandler : ICommandHandler<Recompil
 {
     private readonly IConfiguration _config;
     private readonly ILogger<RecompileProceduresCommandHandler> _logger;
-    private readonly IMessagesDataManager? _messagesDataManager;
+    private readonly IMessagesDataManager _messagesDataManager;
 
     public RecompileProceduresCommandHandler(IConfiguration config, ILogger<RecompileProceduresCommandHandler> logger,
-        IMessagesDataManager? messagesDataManager)
+        IMessagesDataManager messagesDataManager)
     {
         _config = config;
         _logger = logger;

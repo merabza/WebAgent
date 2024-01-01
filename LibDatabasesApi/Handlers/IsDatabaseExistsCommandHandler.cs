@@ -18,10 +18,10 @@ public sealed class IsDatabaseExistsCommandHandler : ICommandHandler<IsDatabaseE
 {
     private readonly IConfiguration _config;
     private readonly ILogger<IsDatabaseExistsCommandHandler> _logger;
-    private readonly IMessagesDataManager? _messagesDataManager;
+    private readonly IMessagesDataManager _messagesDataManager;
 
     public IsDatabaseExistsCommandHandler(IConfiguration config, ILogger<IsDatabaseExistsCommandHandler> logger,
-        IMessagesDataManager? messagesDataManager)
+        IMessagesDataManager messagesDataManager)
     {
         _config = config;
         _logger = logger;

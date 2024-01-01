@@ -20,10 +20,10 @@ public sealed class CheckRepairDatabaseCommandHandler : ICommandHandler<CheckRep
 {
     private readonly IConfiguration _config;
     private readonly ILogger<CheckRepairDatabaseCommandHandler> _logger;
-    private readonly IMessagesDataManager? _messagesDataManager;
+    private readonly IMessagesDataManager _messagesDataManager;
 
     public CheckRepairDatabaseCommandHandler(IConfiguration config, ILogger<CheckRepairDatabaseCommandHandler> logger,
-        IMessagesDataManager? messagesDataManager)
+        IMessagesDataManager messagesDataManager)
     {
         _config = config;
         _logger = logger;

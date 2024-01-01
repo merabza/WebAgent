@@ -26,10 +26,10 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
 {
     private readonly IConfiguration _config;
     private readonly ILogger<RestoreBackupCommandHandler> _logger;
-    private readonly IMessagesDataManager? _messagesDataManager;
+    private readonly IMessagesDataManager _messagesDataManager;
 
     public RestoreBackupCommandHandler(IConfiguration config, ILogger<RestoreBackupCommandHandler> logger,
-        IMessagesDataManager? messagesDataManager)
+        IMessagesDataManager messagesDataManager)
     {
         _config = config;
         _logger = logger;

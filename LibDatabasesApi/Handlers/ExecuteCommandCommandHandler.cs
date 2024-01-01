@@ -20,10 +20,10 @@ public sealed class ExecuteCommandCommandHandler : ICommandHandler<ExecuteComman
 {
     private readonly IConfiguration _config;
     private readonly ILogger<ExecuteCommandCommandHandler> _logger;
-    private readonly IMessagesDataManager? _messagesDataManager;
+    private readonly IMessagesDataManager _messagesDataManager;
 
     public ExecuteCommandCommandHandler(IConfiguration config, ILogger<ExecuteCommandCommandHandler> logger,
-        IMessagesDataManager? messagesDataManager)
+        IMessagesDataManager messagesDataManager)
     {
         _config = config;
         _logger = logger;

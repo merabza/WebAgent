@@ -20,10 +20,10 @@ public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectio
 {
     private readonly IConfiguration _config;
     private readonly ILogger<TestConnectionCommandHandler> _logger;
-    private readonly IMessagesDataManager? _messagesDataManager;
+    private readonly IMessagesDataManager _messagesDataManager;
 
     public TestConnectionCommandHandler(IConfiguration config, ILogger<TestConnectionCommandHandler> logger,
-        IMessagesDataManager? messagesDataManager)
+        IMessagesDataManager messagesDataManager)
     {
         _config = config;
         _logger = logger;
