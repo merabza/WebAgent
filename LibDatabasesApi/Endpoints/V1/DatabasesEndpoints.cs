@@ -155,6 +155,9 @@ public sealed class DatabasesEndpoints : IInstaller
         if (request is null)
             return Results.BadRequest(new[] { ApiErrors.RequestIsEmpty });
         var command = request.AdaptTo(databaseName, userName);
+
+        await messagesDataManager.SendMessage(userName, $"{nameof(RestoreBackup)} mediator.Send command", cancellationToken);
+
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(RestoreBackup)} finished", cancellationToken);
