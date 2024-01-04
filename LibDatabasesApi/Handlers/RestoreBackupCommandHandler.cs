@@ -17,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
 using WebAgentProjectsApiContracts.V1.Responses;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibDatabasesApi.Handlers;
@@ -36,9 +37,11 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         _messagesDataManager = messagesDataManager;
     }
 
-    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(RestoreBackupCommandRequest request, CancellationToken cancellationToken)
+    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(RestoreBackupCommandRequest request,
+        CancellationToken cancellationToken)
     {
-        await _messagesDataManager.SendMessage(request.UserName, $"{nameof(RestoreBackupCommandHandler)} Handle started",
+        await _messagesDataManager.SendMessage(request.UserName,
+            $"{nameof(RestoreBackupCommandHandler)} Handle started",
             cancellationToken);
 
         if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Prefix) ||
@@ -63,7 +66,8 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
 
         var fileStorages = FileStorages.Create(_config);
 
-        await _messagesDataManager.SendMessage(request.UserName, "Create CreateDatabaseManagementClient", cancellationToken);
+        await _messagesDataManager.SendMessage(request.UserName, "Create CreateDatabaseManagementClient",
+            cancellationToken);
 
         var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManagementClient(false, _logger,
             databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
@@ -76,7 +80,9 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         //თუ გაცვლის სერვერის პარამეტრები გვაქვს,
         //შევქმნათ შესაბამისი ფაილმენეჯერი
         var exchangeFileStorageName = appSettings.BackupsExchangeStorage;
-        await _messagesDataManager.SendMessage(request.UserName, $"Create CreateFileStorageAndFileManager {appSettings.BaseBackupsLocalPatch} - {exchangeFileStorageName}", cancellationToken);
+        await _messagesDataManager.SendMessage(request.UserName,
+            $"Create CreateFileStorageAndFileManager {appSettings.BaseBackupsLocalPatch} - {exchangeFileStorageName}",
+            cancellationToken);
 
         var (exchangeFileStorage, exchangeFileManager) = await FileManagersFabricExt.CreateFileStorageAndFileManager(
             false, _logger, appSettings.BaseBackupsLocalPatch, exchangeFileStorageName, fileStorages,
@@ -84,7 +90,9 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
 
         //წყაროს ფაილსაცავი
         var databaseBackupsFileStorageName = databaseServerData.DatabaseBackupsFileStorageName;
-        await _messagesDataManager.SendMessage(request.UserName, $"Create CreateFileStorageAndFileManager {appSettings.BaseBackupsLocalPatch} - {databaseBackupsFileStorageName}", cancellationToken);
+        await _messagesDataManager.SendMessage(request.UserName,
+            $"Create CreateFileStorageAndFileManager {appSettings.BaseBackupsLocalPatch} - {databaseBackupsFileStorageName}",
+            cancellationToken);
 
         var (databaseBackupsFileStorage, databaseBackupsFileManager) =
             await FileManagersFabricExt.CreateFileStorageAndFileManager(false, _logger,
@@ -97,7 +105,8 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         if (databaseBackupsFileManager is null)
             return new[] { DbApiErrors.DatabaseBackupsFileStorageDoesNotCreated };
 
-        await _messagesDataManager.SendMessage(request.UserName, $"Create CreateFileManager {appSettings.BaseBackupsLocalPatch}", cancellationToken);
+        await _messagesDataManager.SendMessage(request.UserName,
+            $"Create CreateFileManager {appSettings.BaseBackupsLocalPatch}", cancellationToken);
 
         var localFileManager =
             FileManagersFabric.CreateFileManager(false, _logger, appSettings.BaseBackupsLocalPatch);
@@ -146,7 +155,6 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
 
         if (needUploadDatabaseBackupsStorage)
         {
-
             await _messagesDataManager.SendMessage(request.UserName, $"UploadFile {request.Name}", cancellationToken);
 
             if (!databaseBackupsFileManager.UploadFile(request.Name, ".up!"))
@@ -166,14 +174,15 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
                 request.Suffix, dbFilesSmartSchema);
         }
 
-        await _messagesDataManager.SendMessage(request.UserName, $"RestoreDatabaseFromBackup {request.DatabaseName}", cancellationToken);
+        await _messagesDataManager.SendMessage(request.UserName, $"RestoreDatabaseFromBackup {request.DatabaseName}",
+            cancellationToken);
 
         var restoreDatabaseFromBackupResult = await databaseManagementClient.RestoreDatabaseFromBackup(
             new BackupFileParameters(request.Name, request.Prefix,
                 request.Suffix, request.DateMask), request.DatabaseName, cancellationToken);
         if (restoreDatabaseFromBackupResult.IsSome)
             return Err.RecreateErrors((Err[])restoreDatabaseFromBackupResult,
-                DbApiErrors.CannotRestoreDatabase(request.DatabaseName, request.Name) );
+                DbApiErrors.CannotRestoreDatabase(request.DatabaseName, request.Name));
         return new Unit();
     }
 }

@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibDatabasesApi.Handlers;
@@ -36,7 +37,8 @@ public sealed class ExecuteCommandCommandHandler : ICommandHandler<ExecuteComman
         if (string.IsNullOrWhiteSpace(request.CommandText))
             return await Task.FromResult(new[] { DbApiErrors.CommandTextIsEmpty });
 
-        var result = await DatabaseClientCreator.Create(_config, _logger, _messagesDataManager, request.UserName, cancellationToken);
+        var result = await DatabaseClientCreator.Create(_config, _logger, _messagesDataManager, request.UserName,
+            cancellationToken);
         if (result.IsT1)
             return result.AsT1.ToArray();
         var databaseManagementClient = result.AsT0;

@@ -30,7 +30,8 @@ public static class DatabaseClientCreator
 
         var dbServerData = appSettings.DatabaseServerData;
 
-        var databaseManagementClient = await GetDatabaseConnectionSettings(logger, config, dbServerData, messagesDataManager, userName, cancellationToken);
+        var databaseManagementClient = await GetDatabaseConnectionSettings(logger, config, dbServerData,
+            messagesDataManager, userName, cancellationToken);
 
         return databaseManagementClient is null
             ? new[] { DbApiErrors.ErrorCreateDatabaseConnection }
