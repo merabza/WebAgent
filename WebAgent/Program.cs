@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using SystemToolsShared;
 using WebInstallers;
-using AssemblyReference = ApiExceptionHandler.AssemblyReference;
+//using AssemblyReference = ApiExceptionHandler.AssemblyReference;
 
 //პროგრამის ატრიბუტების დაყენება 
 ProgramAttributes.Instance.SetAttribute("AppName", "WebAgent");
@@ -22,7 +22,7 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 
 builder.InstallServices(args,
     //WebSystemTools
-    AssemblyReference.Assembly,
+    FluentValidationInstaller.AssemblyReference.Assembly,
     ConfigurationEncrypt.AssemblyReference.Assembly,
     SerilogLogger.AssemblyReference.Assembly,
     SwaggerTools.AssemblyReference.Assembly,
