@@ -91,6 +91,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalRClient", "..\SystemT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabasesManagement", "..\ToolsManagement\DatabasesManagement\DatabasesManagement.csproj", "{33AC9061-66D5-4D2C-9AFF-5F4CE5BB0C9F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiClientsManagement", "..\ToolsManagement\ApiClientsManagement\ApiClientsManagement.csproj", "{315A785B-823C-41A8-9BE2-FEBD8FC829A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -241,6 +243,10 @@ Global
 		{33AC9061-66D5-4D2C-9AFF-5F4CE5BB0C9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33AC9061-66D5-4D2C-9AFF-5F4CE5BB0C9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33AC9061-66D5-4D2C-9AFF-5F4CE5BB0C9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{315A785B-823C-41A8-9BE2-FEBD8FC829A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{315A785B-823C-41A8-9BE2-FEBD8FC829A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{315A785B-823C-41A8-9BE2-FEBD8FC829A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{315A785B-823C-41A8-9BE2-FEBD8FC829A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -280,6 +286,7 @@ Global
 		{AFE59F9F-8FE1-4110-AA9F-0119D47D0DAA} = {26F98FD0-E304-463F-A209-14114B3C4C04}
 		{B55796CC-A213-46A5-96F5-BEDA77548C65} = {E4A8CC3C-E55D-41D5-921B-C38863EA3D24}
 		{33AC9061-66D5-4D2C-9AFF-5F4CE5BB0C9F} = {8C574734-5E59-4B5B-924B-DAAC11B21B59}
+		{315A785B-823C-41A8-9BE2-FEBD8FC829A6} = {8C574734-5E59-4B5B-924B-DAAC11B21B59}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7198439C-4E0D-4A00-BFDC-564A1BD501EA}
