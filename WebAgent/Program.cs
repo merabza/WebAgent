@@ -45,7 +45,8 @@ builder.Services.AddMediatR(cfg =>
 // FluentValidationInstaller
 builder.Services.InstallValidation(LibProjectsApi.AssemblyReference.Assembly);
 
-var app = builder.Build();
+// ReSharper disable once using
+using var app = builder.Build();
 
 app.UseServices();
 
