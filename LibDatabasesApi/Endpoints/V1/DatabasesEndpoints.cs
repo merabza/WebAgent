@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using ApiToolsShared;
+using DatabasesManagement.Requests;
 using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Handlers;
 using LibDatabasesApi.Mappers;
@@ -10,9 +11,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SystemToolsShared;
-using WebAgentDatabasesApiContracts.V1.Requests;
 using WebAgentDatabasesApiContracts.V1.Routes;
-using WebAgentProjectsApiContracts.V1.Requests;
 using WebInstallers;
 
 namespace LibDatabasesApi.Endpoints.V1;

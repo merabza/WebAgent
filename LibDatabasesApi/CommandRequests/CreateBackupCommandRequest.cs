@@ -1,11 +1,12 @@
-﻿using DbTools;
+﻿using DatabasesManagement.Responses;
+using DbTools;
 using MessagingAbstractions;
-using WebAgentProjectsApiContracts.V1.Responses;
 
 namespace LibDatabasesApi.CommandRequests;
 
 public sealed class CreateBackupCommandRequest : ICommand<BackupFileParameters>
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public CreateBackupCommandRequest(string databaseName, string? backupNamePrefix,
         string? dateMask, string? backupFileExtension, string? backupNameMiddlePart, bool compress, bool verify,
         EBackupType backupType, string? dbServerSideBackupPath, string? userName)
