@@ -1,14 +1,17 @@
 ﻿using MessagingAbstractions;
 
-// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibDatabasesApi.CommandRequests;
 
 public sealed class RestoreBackupCommandRequest : ICommand
 {
-    public RestoreBackupCommandRequest(string databaseName, string? prefix, string? suffix, string? name,
+    // ReSharper disable once ConvertToPrimaryConstructor
+    public RestoreBackupCommandRequest(string? destinationDbServerSideDataFolderPath,
+        string? destinationDbServerSideLogFolderPath, string databaseName, string? prefix, string? suffix, string? name,
         string? dateMask, string? userName)
     {
+        DestinationDbServerSideDataFolderPath = destinationDbServerSideDataFolderPath;
+        DestinationDbServerSideLogFolderPath = destinationDbServerSideLogFolderPath;
         DatabaseName = databaseName;
         Prefix = prefix;
         Suffix = suffix;
@@ -17,6 +20,8 @@ public sealed class RestoreBackupCommandRequest : ICommand
         UserName = userName;
     }
 
+    public string? DestinationDbServerSideDataFolderPath { get; }
+    public string? DestinationDbServerSideLogFolderPath { get; }
     public string DatabaseName { get; set; }
     public string? Prefix { get; set; }
     public string? Suffix { get; set; }
