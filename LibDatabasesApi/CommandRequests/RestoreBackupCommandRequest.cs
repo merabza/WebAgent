@@ -1,6 +1,5 @@
 ﻿using MessagingAbstractions;
 
-
 namespace LibDatabasesApi.CommandRequests;
 
 public sealed class RestoreBackupCommandRequest : ICommand
