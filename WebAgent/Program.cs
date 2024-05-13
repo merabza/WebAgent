@@ -31,7 +31,7 @@ builder.InstallServices(args,
     WindowsServiceTools.AssemblyReference.Assembly,
     //WebAgentShared
     LibProjectsApi.AssemblyReference.Assembly,
-    LibWebAgentMessages.AssemblyReference.Assembly,
+    SignalRMessages.AssemblyReference.Assembly,
     //WebAgent
     LibDatabasesApi.AssemblyReference.Assembly
 );

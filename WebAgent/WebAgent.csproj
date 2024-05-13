@@ -9,10 +9,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\WebAgentShared\LibProjectsApi\LibProjectsApi.csproj" />
-    <ProjectReference Include="..\..\WebAgentShared\LibWebAgentMessages\LibWebAgentMessages.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\ConfigurationEncrypt\ConfigurationEncrypt.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\FluentValidationInstaller\FluentValidationInstaller.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\SerilogLogger\SerilogLogger.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\SignalRMessages\SignalRMessages.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\SwaggerTools\SwaggerTools.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\TestToolsApi\TestToolsApi.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\WebInstallers\WebInstallers.csproj" />
