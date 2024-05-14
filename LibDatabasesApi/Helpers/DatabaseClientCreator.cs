@@ -10,6 +10,7 @@ using LibWebAgentData.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
+using SignalRContracts;
 using SystemToolsShared;
 
 namespace LibDatabasesApi.Helpers;

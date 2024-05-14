@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\WebAgentShared\LibProjectsApi\LibProjectsApi.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\ApiExceptionHandler\ApiExceptionHandler.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\ConfigurationEncrypt\ConfigurationEncrypt.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\FluentValidationInstaller\FluentValidationInstaller.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\SerilogLogger\SerilogLogger.csproj" />

@@ -10,6 +10,7 @@ using MessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
+using SignalRContracts;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
