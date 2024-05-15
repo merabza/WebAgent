@@ -1,5 +1,8 @@
 appsettingsEncoded.json
-/Properties/launchSettings.json
+Properties/launchSettings.json
+
+bin/
+obj/
 
 #################
 ## Visual Studio
@@ -366,5 +369,3 @@ msbuild.wrn
 
 # Visual Studio 2015
 .vs/
-bin/
-obj/
