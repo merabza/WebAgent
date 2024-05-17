@@ -38,6 +38,7 @@ try
         //WebSystemTools
         FluentValidationInstaller.AssemblyReference.Assembly,
         ConfigurationEncrypt.AssemblyReference.Assembly,
+        HttpClientInstaller.AssemblyReference.Assembly,
         SerilogLogger.AssemblyReference.Assembly,
         SwaggerTools.AssemblyReference.Assembly,
         TestToolsApi.AssemblyReference.Assembly,

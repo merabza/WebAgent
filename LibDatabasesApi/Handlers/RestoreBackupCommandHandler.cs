@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using ApiToolsShared;
@@ -28,13 +29,15 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
 {
     private readonly IConfiguration _config;
     private readonly ILogger<RestoreBackupCommandHandler> _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IMessagesDataManager _messagesDataManager;
 
     public RestoreBackupCommandHandler(IConfiguration config, ILogger<RestoreBackupCommandHandler> logger,
-        IMessagesDataManager messagesDataManager)
+        IHttpClientFactory httpClientFactory, IMessagesDataManager messagesDataManager)
     {
         _config = config;
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _messagesDataManager = messagesDataManager;
     }
 
@@ -71,7 +74,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
             cancellationToken);
 
         var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManagementClient(false, _logger,
-            databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
+            _httpClientFactory, databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
             databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
             _messagesDataManager, request.UserName, cancellationToken);
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using LibDatabasesApi.CommandRequests;
@@ -13,8 +14,6 @@ using OneOf;
 using SignalRContracts;
 using SystemToolsShared;
 
-// ReSharper disable ConvertToPrimaryConstructor
-
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -22,21 +21,24 @@ public sealed class CheckRepairDatabaseCommandHandler : ICommandHandler<CheckRep
 {
     private readonly IConfiguration _config;
     private readonly ILogger<CheckRepairDatabaseCommandHandler> _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IMessagesDataManager _messagesDataManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public CheckRepairDatabaseCommandHandler(IConfiguration config, ILogger<CheckRepairDatabaseCommandHandler> logger,
-        IMessagesDataManager messagesDataManager)
+        IHttpClientFactory httpClientFactory, IMessagesDataManager messagesDataManager)
     {
         _config = config;
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _messagesDataManager = messagesDataManager;
     }
 
     public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(CheckRepairDatabaseCommandRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await DatabaseClientCreator.Create(_config, _logger, _messagesDataManager, request.UserName,
-            cancellationToken);
+        var result = await DatabaseClientCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
+            request.UserName, cancellationToken);
         if (result.IsT1)
             return result.AsT1.ToArray();
         var databaseManagementClient = result.AsT0;

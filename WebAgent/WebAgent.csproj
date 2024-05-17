@@ -12,6 +12,7 @@
     <ProjectReference Include="..\..\WebSystemTools\ApiExceptionHandler\ApiExceptionHandler.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\ConfigurationEncrypt\ConfigurationEncrypt.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\FluentValidationInstaller\FluentValidationInstaller.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\HttpClientInstaller\HttpClientInstaller.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\SerilogLogger\SerilogLogger.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\SignalRMessages\SignalRMessages.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\SwaggerTools\SwaggerTools.csproj" />

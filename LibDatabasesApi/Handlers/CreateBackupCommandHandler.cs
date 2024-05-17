@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DatabasesManagement;
@@ -27,13 +28,15 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
 {
     private readonly IConfiguration _config;
     private readonly ILogger<CreateBackupCommandHandler> _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IMessagesDataManager _messagesDataManager;
 
     public CreateBackupCommandHandler(IConfiguration config, ILogger<CreateBackupCommandHandler> logger,
-        IMessagesDataManager messagesDataManager)
+        IHttpClientFactory httpClientFactory, IMessagesDataManager messagesDataManager)
     {
         _config = config;
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _messagesDataManager = messagesDataManager;
     }
 
@@ -79,7 +82,7 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
             return new[] { DbApiErrors.DatabaseBackupsFileStorageDoesNotCreated };
 
         var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManagementClient(false, _logger,
-            databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
+            _httpClientFactory, databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
             databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
             _messagesDataManager, request.UserName, cancellationToken);
 

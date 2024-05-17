@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using LibDatabasesApi.CommandRequests;
@@ -20,21 +21,23 @@ public sealed class IsDatabaseExistsCommandHandler : ICommandHandler<IsDatabaseE
 {
     private readonly IConfiguration _config;
     private readonly ILogger<IsDatabaseExistsCommandHandler> _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IMessagesDataManager _messagesDataManager;
 
     public IsDatabaseExistsCommandHandler(IConfiguration config, ILogger<IsDatabaseExistsCommandHandler> logger,
-        IMessagesDataManager messagesDataManager)
+        IHttpClientFactory httpClientFactory, IMessagesDataManager messagesDataManager)
     {
         _config = config;
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _messagesDataManager = messagesDataManager;
     }
 
     public async Task<OneOf<bool, IEnumerable<Err>>> Handle(IsDatabaseExistsCommandRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await DatabaseClientCreator.Create(_config, _logger, _messagesDataManager, request.UserName,
-            cancellationToken);
+        var result = await DatabaseClientCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
+            request.UserName, cancellationToken);
         if (result.IsT1)
             return result.AsT1.ToArray();
         var databaseManagementClient = result.AsT0;

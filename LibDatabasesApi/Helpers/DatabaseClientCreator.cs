@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DatabasesManagement;
@@ -18,7 +19,8 @@ namespace LibDatabasesApi.Helpers;
 public static class DatabaseClientCreator
 {
     public static async Task<OneOf<IDatabaseApiClient, IEnumerable<Err>>> Create(IConfiguration config, ILogger logger,
-        IMessagesDataManager? messagesDataManager, string? userName, CancellationToken cancellationToken)
+        IHttpClientFactory httpClientFactory, IMessagesDataManager? messagesDataManager, string? userName,
+        CancellationToken cancellationToken)
     {
         var appSettings = AppSettings.Create(config);
 
@@ -31,8 +33,8 @@ public static class DatabaseClientCreator
 
         var dbServerData = appSettings.DatabaseServerData;
 
-        var databaseManagementClient = await GetDatabaseConnectionSettings(logger, config, dbServerData,
-            messagesDataManager, userName, cancellationToken);
+        var databaseManagementClient = await GetDatabaseConnectionSettings(logger, httpClientFactory, config,
+            dbServerData, messagesDataManager, userName, cancellationToken);
 
         return databaseManagementClient is null
             ? new[] { DbApiErrors.ErrorCreateDatabaseConnection }
@@ -40,9 +42,9 @@ public static class DatabaseClientCreator
     }
 
 
-    private static async Task<IDatabaseApiClient?> GetDatabaseConnectionSettings(ILogger logger, IConfiguration config,
-        DatabaseServerData databaseServerData, IMessagesDataManager? messagesDataManager, string? userName,
-        CancellationToken cancellationToken)
+    private static async Task<IDatabaseApiClient?> GetDatabaseConnectionSettings(ILogger logger,
+        IHttpClientFactory httpClientFactory, IConfiguration config, DatabaseServerData databaseServerData,
+        IMessagesDataManager? messagesDataManager, string? userName, CancellationToken cancellationToken)
     {
         var appSettings = AppSettings.Create(config);
 
@@ -50,7 +52,7 @@ public static class DatabaseClientCreator
             return null;
 
         var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManagementClient(false, logger,
-            databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
+            httpClientFactory, databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
             databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
             messagesDataManager, userName, cancellationToken);
         return databaseManagementClient;

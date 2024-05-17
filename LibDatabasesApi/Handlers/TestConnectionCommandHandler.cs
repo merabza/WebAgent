@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using LibDatabasesApi.CommandRequests;
@@ -22,21 +23,23 @@ public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectio
 {
     private readonly IConfiguration _config;
     private readonly ILogger<TestConnectionCommandHandler> _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IMessagesDataManager _messagesDataManager;
 
     public TestConnectionCommandHandler(IConfiguration config, ILogger<TestConnectionCommandHandler> logger,
-        IMessagesDataManager messagesDataManager)
+        IHttpClientFactory httpClientFactory, IMessagesDataManager messagesDataManager)
     {
         _config = config;
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _messagesDataManager = messagesDataManager;
     }
 
     public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(TestConnectionCommandRequest request,
         CancellationToken cancellationToken)
     {
-        var databaseClientCreatorResult = await DatabaseClientCreator.Create(_config, _logger, _messagesDataManager,
-            request.UserName, cancellationToken);
+        var databaseClientCreatorResult = await DatabaseClientCreator.Create(_config, _logger, _httpClientFactory,
+            _messagesDataManager, request.UserName, cancellationToken);
         if (databaseClientCreatorResult.IsT1)
             return databaseClientCreatorResult.AsT1.ToArray();
         var databaseManagementClient = databaseClientCreatorResult.AsT0;
