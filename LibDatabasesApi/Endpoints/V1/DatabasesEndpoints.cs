@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
-using ApiToolsShared;
+﻿using ApiToolsShared;
 using DatabasesManagement.Requests;
 using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Handlers;
@@ -12,6 +8,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SignalRContracts;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using WebAgentDatabasesApiContracts.V1.Routes;
 using WebInstallers;
 
