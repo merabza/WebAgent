@@ -18,7 +18,7 @@ namespace LibDatabasesApi.Helpers;
 
 public static class DatabaseClientCreator
 {
-    public static async Task<OneOf<IDatabaseApiClient, IEnumerable<Err>>> Create(IConfiguration config, ILogger logger,
+    public static async Task<OneOf<IDatabaseManager, IEnumerable<Err>>> Create(IConfiguration config, ILogger logger,
         IHttpClientFactory httpClientFactory, IMessagesDataManager? messagesDataManager, string? userName,
         CancellationToken cancellationToken)
     {
@@ -38,11 +38,11 @@ public static class DatabaseClientCreator
 
         return databaseManagementClient is null
             ? new[] { DbApiErrors.ErrorCreateDatabaseConnection }
-            : OneOf<IDatabaseApiClient, IEnumerable<Err>>.FromT0(databaseManagementClient);
+            : OneOf<IDatabaseManager, IEnumerable<Err>>.FromT0(databaseManagementClient);
     }
 
 
-    private static async Task<IDatabaseApiClient?> GetDatabaseConnectionSettings(ILogger logger,
+    private static async Task<IDatabaseManager?> GetDatabaseConnectionSettings(ILogger logger,
         IHttpClientFactory httpClientFactory, IConfiguration config, DatabaseServerData databaseServerData,
         IMessagesDataManager? messagesDataManager, string? userName, CancellationToken cancellationToken)
     {
@@ -51,7 +51,7 @@ public static class DatabaseClientCreator
         if (appSettings?.ApiClients is null)
             return null;
 
-        var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManagementClient(false, logger,
+        var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManager(false, logger,
             httpClientFactory, databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
             databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
             messagesDataManager, userName, cancellationToken);

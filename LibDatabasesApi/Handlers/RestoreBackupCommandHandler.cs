@@ -1,6 +1,5 @@
 ﻿using ApiToolsShared;
 using DatabasesManagement;
-using DatabasesManagement.Responses;
 using FileManagersMain;
 using LibApiClientParameters;
 using LibDatabaseParameters;
@@ -19,6 +18,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using SystemToolsShared;
+using WebAgentDatabasesApiContracts.V1.Responses;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -73,7 +73,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         await _messagesDataManager.SendMessage(request.UserName, "Create CreateDatabaseManagementClient",
             cancellationToken);
 
-        var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManagementClient(false, _logger,
+        var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManager(false, _logger,
             _httpClientFactory, databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
             databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
             _messagesDataManager, request.UserName, cancellationToken);

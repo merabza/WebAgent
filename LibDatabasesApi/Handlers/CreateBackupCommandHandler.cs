@@ -1,10 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using DatabasesManagement;
-using DatabasesManagement.Responses;
+﻿using DatabasesManagement;
 using FileManagersMain;
 using LibApiClientParameters;
 using LibDatabaseParameters;
@@ -17,7 +11,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
 using SignalRContracts;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemToolsShared;
+using WebAgentDatabasesApiContracts.V1.Responses;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -81,7 +81,7 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         if (databaseBackupsFileStorage == null)
             return new[] { DbApiErrors.DatabaseBackupsFileStorageDoesNotCreated };
 
-        var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManagementClient(false, _logger,
+        var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManager(false, _logger,
             _httpClientFactory, databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
             databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
             _messagesDataManager, request.UserName, cancellationToken);
