@@ -29,7 +29,8 @@ public sealed class DatabasesEndpoints : IInstaller
 
     public void UseServices(WebApplication app)
     {
-        var group = app.MapGroup(DatabaseApiRoutes.Database.DatabaseBase).RequireAuthorization();
+        var group = app.MapGroup(DatabaseApiRoutes.ApiBase + DatabaseApiRoutes.Database.DatabaseBase)
+            .RequireAuthorization();
 
         group.MapPost(DatabaseApiRoutes.Database.CheckRepairDatabase, CheckRepairDatabase);
         group.MapPost(DatabaseApiRoutes.Database.CreateBackup, CreateBackup);

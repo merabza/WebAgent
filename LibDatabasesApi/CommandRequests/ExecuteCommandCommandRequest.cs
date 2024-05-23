@@ -4,6 +4,7 @@ namespace LibDatabasesApi.CommandRequests;
 
 public sealed class ExecuteCommandCommandRequest : ICommand
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ExecuteCommandCommandRequest(string databaseName, string? commandText, string? userName)
     {
         DatabaseName = databaseName;
