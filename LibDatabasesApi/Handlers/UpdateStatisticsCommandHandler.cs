@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using LibDatabasesApi.CommandRequests;
+﻿using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
 using LibWebAgentData.ErrorModels;
 using MediatR;
@@ -11,7 +6,11 @@ using MessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
-using SignalRContracts;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
