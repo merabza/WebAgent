@@ -1,14 +1,14 @@
-﻿using LibDatabasesApi.CommandRequests;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
 using MessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -19,8 +19,8 @@ namespace LibDatabasesApi.Handlers;
 public sealed class IsDatabaseExistsCommandHandler : ICommandHandler<IsDatabaseExistsCommandRequest, bool>
 {
     private readonly IConfiguration _config;
-    private readonly ILogger<IsDatabaseExistsCommandHandler> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<IsDatabaseExistsCommandHandler> _logger;
     private readonly IMessagesDataManager _messagesDataManager;
 
     public IsDatabaseExistsCommandHandler(IConfiguration config, ILogger<IsDatabaseExistsCommandHandler> logger,

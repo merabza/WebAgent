@@ -1,4 +1,9 @@
-﻿using DatabasesManagement;
+﻿using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using ApiContracts;
+using DatabasesManagement;
 using FileManagersMain;
 using LibApiClientParameters;
 using LibDatabaseParameters;
@@ -11,11 +16,6 @@ using MessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using ApiContracts;
 using SystemToolsShared;
 using WebAgentDatabasesApiContracts.V1.Responses;
 
@@ -27,8 +27,8 @@ namespace LibDatabasesApi.Handlers;
 public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupCommandRequest>
 {
     private readonly IConfiguration _config;
-    private readonly ILogger<RestoreBackupCommandHandler> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<RestoreBackupCommandHandler> _logger;
     private readonly IMessagesDataManager _messagesDataManager;
 
     public RestoreBackupCommandHandler(IConfiguration config, ILogger<RestoreBackupCommandHandler> logger,

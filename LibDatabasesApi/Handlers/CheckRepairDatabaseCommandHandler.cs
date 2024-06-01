@@ -1,4 +1,9 @@
-﻿using LibDatabasesApi.CommandRequests;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
 using LibWebAgentData.ErrorModels;
 using MediatR;
@@ -6,11 +11,6 @@ using MessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using SystemToolsShared;
 
 namespace LibDatabasesApi.Handlers;
@@ -19,8 +19,8 @@ namespace LibDatabasesApi.Handlers;
 public sealed class CheckRepairDatabaseCommandHandler : ICommandHandler<CheckRepairDatabaseCommandRequest>
 {
     private readonly IConfiguration _config;
-    private readonly ILogger<CheckRepairDatabaseCommandHandler> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<CheckRepairDatabaseCommandHandler> _logger;
     private readonly IMessagesDataManager _messagesDataManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor

@@ -1,4 +1,9 @@
-﻿using DatabasesManagement;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using DatabasesManagement;
 using FileManagersMain;
 using LibApiClientParameters;
 using LibDatabaseParameters;
@@ -10,11 +15,6 @@ using MessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using SystemToolsShared;
 using WebAgentDatabasesApiContracts.V1.Responses;
 
@@ -26,8 +26,8 @@ namespace LibDatabasesApi.Handlers;
 public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCommandRequest, BackupFileParameters>
 {
     private readonly IConfiguration _config;
-    private readonly ILogger<CreateBackupCommandHandler> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<CreateBackupCommandHandler> _logger;
     private readonly IMessagesDataManager _messagesDataManager;
 
     public CreateBackupCommandHandler(IConfiguration config, ILogger<CreateBackupCommandHandler> logger,

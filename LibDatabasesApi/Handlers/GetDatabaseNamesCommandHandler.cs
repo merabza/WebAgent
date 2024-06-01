@@ -1,15 +1,15 @@
-﻿using DbTools.Models;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using DbTools.Models;
 using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
 using MessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -21,8 +21,8 @@ public sealed class
     GetDatabaseNamesCommandHandler : ICommandHandler<GetDatabaseNamesCommandRequest, IEnumerable<DatabaseInfoModel>>
 {
     private readonly IConfiguration _config;
-    private readonly ILogger<GetDatabaseNamesCommandHandler> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<GetDatabaseNamesCommandHandler> _logger;
     private readonly IMessagesDataManager _messagesDataManager;
 
     public GetDatabaseNamesCommandHandler(IConfiguration config, ILogger<GetDatabaseNamesCommandHandler> logger,
