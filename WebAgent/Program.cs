@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using SwaggerTools;
 using WebInstallers;
-using AssemblyReference = FluentValidationInstaller.AssemblyReference;
 
 //using AssemblyReference = ApiExceptionHandler.AssemblyReference;
 
@@ -37,8 +36,9 @@ try
 
     builder.InstallServices(args, parameters,
         //WebSystemTools
-        AssemblyReference.Assembly,
+        ApiExceptionHandler.AssemblyReference.Assembly,
         ConfigurationEncrypt.AssemblyReference.Assembly,
+        FluentValidationInstaller.AssemblyReference.Assembly,
         HttpClientInstaller.AssemblyReference.Assembly,
         SerilogLogger.AssemblyReference.Assembly,
         SwaggerTools.AssemblyReference.Assembly,
