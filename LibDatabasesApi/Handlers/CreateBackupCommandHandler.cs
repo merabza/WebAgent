@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
+using SystemToolsShared.Errors;
 using WebAgentDatabasesApiContracts.V1.Responses;
 
 // ReSharper disable ConvertToPrimaryConstructor

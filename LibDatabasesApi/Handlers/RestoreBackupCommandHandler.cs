@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using ApiContracts;
+﻿using ApiContracts.Errors;
 using DatabasesManagement;
 using FileManagersMain;
 using LibApiClientParameters;
@@ -16,7 +12,12 @@ using MessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemToolsShared;
+using SystemToolsShared.Errors;
 using WebAgentDatabasesApiContracts.V1.Responses;
 
 // ReSharper disable ConvertToPrimaryConstructor
