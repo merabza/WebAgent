@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using SwaggerTools;
 using WebInstallers;
+using AssemblyReference = ApiExceptionHandler.AssemblyReference;
 
 //using AssemblyReference = ApiExceptionHandler.AssemblyReference;
 
@@ -36,7 +37,7 @@ try
 
     builder.InstallServices(args, parameters,
         //WebSystemTools
-        ApiExceptionHandler.AssemblyReference.Assembly,
+        AssemblyReference.Assembly,
         ConfigurationEncrypt.AssemblyReference.Assembly,
         FluentValidationInstaller.AssemblyReference.Assembly,
         HttpClientInstaller.AssemblyReference.Assembly,
@@ -48,7 +49,7 @@ try
 
         //WebAgentShared
         LibProjectsApi.AssemblyReference.Assembly,
-        ApiExceptionHandler.AssemblyReference.Assembly,
+        AssemblyReference.Assembly,
 
         //WebAgent
         LibDatabasesApi.AssemblyReference.Assembly
