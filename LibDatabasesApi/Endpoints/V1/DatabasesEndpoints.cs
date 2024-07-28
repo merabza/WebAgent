@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,12 +24,16 @@ public sealed class DatabasesEndpoints : IInstaller
     public int InstallPriority => 50;
     public int ServiceUsePriority => 50;
 
-    public void InstallServices(WebApplicationBuilder builder, string[] args, Dictionary<string, string> parameters)
+    public void InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args,
+        Dictionary<string, string> parameters)
     {
     }
 
-    public void UseServices(WebApplication app)
+    public void UseServices(WebApplication app, bool debugMode)
     {
+        if (debugMode)
+            Console.WriteLine($"{GetType().Name}.{nameof(UseServices)} Started");
+
         var group = app.MapGroup(DatabaseApiRoutes.ApiBase + DatabaseApiRoutes.Database.DatabaseBase)
             .RequireAuthorization();
 
@@ -41,6 +46,9 @@ public sealed class DatabasesEndpoints : IInstaller
         group.MapPost(DatabaseApiRoutes.Database.RecompileProcedures, RecompileProcedures);
         group.MapGet(DatabaseApiRoutes.Database.TestConnection, TestConnection);
         group.MapPost(DatabaseApiRoutes.Database.UpdateStatistics, UpdateStatistics);
+
+        if (debugMode)
+            Console.WriteLine($"{GetType().Name}.{nameof(UseServices)} Finished");
     }
 
     // POST api/database/checkrepairdatabase/{databaseName}

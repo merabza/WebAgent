@@ -5,6 +5,7 @@ using ConfigurationEncrypt;
 using FluentValidationInstaller;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using SwaggerTools;
 using WebInstallers;
@@ -35,7 +36,9 @@ try
         Args = args
     });
 
-    builder.InstallServices(args, parameters,
+    var debugMode = builder.Environment.IsDevelopment();
+
+    builder.InstallServices(debugMode, args, parameters,
         //WebSystemTools
         AssemblyReference.Assembly,
         ConfigurationEncrypt.AssemblyReference.Assembly,
@@ -67,7 +70,7 @@ try
     // ReSharper disable once using
     using var app = builder.Build();
 
-    app.UseServices();
+    app.UseServices(debugMode);
 
     Log.Information("Directory.GetCurrentDirectory() = {0}", Directory.GetCurrentDirectory());
     Log.Information("AppContext.BaseDirectory = {0}", AppContext.BaseDirectory);
