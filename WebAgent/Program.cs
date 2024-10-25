@@ -48,7 +48,6 @@ try
             SwaggerTools.AssemblyReference.Assembly,
             TestToolsApi.AssemblyReference.Assembly,
             WindowsServiceTools.AssemblyReference.Assembly,
-            SignalRMessages.AssemblyReference.Assembly,
 
             //WebAgentShared
             LibProjectsApi.AssemblyReference.Assembly,
