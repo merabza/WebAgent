@@ -8,20 +8,22 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using SwaggerTools;
+using SystemToolsShared;
 using WebInstallers;
 
+
+const string appName = "WebAgent";
+
 //პროგრამის ატრიბუტების დაყენება 
-//ProgramAttributes.Instance.SetAttribute("AppName", "WebAgent");
-//ProgramAttributes.Instance.SetAttribute("VersionCount", 1);
-//ProgramAttributes.Instance.SetAttribute("UseSwaggerWithJWTBearer", false);
-//ProgramAttributes.Instance.SetAttribute("AppKey", "E0FFB24C-7561-4DBA-8E0F-02CA585A3C9C");
+ProgramAttributes.Instance.SetAttribute("AppName", appName);
+
 try
 {
     var parameters = new Dictionary<string, string>
     {
         //{ SignalRMessagesInstaller.SignalRReCounterKey, string.Empty },//Allow SignalRReCounterKey
         { ConfigurationEncryptInstaller.AppKeyKey, "E0FFB24C-7561-4DBA-8E0F-02CA585A3C9C" },
-        { SwaggerInstaller.AppNameKey, "WebAgent" },
+        { SwaggerInstaller.AppNameKey, appName },
         { SwaggerInstaller.VersionCountKey, 1.ToString() }
         //{ SwaggerInstaller.UseSwaggerWithJwtBearerKey, string.Empty },//Allow Swagger
     };
