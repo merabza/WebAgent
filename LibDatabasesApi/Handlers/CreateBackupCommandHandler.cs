@@ -41,7 +41,7 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
     }
 
     public async Task<OneOf<BackupFileParameters, IEnumerable<Err>>> Handle(CreateBackupCommandRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var appSettings = AppSettings.Create(_config);
 

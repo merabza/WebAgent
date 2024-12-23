@@ -34,7 +34,7 @@ public sealed class IsDatabaseExistsCommandHandler : ICommandHandler<IsDatabaseE
     }
 
     public async Task<OneOf<bool, IEnumerable<Err>>> Handle(IsDatabaseExistsCommandRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var result = await DatabaseClientCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
             request.UserName, cancellationToken);

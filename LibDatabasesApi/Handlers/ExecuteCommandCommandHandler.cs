@@ -36,7 +36,7 @@ public sealed class ExecuteCommandCommandHandler : ICommandHandler<ExecuteComman
     }
 
     public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(ExecuteCommandCommandRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(request.CommandText))
             return await Task.FromResult(new[] { DbApiErrors.CommandTextIsEmpty });
@@ -47,7 +47,7 @@ public sealed class ExecuteCommandCommandHandler : ICommandHandler<ExecuteComman
             return result.AsT1.ToArray();
         var databaseManagementClient = result.AsT0;
 
-        if (await databaseManagementClient.ExecuteCommand(request.CommandText, cancellationToken, request.DatabaseName))
+        if (await databaseManagementClient.ExecuteCommand(request.CommandText, request.DatabaseName, cancellationToken))
             return new Unit();
 
         var err = DbApiErrors.CouldNotExecuteCommand(request.DatabaseName);

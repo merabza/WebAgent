@@ -18,9 +18,9 @@ namespace LibDatabasesApi.Helpers;
 
 public static class DatabaseClientCreator
 {
-    public static async Task<OneOf<IDatabaseManager, IEnumerable<Err>>> Create(IConfiguration config, ILogger logger,
-        IHttpClientFactory httpClientFactory, IMessagesDataManager? messagesDataManager, string? userName,
-        CancellationToken cancellationToken)
+    public static async ValueTask<OneOf<IDatabaseManager, IEnumerable<Err>>> Create(IConfiguration config,
+        ILogger logger, IHttpClientFactory httpClientFactory, IMessagesDataManager? messagesDataManager,
+        string? userName, CancellationToken cancellationToken = default)
     {
         var appSettings = AppSettings.Create(config);
 
@@ -42,9 +42,9 @@ public static class DatabaseClientCreator
     }
 
 
-    private static async Task<IDatabaseManager?> GetDatabaseConnectionSettings(ILogger logger,
+    private static async ValueTask<IDatabaseManager?> GetDatabaseConnectionSettings(ILogger logger,
         IHttpClientFactory httpClientFactory, IConfiguration config, DatabaseServerData databaseServerData,
-        IMessagesDataManager? messagesDataManager, string? userName, CancellationToken cancellationToken)
+        IMessagesDataManager? messagesDataManager, string? userName, CancellationToken cancellationToken = default)
     {
         var appSettings = AppSettings.Create(config);
 

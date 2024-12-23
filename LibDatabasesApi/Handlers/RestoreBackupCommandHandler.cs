@@ -42,7 +42,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
     }
 
     public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(RestoreBackupCommandRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         await _messagesDataManager.SendMessage(request.UserName,
             $"{nameof(RestoreBackupCommandHandler)} Handle started",
@@ -184,7 +184,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         var restoreDatabaseFromBackupResult = await databaseManagementClient.RestoreDatabaseFromBackup(
             new BackupFileParameters(request.Name, request.Prefix, request.Suffix, request.DateMask),
             request.DestinationDbServerSideDataFolderPath, request.DestinationDbServerSideLogFolderPath,
-            request.DatabaseName, cancellationToken);
+            request.DatabaseName, null, cancellationToken);
         if (restoreDatabaseFromBackupResult.IsSome)
             return Err.RecreateErrors((Err[])restoreDatabaseFromBackupResult,
                 DbApiErrors.CannotRestoreDatabase(request.DatabaseName, request.Name));

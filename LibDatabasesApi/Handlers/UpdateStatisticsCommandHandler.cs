@@ -36,7 +36,7 @@ public sealed class UpdateStatisticsCommandHandler : ICommandHandler<UpdateStati
     }
 
     public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(UpdateStatisticsCommandRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var result = await DatabaseClientCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
             request.UserName, cancellationToken);

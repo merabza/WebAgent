@@ -36,7 +36,7 @@ public sealed class RecompileProceduresCommandHandler : ICommandHandler<Recompil
     }
 
     public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(RecompileProceduresCommandRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var result = await DatabaseClientCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
             request.UserName, cancellationToken);

@@ -36,7 +36,7 @@ public sealed class
     }
 
     public async Task<OneOf<IEnumerable<DatabaseInfoModel>, IEnumerable<Err>>> Handle(
-        GetDatabaseNamesCommandRequest request, CancellationToken cancellationToken)
+        GetDatabaseNamesCommandRequest request, CancellationToken cancellationToken = default)
     {
         var result = await DatabaseClientCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
             request.UserName, cancellationToken);
