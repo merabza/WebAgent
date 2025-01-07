@@ -99,6 +99,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiKeyIdentity", "..\WebSys
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiKeysManagement", "..\SystemTools\ApiKeysManagement\ApiKeysManagement.csproj", "{AB725E7B-23C4-4D70-B694-BD1744802170}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OleDbTools", "..\DatabaseTools\OleDbTools\OleDbTools.csproj", "{8E709ED9-55ED-4C72-8921-E423EDE80247}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -265,6 +267,10 @@ Global
 		{AB725E7B-23C4-4D70-B694-BD1744802170}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB725E7B-23C4-4D70-B694-BD1744802170}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB725E7B-23C4-4D70-B694-BD1744802170}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E709ED9-55ED-4C72-8921-E423EDE80247}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E709ED9-55ED-4C72-8921-E423EDE80247}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E709ED9-55ED-4C72-8921-E423EDE80247}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E709ED9-55ED-4C72-8921-E423EDE80247}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -308,6 +314,7 @@ Global
 		{215EFE15-36BA-423C-946B-445A897B4F62} = {E7B9B619-84C5-49A5-B761-18BB932F7A39}
 		{4CC23E54-DD82-4DB8-9969-B0D24F3270F0} = {E7B9B619-84C5-49A5-B761-18BB932F7A39}
 		{AB725E7B-23C4-4D70-B694-BD1744802170} = {E4A8CC3C-E55D-41D5-921B-C38863EA3D24}
+		{8E709ED9-55ED-4C72-8921-E423EDE80247} = {586B4C0C-3489-41A3-8D9E-B456D87D7BAF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7198439C-4E0D-4A00-BFDC-564A1BD501EA}

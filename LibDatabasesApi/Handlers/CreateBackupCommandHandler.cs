@@ -89,20 +89,20 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         if (databaseManagementClient is null)
             return new[] { DbApiErrors.DatabaseManagementClientDoesNotCreated };
 
-        var result = DatabaseBackupParametersDomainCreator.Create(request);
+        //var result = DatabaseBackupParametersDomainCreator.Create(request);
 
-        DatabaseBackupParametersDomain databaseBackupParametersDomain;
-        if (result.IsT0)
-            databaseBackupParametersDomain = result.AsT0;
-        else
-            return result.AsT1.ToArray();
+        //DatabaseBackupParametersDomain databaseBackupParametersDomain;
+        //if (result.IsT0)
+        //    databaseBackupParametersDomain = result.AsT0;
+        //else
+        //    return result.AsT1.ToArray();
 
-        if (databaseBackupParametersDomain is null)
-            return new[] { DbApiErrors.CreateBackupRequestIsInvalid };
+        //if (databaseBackupParametersDomain is null)
+        //    return new[] { DbApiErrors.CreateBackupRequestIsInvalid };
 
+        //databaseBackupParametersDomain
         var backupFileParametersResult =
-            await databaseManagementClient.CreateBackup(databaseBackupParametersDomain, request.DatabaseName,
-                cancellationToken);
+            await databaseManagementClient.CreateBackup(request.DatabaseName, cancellationToken);
 
         if (backupFileParametersResult.IsT1)
             return Err.RecreateErrors(backupFileParametersResult.AsT1, DbApiErrors.BackupDoesNotCreated);
@@ -122,11 +122,9 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
                 return new[] { DbApiErrors.CanNotDownloadFile(backupFileParameters.Name) };
 
 
-            var downloadSmartSchema =
-                smartSchemas.GetSmartSchemaByKey(databaseServerData.DbSmartSchemaName);
+            var downloadSmartSchema = smartSchemas.GetSmartSchemaByKey(databaseServerData.DbSmartSchemaName);
             //if (downloadSmartSchema != null)// ეს შემოწმება საჭირო იქნება, თუ დასაშვები იქნება ჭკვიანი სქემის არ მითითება
-            databaseBackupsFileManager.RemoveRedundantFiles(backupFileParameters.Prefix,
-                backupFileParameters.DateMask,
+            databaseBackupsFileManager.RemoveRedundantFiles(backupFileParameters.Prefix, backupFileParameters.DateMask,
                 backupFileParameters.Suffix, downloadSmartSchema);
 
             var localSmartSchema = smartSchemas.GetSmartSchemaByKey(appSettings.LocalSmartSchemaName);
@@ -156,8 +154,7 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         if (!exchangeFileManager.UploadFile(backupFileParameters.Name, ".up!"))
             return new[] { DbApiErrors.CanNotUploadFile(backupFileParameters.Name) };
 
-        var exchangeSmartSchema =
-            smartSchemas.GetSmartSchemaByKey(appSettings.BackupsExchangeStorageSmartSchemaName);
+        var exchangeSmartSchema = smartSchemas.GetSmartSchemaByKey(appSettings.BackupsExchangeStorageSmartSchemaName);
         //if (exchangeSmartSchema != null)// ეს შემოწმება საჭირო იქნება, თუ დასაშვები იქნება ჭკვიანი სქემის არ მითითება
         exchangeFileManager.RemoveRedundantFiles(backupFileParameters.Prefix, backupFileParameters.DateMask,
             backupFileParameters.Suffix, exchangeSmartSchema);

@@ -45,8 +45,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         CancellationToken cancellationToken = default)
     {
         await _messagesDataManager.SendMessage(request.UserName,
-            $"{nameof(RestoreBackupCommandHandler)} Handle started",
-            cancellationToken);
+            $"{nameof(RestoreBackupCommandHandler)} Handle started", cancellationToken);
 
         if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Prefix) ||
             string.IsNullOrWhiteSpace(request.DateMask) || string.IsNullOrWhiteSpace(request.Suffix))
@@ -112,8 +111,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         await _messagesDataManager.SendMessage(request.UserName,
             $"Create CreateFileManager {appSettings.BaseBackupsLocalPatch}", cancellationToken);
 
-        var localFileManager =
-            FileManagersFabric.CreateFileManager(false, _logger, appSettings.BaseBackupsLocalPatch);
+        var localFileManager = FileManagersFabric.CreateFileManager(false, _logger, appSettings.BaseBackupsLocalPatch);
 
         //, _messagesDataManager, request.UserName
         var needDownloadFromExchange = exchangeFileStorage != null &&
@@ -143,14 +141,13 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
             var exchangeSmartSchema =
                 smartSchemas.GetSmartSchemaByKey(appSettings.BackupsExchangeStorageSmartSchemaName);
             //if (exchangeSmartSchema != null)// ეს შემოწმება საჭირო იქნება, თუ დასაშვები იქნება ჭკვიანი სქემის არ მითითება
-            exchangeFileManager.RemoveRedundantFiles(request.Prefix, request.DateMask,
-                request.Suffix, exchangeSmartSchema);
+            exchangeFileManager.RemoveRedundantFiles(request.Prefix, request.DateMask, request.Suffix,
+                exchangeSmartSchema);
 
             var localSmartSchema = smartSchemas.GetSmartSchemaByKey(appSettings.LocalSmartSchemaName);
             //if (localSmartSchema != null)// ეს შემოწმება საჭირო იქნება, თუ დასაშვები იქნება ჭკვიანი სქემის არ მითითება
 
-            localFileManager.RemoveRedundantFiles(request.Prefix, request.DateMask,
-                request.Suffix, localSmartSchema);
+            localFileManager.RemoveRedundantFiles(request.Prefix, request.DateMask, request.Suffix, localSmartSchema);
         }
 
         //, _messagesDataManager, request.UserName
@@ -170,12 +167,10 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
 
             SmartSchemas smartSchemas = new(appSettings.SmartSchemas);
 
-            var dbFilesSmartSchema =
-                smartSchemas.GetSmartSchemaByKey(databaseServerData.DbSmartSchemaName);
+            var dbFilesSmartSchema = smartSchemas.GetSmartSchemaByKey(databaseServerData.DbSmartSchemaName);
             //if (downloadSmartSchema != null)// ეს შემოწმება საჭირო იქნება, თუ დასაშვები იქნება ჭკვიანი სქემის არ მითითება
-            databaseBackupsFileManager.RemoveRedundantFiles(request.Prefix,
-                request.DateMask,
-                request.Suffix, dbFilesSmartSchema);
+            databaseBackupsFileManager.RemoveRedundantFiles(request.Prefix, request.DateMask, request.Suffix,
+                dbFilesSmartSchema);
         }
 
         await _messagesDataManager.SendMessage(request.UserName, $"RestoreDatabaseFromBackup {request.DatabaseName}",
@@ -183,7 +178,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
 
         var restoreDatabaseFromBackupResult = await databaseManagementClient.RestoreDatabaseFromBackup(
             new BackupFileParameters(request.Name, request.Prefix, request.Suffix, request.DateMask),
-            request.DestinationDbServerSideDataFolderPath, request.DestinationDbServerSideLogFolderPath,
+            //request.DestinationDbServerSideDataFolderPath, request.DestinationDbServerSideLogFolderPath,
             request.DatabaseName, null, cancellationToken);
         if (restoreDatabaseFromBackupResult.IsSome)
             return Err.RecreateErrors((Err[])restoreDatabaseFromBackupResult,
