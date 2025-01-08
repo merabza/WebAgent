@@ -51,7 +51,7 @@ public static class DatabaseClientCreator
         if (appSettings?.ApiClients is null)
             return null;
 
-        var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManager(false, config, logger,
+        var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManager(false, logger,
             httpClientFactory, databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
             databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
             messagesDataManager, userName, cancellationToken);

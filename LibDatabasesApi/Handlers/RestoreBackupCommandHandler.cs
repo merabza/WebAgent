@@ -72,7 +72,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         await _messagesDataManager.SendMessage(request.UserName, "Create CreateDatabaseManagementClient",
             cancellationToken);
 
-        var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManager(false, _config, _logger,
+        var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManager(false, _logger,
             _httpClientFactory, databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
             databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
             _messagesDataManager, request.UserName, cancellationToken);
