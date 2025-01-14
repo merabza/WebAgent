@@ -7,7 +7,7 @@ namespace LibDatabasesApi.CommandRequests;
 public sealed class CreateBackupCommandRequest : ICommand<BackupFileParameters>
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CreateBackupCommandRequest(string databaseName, string? backupNamePrefix,
+    public CreateBackupCommandRequest(string databaseName, string dbServerFoldersSetName, string? backupNamePrefix,
         string? dateMask, string? backupFileExtension, string? backupNameMiddlePart, bool compress, bool verify,
         EBackupType backupType, string? dbServerSideBackupPath, string? userName)
     {
@@ -21,9 +21,11 @@ public sealed class CreateBackupCommandRequest : ICommand<BackupFileParameters>
         BackupType = backupType;
         DbServerSideBackupPath = dbServerSideBackupPath;
         UserName = userName;
+        DbServerFoldersSetName = dbServerFoldersSetName;
     }
 
     public string DatabaseName { get; set; }
+    public string DbServerFoldersSetName { get; set; }
     public string? BackupNamePrefix { get; set; }
     public string? DateMask { get; set; }
     public string? BackupFileExtension { get; set; }

@@ -69,10 +69,10 @@ public sealed class DatabasesEndpoints : IInstaller
         return result.Match(_ => Results.Ok(), Results.BadRequest);
     }
 
-    // POST api/database/createbackup/{databaseName}
-    private static async Task<IResult> CreateBackup([FromRoute] string databaseName, HttpRequest httpRequest,
-        [FromBody] CreateBackupRequest? request, IMediator mediator, IMessagesDataManager messagesDataManager,
-        CancellationToken cancellationToken = default)
+    // POST api/database/createbackup/{databaseName}/{dbServerFoldersSetName}
+    private static async Task<IResult> CreateBackup([FromRoute] string databaseName,
+        [FromRoute] string dbServerFoldersSetName, HttpRequest httpRequest, [FromBody] CreateBackupRequest? request,
+        IMediator mediator, IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
     {
         var userName = httpRequest.HttpContext.User.Identity?.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(CreateBackup)} started", cancellationToken);
@@ -81,7 +81,7 @@ public sealed class DatabasesEndpoints : IInstaller
         if (request is null)
             return Results.BadRequest(new[] { ApiErrors.RequestIsEmpty });
 
-        var command = request.AdaptTo(databaseName, userName);
+        var command = request.AdaptTo(databaseName, dbServerFoldersSetName, userName);
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(CreateBackup)} finished", cancellationToken);
@@ -155,10 +155,10 @@ public sealed class DatabasesEndpoints : IInstaller
         return result.Match(_ => Results.Ok(), Results.BadRequest);
     }
 
-    // PUT restorebackup/{databaseName}
-    private static async Task<IResult> RestoreBackup([FromRoute] string databaseName, HttpRequest httpRequest,
-        [FromBody] RestoreBackupRequest? request, IMediator mediator, IMessagesDataManager messagesDataManager,
-        CancellationToken cancellationToken = default)
+    // PUT restorebackup/{databaseName}/{dbServerFoldersSetName}
+    private static async Task<IResult> RestoreBackup([FromRoute] string databaseName,
+        [FromRoute] string dbServerFoldersSetName, HttpRequest httpRequest, [FromBody] RestoreBackupRequest? request,
+        IMediator mediator, IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
     {
         var userName = httpRequest.HttpContext.User.Identity?.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(RestoreBackup)} started", cancellationToken);
@@ -166,7 +166,7 @@ public sealed class DatabasesEndpoints : IInstaller
 
         if (request is null)
             return Results.BadRequest(new[] { ApiErrors.RequestIsEmpty });
-        var command = request.AdaptTo(databaseName, userName);
+        var command = request.AdaptTo(databaseName, dbServerFoldersSetName, userName);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(RestoreBackup)} mediator.Send command",
             cancellationToken);

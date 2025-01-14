@@ -41,7 +41,7 @@ public sealed class ExecuteCommandCommandHandler : ICommandHandler<ExecuteComman
         if (string.IsNullOrWhiteSpace(request.CommandText))
             return await Task.FromResult(new[] { DbApiErrors.CommandTextIsEmpty });
 
-        var result = await DatabaseClientCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
+        var result = await DatabaseManagerCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
             request.UserName, cancellationToken);
         if (result.IsT1)
             return result.AsT1.ToArray();

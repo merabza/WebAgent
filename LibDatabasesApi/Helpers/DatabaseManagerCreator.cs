@@ -16,7 +16,7 @@ using SystemToolsShared.Errors;
 
 namespace LibDatabasesApi.Helpers;
 
-public static class DatabaseClientCreator
+public static class DatabaseManagerCreator
 {
     public static async ValueTask<OneOf<IDatabaseManager, IEnumerable<Err>>> Create(IConfiguration config,
         ILogger logger, IHttpClientFactory httpClientFactory, IMessagesDataManager? messagesDataManager,
@@ -51,10 +51,10 @@ public static class DatabaseClientCreator
         if (appSettings?.ApiClients is null)
             return null;
 
-        var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManager(false, logger,
-            httpClientFactory, databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
-            databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
-            messagesDataManager, userName, cancellationToken);
+        var databaseManagementClient = await DatabaseManagersFabric.CreateDatabaseManager(logger, httpClientFactory,
+            false, databaseServerData.DbConnectionName,
+            new DatabaseServerConnections(appSettings.DatabaseServerConnections),
+            new ApiClients(appSettings.ApiClients), messagesDataManager, userName, cancellationToken);
         return databaseManagementClient;
     }
 }

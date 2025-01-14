@@ -38,7 +38,7 @@ public sealed class
     public async Task<OneOf<IEnumerable<DatabaseInfoModel>, IEnumerable<Err>>> Handle(
         GetDatabaseNamesCommandRequest request, CancellationToken cancellationToken = default)
     {
-        var result = await DatabaseClientCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
+        var result = await DatabaseManagerCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
             request.UserName, cancellationToken);
         if (result.IsT1)
             return result.AsT1.ToArray();

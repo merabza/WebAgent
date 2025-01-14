@@ -72,10 +72,10 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         await _messagesDataManager.SendMessage(request.UserName, "Create CreateDatabaseManagementClient",
             cancellationToken);
 
-        var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManager(false, _logger,
-            _httpClientFactory, databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
-            databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
-            _messagesDataManager, request.UserName, cancellationToken);
+        var databaseManagementClient = await DatabaseManagersFabric.CreateDatabaseManager(_logger, _httpClientFactory,
+            false, databaseServerData.DbConnectionName,
+            new DatabaseServerConnections(appSettings.DatabaseServerConnections),
+            new ApiClients(appSettings.ApiClients), _messagesDataManager, request.UserName, cancellationToken);
 
         if (databaseManagementClient is null)
             return new[] { DbApiErrors.DatabaseManagementClientDoesNotCreated };
@@ -179,7 +179,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         var restoreDatabaseFromBackupResult = await databaseManagementClient.RestoreDatabaseFromBackup(
             new BackupFileParameters(request.Name, request.Prefix, request.Suffix, request.DateMask),
             //request.DestinationDbServerSideDataFolderPath, request.DestinationDbServerSideLogFolderPath,
-            request.DatabaseName, null, cancellationToken);
+            request.DatabaseName, request.DbServerFoldersSetName, null, cancellationToken);
         if (restoreDatabaseFromBackupResult.IsSome)
             return Err.RecreateErrors((Err[])restoreDatabaseFromBackupResult,
                 DbApiErrors.CannotRestoreDatabase(request.DatabaseName, request.Name));

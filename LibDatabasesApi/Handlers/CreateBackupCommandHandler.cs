@@ -80,10 +80,10 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         if (databaseBackupsFileStorage == null)
             return new[] { DbApiErrors.DatabaseBackupsFileStorageDoesNotCreated };
 
-        var databaseManagementClient = await DatabaseAgentClientsFabric.CreateDatabaseManager(false, _logger,
-            _httpClientFactory, databaseServerData.DbWebAgentName, new ApiClients(appSettings.ApiClients),
-            databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
-            _messagesDataManager, request.UserName, cancellationToken);
+        var databaseManagementClient = await DatabaseManagersFabric.CreateDatabaseManager(_logger, _httpClientFactory,
+            false, databaseServerData.DbConnectionName,
+            new DatabaseServerConnections(appSettings.DatabaseServerConnections),
+            new ApiClients(appSettings.ApiClients), _messagesDataManager, request.UserName, cancellationToken);
 
         if (databaseManagementClient is null)
             return new[] { DbApiErrors.DatabaseManagementClientDoesNotCreated };
@@ -100,8 +100,8 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         //    return new[] { DbApiErrors.CreateBackupRequestIsInvalid };
 
         //databaseBackupParametersDomain
-        var backupFileParametersResult =
-            await databaseManagementClient.CreateBackup(request.DatabaseName, cancellationToken);
+        var backupFileParametersResult = await databaseManagementClient.CreateBackup(request.DatabaseName,
+            request.DbServerFoldersSetName, cancellationToken);
 
         if (backupFileParametersResult.IsT1)
             return Err.RecreateErrors(backupFileParametersResult.AsT1, DbApiErrors.BackupDoesNotCreated);
