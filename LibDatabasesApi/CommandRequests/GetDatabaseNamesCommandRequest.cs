@@ -6,6 +6,7 @@ namespace LibDatabasesApi.CommandRequests;
 
 public sealed class GetDatabaseNamesCommandRequest : ICommand<IEnumerable<DatabaseInfoModel>>
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public GetDatabaseNamesCommandRequest(string? userName)
     {
         UserName = userName;
