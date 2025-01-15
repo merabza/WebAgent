@@ -42,6 +42,8 @@ public sealed class DatabasesEndpoints : IInstaller
         group.MapPost(DatabaseApiRoutes.Database.CreateBackup, CreateBackup);
         group.MapPost(DatabaseApiRoutes.Database.ExecuteCommand, ExecuteCommand);
         group.MapGet(DatabaseApiRoutes.Database.GetDatabaseNames, GetDatabaseNames);
+        group.MapGet(DatabaseApiRoutes.Database.GetDatabaseFoldersSets, GetDatabaseFoldersSets);
+        group.MapGet(DatabaseApiRoutes.Database.GetDatabaseConnectionNames, GetDatabaseConnectionNames);
         group.MapGet(DatabaseApiRoutes.Database.IsDatabaseExists, IsDatabaseExists);
         group.MapPut(DatabaseApiRoutes.Database.RestoreBackup, RestoreBackup);
         group.MapPost(DatabaseApiRoutes.Database.RecompileProcedures, RecompileProcedures);
@@ -103,6 +105,38 @@ public sealed class DatabasesEndpoints : IInstaller
 
         await messagesDataManager.SendMessage(userName, $"{nameof(ExecuteCommand)} finished", cancellationToken);
         return result.Match(_ => Results.Ok(), Results.BadRequest);
+    }
+
+    // GET api/database/getdatabaseconnectionnames
+    private static async Task<IResult> GetDatabaseConnectionNames(HttpRequest httpRequest, IMediator mediator,
+        IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
+    {
+        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseConnectionNames)} started", cancellationToken);
+        Debug.WriteLine($"Call {nameof(GetDatabaseConnectionNamesCommandHandler)} from {nameof(GetDatabaseConnectionNames)}");
+
+        //GetDatabaseConnectionNamesCommandRequest
+        var command = GetDatabaseConnectionNamesCommandRequest.Create(userName);
+        var result = await mediator.Send(command, cancellationToken);
+
+        await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseConnectionNames)} finished", cancellationToken);
+        return result.Match(Results.Ok, Results.BadRequest);
+    }
+
+    // GET api/database/getdatabasefolderssets
+    private static async Task<IResult> GetDatabaseFoldersSets(HttpRequest httpRequest, IMediator mediator,
+        IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
+    {
+        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseFoldersSets)} started", cancellationToken);
+        Debug.WriteLine($"Call {nameof(GetDatabaseFoldersSetsCommandHandler)} from {nameof(GetDatabaseFoldersSets)}");
+
+        //GetDatabaseFoldersSetsCommandRequest
+        var command = GetDatabaseFoldersSetsCommandRequest.Create(userName);
+        var result = await mediator.Send(command, cancellationToken);
+
+        await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseFoldersSets)} finished", cancellationToken);
+        return result.Match(Results.Ok, Results.BadRequest);
     }
 
     // GET api/database/getdatabasenames
