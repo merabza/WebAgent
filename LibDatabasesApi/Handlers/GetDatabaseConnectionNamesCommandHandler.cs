@@ -1,16 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using LibDatabasesApi.CommandRequests;
-using LibDatabasesApi.Helpers;
+using LibWebAgentData;
 using MessagingAbstractions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using OneOf;
-using SystemToolsShared;
 using SystemToolsShared.Errors;
+using WebAgentDatabasesApiContracts.Errors;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -21,31 +18,20 @@ public sealed class GetDatabaseConnectionNamesCommandHandler : ICommandHandler<G
     IEnumerable<string>>
 {
     private readonly IConfiguration _config;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<GetDatabaseConnectionNamesCommandHandler> _logger;
-    private readonly IMessagesDataManager _messagesDataManager;
 
-    public GetDatabaseConnectionNamesCommandHandler(IConfiguration config,
-        ILogger<GetDatabaseConnectionNamesCommandHandler> logger, IHttpClientFactory httpClientFactory,
-        IMessagesDataManager messagesDataManager)
+    public GetDatabaseConnectionNamesCommandHandler(IConfiguration config)
     {
         _config = config;
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-        _messagesDataManager = messagesDataManager;
     }
 
     public async Task<OneOf<IEnumerable<string>, IEnumerable<Err>>> Handle(
         GetDatabaseConnectionNamesCommandRequest request, CancellationToken cancellationToken = default)
     {
-        var result = await DatabaseManagerCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
-            request.UserName, cancellationToken);
-        if (result.IsT1)
-            return result.AsT1.ToArray();
-        var databaseManagementClient = result.AsT0;
+        var appSettings = AppSettings.Create(_config);
 
-        var getDatabaseConnectionNamesResult =
-            await databaseManagementClient.GetDatabaseConnectionNames(cancellationToken);
-        return getDatabaseConnectionNamesResult.Match<OneOf<IEnumerable<string>, IEnumerable<Err>>>(f0 => f0, f1 => f1);
+        if (appSettings is null)
+            return await Task.FromResult(new[] { DatabaseApiClientErrors.AppSettingsIsNotCreated });
+
+        return await Task.FromResult(appSettings.DatabaseServerConnections.Keys);
     }
 }

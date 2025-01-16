@@ -44,8 +44,8 @@ public sealed class GetDatabaseFoldersSetNamesCommandHandler : ICommandHandler<G
             return result.AsT1.ToArray();
         var databaseManagementClient = result.AsT0;
 
-        var getDatabaseFoldersSetNamesResult =
-            await databaseManagementClient.GetDatabaseFoldersSetNames(cancellationToken);
-        return getDatabaseFoldersSetNamesResult.Match<OneOf<IEnumerable<string>, IEnumerable<Err>>>(f0 => f0, f1 => f1);
+        var getDatabaseFoldersSetNamesResult = await databaseManagementClient.GetDatabaseFoldersSets(cancellationToken);
+        return getDatabaseFoldersSetNamesResult.Match<OneOf<IEnumerable<string>, IEnumerable<Err>>>(f0 => f0.Keys,
+            f1 => f1);
     }
 }
