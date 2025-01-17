@@ -45,6 +45,6 @@ public sealed class IsDatabaseExistsCommandHandler : ICommandHandler<IsDatabaseE
         var isDatabaseExistsResult =
             await databaseManagementClient.IsDatabaseExists(request.DatabaseName, cancellationToken);
 
-        return isDatabaseExistsResult.Match<OneOf<bool, IEnumerable<Err>>>(f0 => f0, f1 => f1);
+        return isDatabaseExistsResult.Match<OneOf<bool, IEnumerable<Err>>>(f0 => f0, f1 => (Err[])f1);
     }
 }

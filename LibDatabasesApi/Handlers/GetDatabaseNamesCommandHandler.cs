@@ -45,8 +45,8 @@ public sealed class
         var databaseManagementClient = result.AsT0;
 
         var getDatabaseNamesResult = await databaseManagementClient.GetDatabaseNames(cancellationToken);
-        return getDatabaseNamesResult
-            .Match<OneOf<IEnumerable<DatabaseInfoModel>, IEnumerable<Err>>>(f0 => f0, f1 => f1);
+        return getDatabaseNamesResult.Match<OneOf<IEnumerable<DatabaseInfoModel>, IEnumerable<Err>>>(f0 => f0,
+            f1 => (Err[])f1);
 
 
         //ასეთი კონსტრუქცია ვერ გავმართე

@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
 using SystemToolsShared.Errors;
+using WebAgentDatabasesApiContracts.Errors;
 
 namespace LibDatabasesApi.Helpers;
 
@@ -24,7 +25,10 @@ public static class DatabaseManagerCreator
     {
         var appSettings = AppSettings.Create(config);
 
-        if (appSettings?.DatabaseServerData is null)
+        if (appSettings is null)
+            return await Task.FromResult(new[] { DatabaseApiClientErrors.AppSettingsIsNotCreated });
+
+        if (appSettings.DatabaseServerData is null)
         {
             var err1 = DbApiErrors.DatabaseSettingsDoesNotSpecified;
             logger.LogError(err1.ErrorMessage);
@@ -33,23 +37,20 @@ public static class DatabaseManagerCreator
 
         var dbServerData = appSettings.DatabaseServerData;
 
-        var databaseManagementClient = await GetDatabaseConnectionSettings(logger, httpClientFactory, config,
-            dbServerData, messagesDataManager, userName, cancellationToken);
-
-        return databaseManagementClient is null
-            ? new[] { DbApiErrors.ErrorCreateDatabaseConnection }
-            : OneOf<IDatabaseManager, IEnumerable<Err>>.FromT0(databaseManagementClient);
+        return await GetDatabaseConnectionSettings(logger, httpClientFactory, config, dbServerData, messagesDataManager,
+            userName, cancellationToken);
     }
 
 
-    private static async ValueTask<IDatabaseManager?> GetDatabaseConnectionSettings(ILogger logger,
-        IHttpClientFactory httpClientFactory, IConfiguration config, DatabaseServerData databaseServerData,
-        IMessagesDataManager? messagesDataManager, string? userName, CancellationToken cancellationToken = default)
+    private static async ValueTask<OneOf<IDatabaseManager, IEnumerable<Err>>> GetDatabaseConnectionSettings(
+        ILogger logger, IHttpClientFactory httpClientFactory, IConfiguration config,
+        DatabaseServerData databaseServerData, IMessagesDataManager? messagesDataManager, string? userName,
+        CancellationToken cancellationToken = default)
     {
         var appSettings = AppSettings.Create(config);
 
-        if (appSettings?.ApiClients is null)
-            return null;
+        if (appSettings is null)
+            return await Task.FromResult(new[] { DatabaseApiClientErrors.AppSettingsIsNotCreated });
 
         var databaseManagementClient = await DatabaseManagersFabric.CreateDatabaseManager(logger, httpClientFactory,
             false, databaseServerData.DbConnectionName,

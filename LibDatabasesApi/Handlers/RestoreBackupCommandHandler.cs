@@ -72,13 +72,14 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         await _messagesDataManager.SendMessage(request.UserName, "Create CreateDatabaseManagementClient",
             cancellationToken);
 
-        var databaseManagementClient = await DatabaseManagersFabric.CreateDatabaseManager(_logger, _httpClientFactory,
-            false, databaseServerData.DbConnectionName,
+        var createDatabaseManagerResult = await DatabaseManagersFabric.CreateDatabaseManager(_logger,
+            _httpClientFactory, false, databaseServerData.DbConnectionName,
             new DatabaseServerConnections(appSettings.DatabaseServerConnections),
             new ApiClients(appSettings.ApiClients), _messagesDataManager, request.UserName, cancellationToken);
 
-        if (databaseManagementClient is null)
-            return new[] { DbApiErrors.DatabaseManagementClientDoesNotCreated };
+        if (createDatabaseManagerResult.IsT1)
+            return Err.RecreateErrors(createDatabaseManagerResult.AsT1,
+                DbApiErrors.DatabaseManagementClientDoesNotCreated);
 
         //თუ გაცვლის სერვერის პარამეტრები გვაქვს,
         //შევქმნათ შესაბამისი ფაილმენეჯერი
@@ -176,7 +177,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         await _messagesDataManager.SendMessage(request.UserName, $"RestoreDatabaseFromBackup {request.DatabaseName}",
             cancellationToken);
 
-        var restoreDatabaseFromBackupResult = await databaseManagementClient.RestoreDatabaseFromBackup(
+        var restoreDatabaseFromBackupResult = await createDatabaseManagerResult.AsT0.RestoreDatabaseFromBackup(
             new BackupFileParameters(request.Name, request.Prefix, request.Suffix, request.DateMask),
             //request.DestinationDbServerSideDataFolderPath, request.DestinationDbServerSideLogFolderPath,
             request.DatabaseName, request.DbServerFoldersSetName, null, cancellationToken);
