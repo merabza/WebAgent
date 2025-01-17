@@ -1,5 +1,5 @@
-﻿using MessagingAbstractions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using MessagingAbstractions;
 
 namespace LibDatabasesApi.CommandRequests;
 

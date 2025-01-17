@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using ConfigurationEncrypt;
 using FluentValidationInstaller;
 using Microsoft.AspNetCore.Builder;
@@ -5,11 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using SwaggerTools;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using SystemToolsShared;
 using WebInstallers;
+using AssemblyReference = ApiExceptionHandler.AssemblyReference;
 
 const string appName = "WebAgent";
 const string appKey = "E0FFB24C-7561-4DBA-8E0F-02CA585A3C9C";
@@ -32,31 +33,24 @@ try
 
     var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     {
-        ContentRootPath = AppContext.BaseDirectory,
-        Args = args
+        ContentRootPath = AppContext.BaseDirectory, Args = args
     });
 
     var debugMode = builder.Environment.IsDevelopment();
 
     if (!builder.InstallServices(debugMode, args, parameters,
             //WebSystemTools
-            ApiExceptionHandler.AssemblyReference.Assembly,
-            ApiKeyIdentity.AssemblyReference.Assembly,
-            ConfigurationEncrypt.AssemblyReference.Assembly,
-            FluentValidationInstaller.AssemblyReference.Assembly,
-            HttpClientInstaller.AssemblyReference.Assembly,
-            SerilogLogger.AssemblyReference.Assembly,
-            SignalRMessages.AssemblyReference.Assembly,
-            SwaggerTools.AssemblyReference.Assembly,
-            TestToolsApi.AssemblyReference.Assembly,
-            WindowsServiceTools.AssemblyReference.Assembly,
+            AssemblyReference.Assembly, ApiKeyIdentity.AssemblyReference.Assembly,
+            ConfigurationEncrypt.AssemblyReference.Assembly, FluentValidationInstaller.AssemblyReference.Assembly,
+            HttpClientInstaller.AssemblyReference.Assembly, SerilogLogger.AssemblyReference.Assembly,
+            SignalRMessages.AssemblyReference.Assembly, SwaggerTools.AssemblyReference.Assembly,
+            TestToolsApi.AssemblyReference.Assembly, WindowsServiceTools.AssemblyReference.Assembly,
 
             //WebAgentShared
             LibProjectsApi.AssemblyReference.Assembly,
 
             //WebAgent
-            LibDatabasesApi.AssemblyReference.Assembly
-        ))
+            LibDatabasesApi.AssemblyReference.Assembly))
         return 2;
 
     builder.Services.AddMediatR(cfg =>

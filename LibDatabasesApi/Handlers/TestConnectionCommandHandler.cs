@@ -1,4 +1,9 @@
-﻿using LibDatabasesApi.CommandRequests;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
 using LibWebAgentData.ErrorModels;
 using MediatR;
@@ -6,11 +11,6 @@ using MessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using SystemToolsShared;
 using SystemToolsShared.Errors;
 
