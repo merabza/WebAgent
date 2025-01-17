@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using DbTools.Models;
+﻿using DbTools.Models;
 using MessagingAbstractions;
+using System.Collections.Generic;
 
 namespace LibDatabasesApi.CommandRequests;
 
