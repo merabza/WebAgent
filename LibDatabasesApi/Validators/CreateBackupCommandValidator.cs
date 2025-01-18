@@ -10,10 +10,6 @@ public sealed class CreateBackupCommandValidator : AbstractValidator<CreateBacku
     public CreateBackupCommandValidator()
     {
         RuleFor(x => x.DatabaseName).FileName();
-        RuleFor(x => x.BackupNamePrefix).FileName();
-        RuleFor(x => x.DateMask).DateMask();
-        RuleFor(x => x.BackupFileExtension).FileExtension();
-        RuleFor(x => x.BackupNameMiddlePart).FileName();
-        RuleFor(x => x.DbServerSideBackupPath).FilePath();
+        RuleFor(x => x.DbServerFoldersSetName).FileName();
     }
 }
