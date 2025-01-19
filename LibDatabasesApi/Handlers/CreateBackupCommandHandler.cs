@@ -3,14 +3,12 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DatabasesManagement;
-using FileManagersMain;
 using LibApiClientParameters;
 using LibDatabaseParameters;
 using LibDatabasesApi.CommandRequests;
 using LibFileParameters.Models;
 using LibProjectsApi;
 using LibWebAgentData;
-using LibWebAgentData.ErrorModels;
 using MessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -44,11 +42,6 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
     public async Task<OneOf<BackupFileParameters, IEnumerable<Err>>> Handle(CreateBackupCommandRequest request,
         CancellationToken cancellationToken = default)
     {
-        var fromDatabaseParameters = new DatabasesParameters
-        {
-            DatabaseName = request.DatabaseName, DbServerFoldersSetName = request.DbServerFoldersSetName
-        };
-
         var appSettings = AppSettings.Create(_config);
         if (appSettings is null)
             return await Task.FromResult(new[] { ProjectsErrors.AppSettingsIsNotCreated });
@@ -59,6 +52,19 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
             {
                 DatabaseApiClientErrors.DatabasesBackupFilesExchangeParametersIsNotConfigured
             });
+
+        var databaseServerData = appSettings.DatabaseServerData;
+        if (databaseServerData is null)
+            return await Task.FromResult(new[] { DatabaseApiClientErrors.DatabaseServerDataIsNotConfigured });
+
+        var fromDatabaseParameters = new DatabasesParameters
+        {
+            DatabaseName = request.DatabaseName,
+            DbServerFoldersSetName = request.DbServerFoldersSetName,
+            DbConnectionName = databaseServerData.DbConnectionName,
+            FileStorageName = databaseServerData.DatabaseBackupsFileStorageName,
+            SmartSchemaName = databaseServerData.DbSmartSchemaName
+        };
 
         var databaseServerConnections = new DatabaseServerConnections(appSettings.DatabaseServerConnections);
         var apiClients = new ApiClients(appSettings.ApiClients);
@@ -87,8 +93,6 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
             return await Task.FromResult(new[] { DatabaseApiClientErrors.BackupFileParametersIsNull });
 
         return backupFileParameters;
-
-
 
 
         //if (string.IsNullOrWhiteSpace(appSettings?.BaseBackupsLocalPatch))
