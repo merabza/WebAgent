@@ -41,7 +41,6 @@ public static class DatabaseManagerCreator
             userName, cancellationToken);
     }
 
-
     private static async ValueTask<OneOf<IDatabaseManager, IEnumerable<Err>>> GetDatabaseConnectionSettings(
         ILogger logger, IHttpClientFactory httpClientFactory, IConfiguration config,
         DatabaseServerData databaseServerData, IMessagesDataManager? messagesDataManager, string? userName,
