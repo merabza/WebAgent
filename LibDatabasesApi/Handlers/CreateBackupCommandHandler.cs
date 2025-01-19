@@ -70,18 +70,18 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         var exchangeFileStorageName = databasesBackupFilesExchangeParameters.ExchangeFileStorageName;
         var uploadTempExtension = databasesBackupFilesExchangeParameters.UploadTempExtension;
 
-        var baseBackupParameters = await CreateBaseBackupParametersFabric.CreateBaseBackupParameters(_logger,
+        var baseBackupRestoreParameters = await CreateBaseBackupParametersFabric.CreateBaseBackupParameters(_logger,
             _httpClientFactory, fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages,
             smartSchemas, localPath, downloadTempExtension, localSmartSchemaName, exchangeFileStorageName,
             uploadTempExtension);
 
-        if (baseBackupParameters is null)
+        if (baseBackupRestoreParameters is null)
             return await Task.FromResult(new[] { DatabaseApiClientErrors.BaseBackupParametersIsNotCreated });
 
         _logger.LogInformation("Create Backup for source Database");
 
-        var sourceBaseBackupCreator = new BaseBackupCreator(_logger, baseBackupParameters);
-        var backupFileParameters = await sourceBaseBackupCreator.RunAction(cancellationToken);
+        var sourceBaseBackupCreator = new BaseBackupRestorer(_logger, baseBackupRestoreParameters);
+        var backupFileParameters = await sourceBaseBackupCreator.CreateDatabaseBackup(cancellationToken);
 
         if (backupFileParameters is null)
             return await Task.FromResult(new[] { DatabaseApiClientErrors.BackupFileParametersIsNull });

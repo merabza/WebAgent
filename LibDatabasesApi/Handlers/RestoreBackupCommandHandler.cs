@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using ApiContracts.Errors;
 using DatabasesManagement;
-using FileManagersMain;
 using LibApiClientParameters;
 using LibDatabaseParameters;
 using LibDatabasesApi.CommandRequests;
@@ -57,143 +56,173 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
 
         var appSettings = AppSettings.Create(_config);
         if (appSettings is null)
-            return await Task.FromResult(new[] { ProjectsErrors.AppSettingsIsNotCreated });
+            return new[] { ProjectsErrors.AppSettingsIsNotCreated };
 
         var databasesBackupFilesExchangeParameters = appSettings.DatabasesBackupFilesExchangeParameters;
         if (databasesBackupFilesExchangeParameters is null)
-            return await Task.FromResult(new[]
-            {
-                DatabaseApiClientErrors.DatabasesBackupFilesExchangeParametersIsNotConfigured
-            });
+            return new[] { DatabaseApiClientErrors.DatabasesBackupFilesExchangeParametersIsNotConfigured };
 
-        if (string.IsNullOrWhiteSpace(databasesBackupFilesExchangeParameters.LocalPath))
-            return new[] { DbApiErrors.BaseBackupsLocalPatchIsEmpty };
-
-        if (appSettings.DatabaseServerData is null)
+        var restoreDatabaseParameters = new DatabasesParameters
         {
-            var err1 = DbApiErrors.DatabaseSettingsDoesNotSpecified;
-            _logger.LogError(err1.ErrorMessage);
-            return new[] { err1 };
-        }
+            DatabaseName = request.DatabaseName, DbServerFoldersSetName = request.DbServerFoldersSetName
+        };
 
-        var databaseServerData = appSettings.DatabaseServerData;
-
+        var databaseServerConnections = new DatabaseServerConnections(appSettings.DatabaseServerConnections);
+        var apiClients = new ApiClients(appSettings.ApiClients);
+        var smartSchemas = new SmartSchemas(appSettings.SmartSchemas);
         var fileStorages = new FileStorages(appSettings.FileStorages);
+        var localPath = databasesBackupFilesExchangeParameters.LocalPath;
+        var downloadTempExtension = databasesBackupFilesExchangeParameters.DownloadTempExtension;
+        var localSmartSchemaName = databasesBackupFilesExchangeParameters.LocalSmartSchemaName;
+        var exchangeFileStorageName = databasesBackupFilesExchangeParameters.ExchangeFileStorageName;
+        var uploadTempExtension = databasesBackupFilesExchangeParameters.UploadTempExtension;
 
-        await _messagesDataManager.SendMessage(request.UserName, "Create CreateDatabaseManagementClient",
-            cancellationToken);
+        var baseBackupRestoreParameters = await CreateBaseBackupParametersFabric.CreateBaseBackupParameters(_logger,
+            _httpClientFactory, restoreDatabaseParameters, databaseServerConnections, apiClients, fileStorages,
+            smartSchemas, localPath, downloadTempExtension, localSmartSchemaName, exchangeFileStorageName,
+            uploadTempExtension);
 
-        var createDatabaseManagerResult = await DatabaseManagersFabric.CreateDatabaseManager(_logger,
-            _httpClientFactory, false, databaseServerData.DbConnectionName,
-            new DatabaseServerConnections(appSettings.DatabaseServerConnections),
-            new ApiClients(appSettings.ApiClients), _messagesDataManager, request.UserName, cancellationToken);
+        if (baseBackupRestoreParameters is null)
+            return await Task.FromResult(new[] { DatabaseApiClientErrors.BaseBackupParametersIsNotCreated });
 
-        if (createDatabaseManagerResult.IsT1)
-            return Err.RecreateErrors(createDatabaseManagerResult.AsT1,
-                DbApiErrors.DatabaseManagementClientDoesNotCreated);
+        var destinationBaseBackupRestorer = new BaseBackupRestorer(_logger, baseBackupRestoreParameters);
+        await destinationBaseBackupRestorer.CreateDatabaseBackup(cancellationToken);
 
-        //თუ გაცვლის სერვერის პარამეტრები გვაქვს,
-        //შევქმნათ შესაბამისი ფაილმენეჯერი
-        var exchangeFileStorageName = appSettings.BackupsExchangeStorage;
-        await _messagesDataManager.SendMessage(request.UserName,
-            $"Create CreateFileStorageAndFileManager {appSettings.BaseBackupsLocalPatch} - {exchangeFileStorageName}",
-            cancellationToken);
+        var backupFileParameters = new BackupFileParameters(null, request.Name, request.Prefix, request.Suffix,
+            request.DateMask);
 
-        var (exchangeFileStorage, exchangeFileManager) = await FileManagersFabricExt.CreateFileStorageAndFileManager(
-            false, _logger, appSettings.BaseBackupsLocalPatch, exchangeFileStorageName, fileStorages,
-            _messagesDataManager, request.UserName, cancellationToken);
+        if (!await destinationBaseBackupRestorer.RestoreDatabaseFromBackup(backupFileParameters, cancellationToken))
+            return new[] { DbApiErrors.CannotRestoreDatabase(request.DatabaseName, request.Name) };
 
-        //წყაროს ფაილსაცავი
-        var databaseBackupsFileStorageName = databaseServerData.DatabaseBackupsFileStorageName;
-        await _messagesDataManager.SendMessage(request.UserName,
-            $"Create CreateFileStorageAndFileManager {appSettings.BaseBackupsLocalPatch} - {databaseBackupsFileStorageName}",
-            cancellationToken);
 
-        var (databaseBackupsFileStorage, databaseBackupsFileManager) =
-            await FileManagersFabricExt.CreateFileStorageAndFileManager(false, _logger,
-                appSettings.BaseBackupsLocalPatch, databaseBackupsFileStorageName, fileStorages, _messagesDataManager,
-                request.UserName, cancellationToken);
+        //if (string.IsNullOrWhiteSpace(databasesBackupFilesExchangeParameters.LocalPath))
+        //    return new[] { DbApiErrors.BaseBackupsLocalPatchIsEmpty };
 
-        if (databaseBackupsFileStorage is null)
-            return new[] { DbApiErrors.DatabaseBackupsFileManagerDoesNotCreated };
+        //if (appSettings.DatabaseServerData is null)
+        //{
+        //    var err1 = DbApiErrors.DatabaseSettingsDoesNotSpecified;
+        //    _logger.LogError(err1.ErrorMessage);
+        //    return new[] { err1 };
+        //}
 
-        if (databaseBackupsFileManager is null)
-            return new[] { DbApiErrors.DatabaseBackupsFileStorageDoesNotCreated };
+        //var databaseServerData = appSettings.DatabaseServerData;
 
-        await _messagesDataManager.SendMessage(request.UserName,
-            $"Create CreateFileManager {appSettings.BaseBackupsLocalPatch}", cancellationToken);
+        //var fileStorages = new FileStorages(appSettings.FileStorages);
 
-        var localFileManager = FileManagersFabric.CreateFileManager(false, _logger, appSettings.BaseBackupsLocalPatch);
+        //await _messagesDataManager.SendMessage(request.UserName, "Create CreateDatabaseManagementClient",
+        //    cancellationToken);
 
-        //, _messagesDataManager, request.UserName
-        var needDownloadFromExchange = exchangeFileStorage != null &&
-                                       !FileStorageData.IsSameToLocal(exchangeFileStorage,
-                                           appSettings.BaseBackupsLocalPatch);
+        //var createDatabaseManagerResult = await DatabaseManagersFabric.CreateDatabaseManager(_logger,
+        //    _httpClientFactory, false, databaseServerData.DbConnectionName,
+        //    new DatabaseServerConnections(appSettings.DatabaseServerConnections),
+        //    new ApiClients(appSettings.ApiClients), _messagesDataManager, request.UserName, cancellationToken);
 
-        if (needDownloadFromExchange)
-        {
-            if (localFileManager is null)
-                return new[] { DbApiErrors.LocalFileManagerDoesNotCreated };
+        //if (createDatabaseManagerResult.IsT1)
+        //    return Err.RecreateErrors(createDatabaseManagerResult.AsT1,
+        //        DbApiErrors.DatabaseManagementClientDoesNotCreated);
 
-            if (exchangeFileManager is null)
-                return new[] { DbApiErrors.ExchangeFileManagerDoesNotCreated };
+        ////თუ გაცვლის სერვერის პარამეტრები გვაქვს,
+        ////შევქმნათ შესაბამისი ფაილმენეჯერი
+        //var exchangeFileStorageName = appSettings.BackupsExchangeStorage;
+        //await _messagesDataManager.SendMessage(request.UserName,
+        //    $"Create CreateFileStorageAndFileManager {appSettings.BaseBackupsLocalPatch} - {exchangeFileStorageName}",
+        //    cancellationToken);
 
-            await _messagesDataManager.SendMessage(request.UserName, $"DownloadFile {request.Name}", cancellationToken);
+        //var (exchangeFileStorage, exchangeFileManager) = await FileManagersFabricExt.CreateFileStorageAndFileManager(
+        //    false, _logger, appSettings.BaseBackupsLocalPatch, exchangeFileStorageName, fileStorages,
+        //    _messagesDataManager, request.UserName, cancellationToken);
 
-            //წყაროდან ლოკალურ ფოლდერში მოქაჩვა
-            if (!exchangeFileManager.DownloadFile(request.Name, ".down!"))
-            {
-                var err = DbApiErrors.LocalFileManagerDoesNotCreated;
-                _logger.LogError(err.ErrorMessage);
-                return new[] { err };
-            }
+        ////წყაროს ფაილსაცავი
+        //var databaseBackupsFileStorageName = databaseServerData.DatabaseBackupsFileStorageName;
+        //await _messagesDataManager.SendMessage(request.UserName,
+        //    $"Create CreateFileStorageAndFileManager {appSettings.BaseBackupsLocalPatch} - {databaseBackupsFileStorageName}",
+        //    cancellationToken);
 
-            SmartSchemas smartSchemas = new(appSettings.SmartSchemas);
+        //var (databaseBackupsFileStorage, databaseBackupsFileManager) =
+        //    await FileManagersFabricExt.CreateFileStorageAndFileManager(false, _logger,
+        //        appSettings.BaseBackupsLocalPatch, databaseBackupsFileStorageName, fileStorages, _messagesDataManager,
+        //        request.UserName, cancellationToken);
 
-            var exchangeSmartSchema =
-                smartSchemas.GetSmartSchemaByKey(appSettings.BackupsExchangeStorageSmartSchemaName);
-            //if (exchangeSmartSchema != null)// ეს შემოწმება საჭირო იქნება, თუ დასაშვები იქნება ჭკვიანი სქემის არ მითითება
-            exchangeFileManager.RemoveRedundantFiles(request.Prefix, request.DateMask, request.Suffix,
-                exchangeSmartSchema);
+        //if (databaseBackupsFileStorage is null)
+        //    return new[] { DbApiErrors.DatabaseBackupsFileManagerDoesNotCreated };
 
-            var localSmartSchema = smartSchemas.GetSmartSchemaByKey(appSettings.LocalSmartSchemaName);
-            //if (localSmartSchema != null)// ეს შემოწმება საჭირო იქნება, თუ დასაშვები იქნება ჭკვიანი სქემის არ მითითება
+        //if (databaseBackupsFileManager is null)
+        //    return new[] { DbApiErrors.DatabaseBackupsFileStorageDoesNotCreated };
 
-            localFileManager.RemoveRedundantFiles(request.Prefix, request.DateMask, request.Suffix, localSmartSchema);
-        }
+        //await _messagesDataManager.SendMessage(request.UserName,
+        //    $"Create CreateFileManager {appSettings.BaseBackupsLocalPatch}", cancellationToken);
 
-        //, _messagesDataManager, request.UserName
-        var needUploadDatabaseBackupsStorage =
-            !FileStorageData.IsSameToLocal(databaseBackupsFileStorage, appSettings.BaseBackupsLocalPatch);
+        //var localFileManager = FileManagersFabric.CreateFileManager(false, _logger, appSettings.BaseBackupsLocalPatch);
 
-        if (needUploadDatabaseBackupsStorage)
-        {
-            await _messagesDataManager.SendMessage(request.UserName, $"UploadFile {request.Name}", cancellationToken);
+        ////, _messagesDataManager, request.UserName
+        //var needDownloadFromExchange = exchangeFileStorage != null &&
+        //                               !FileStorageData.IsSameToLocal(exchangeFileStorage,
+        //                                   appSettings.BaseBackupsLocalPatch);
 
-            if (!databaseBackupsFileManager.UploadFile(request.Name, ".up!"))
-            {
-                var err = DbApiErrors.CanNotUploadFile(request.Name);
-                _logger.LogError(err.ErrorMessage);
-                return new[] { err };
-            }
+        //if (needDownloadFromExchange)
+        //{
+        //    if (localFileManager is null)
+        //        return new[] { DbApiErrors.LocalFileManagerDoesNotCreated };
 
-            SmartSchemas smartSchemas = new(appSettings.SmartSchemas);
+        //    if (exchangeFileManager is null)
+        //        return new[] { DbApiErrors.ExchangeFileManagerDoesNotCreated };
 
-            var dbFilesSmartSchema = smartSchemas.GetSmartSchemaByKey(databaseServerData.DbSmartSchemaName);
-            //if (downloadSmartSchema != null)// ეს შემოწმება საჭირო იქნება, თუ დასაშვები იქნება ჭკვიანი სქემის არ მითითება
-            databaseBackupsFileManager.RemoveRedundantFiles(request.Prefix, request.DateMask, request.Suffix,
-                dbFilesSmartSchema);
-        }
+        //    await _messagesDataManager.SendMessage(request.UserName, $"DownloadFile {request.Name}", cancellationToken);
 
-        await _messagesDataManager.SendMessage(request.UserName, $"RestoreDatabaseFromBackup {request.DatabaseName}",
-            cancellationToken);
+        //    //წყაროდან ლოკალურ ფოლდერში მოქაჩვა
+        //    if (!exchangeFileManager.DownloadFile(request.Name, ".down!"))
+        //    {
+        //        var err = DbApiErrors.LocalFileManagerDoesNotCreated;
+        //        _logger.LogError(err.ErrorMessage);
+        //        return new[] { err };
+        //    }
 
-        var restoreDatabaseFromBackupResult = await createDatabaseManagerResult.AsT0.RestoreDatabaseFromBackup(
-            new BackupFileParameters(null, request.Name, request.Prefix, request.Suffix, request.DateMask),
-            request.DatabaseName, request.DbServerFoldersSetName, null, cancellationToken);
-        if (restoreDatabaseFromBackupResult.IsSome)
-            return Err.RecreateErrors((Err[])restoreDatabaseFromBackupResult,
-                DbApiErrors.CannotRestoreDatabase(request.DatabaseName, request.Name));
+        //    SmartSchemas smartSchemas = new(appSettings.SmartSchemas);
+
+        //    var exchangeSmartSchema =
+        //        smartSchemas.GetSmartSchemaByKey(appSettings.BackupsExchangeStorageSmartSchemaName);
+        //    //if (exchangeSmartSchema != null)// ეს შემოწმება საჭირო იქნება, თუ დასაშვები იქნება ჭკვიანი სქემის არ მითითება
+        //    exchangeFileManager.RemoveRedundantFiles(request.Prefix, request.DateMask, request.Suffix,
+        //        exchangeSmartSchema);
+
+        //    var localSmartSchema = smartSchemas.GetSmartSchemaByKey(appSettings.LocalSmartSchemaName);
+        //    //if (localSmartSchema != null)// ეს შემოწმება საჭირო იქნება, თუ დასაშვები იქნება ჭკვიანი სქემის არ მითითება
+
+        //    localFileManager.RemoveRedundantFiles(request.Prefix, request.DateMask, request.Suffix, localSmartSchema);
+        //}
+
+        ////, _messagesDataManager, request.UserName
+        //var needUploadDatabaseBackupsStorage =
+        //    !FileStorageData.IsSameToLocal(databaseBackupsFileStorage, appSettings.BaseBackupsLocalPatch);
+
+        //if (needUploadDatabaseBackupsStorage)
+        //{
+        //    await _messagesDataManager.SendMessage(request.UserName, $"UploadFile {request.Name}", cancellationToken);
+
+        //    if (!databaseBackupsFileManager.UploadFile(request.Name, ".up!"))
+        //    {
+        //        var err = DbApiErrors.CanNotUploadFile(request.Name);
+        //        _logger.LogError(err.ErrorMessage);
+        //        return new[] { err };
+        //    }
+
+        //    SmartSchemas smartSchemas = new(appSettings.SmartSchemas);
+
+        //    var dbFilesSmartSchema = smartSchemas.GetSmartSchemaByKey(databaseServerData.DbSmartSchemaName);
+        //    //if (downloadSmartSchema != null)// ეს შემოწმება საჭირო იქნება, თუ დასაშვები იქნება ჭკვიანი სქემის არ მითითება
+        //    databaseBackupsFileManager.RemoveRedundantFiles(request.Prefix, request.DateMask, request.Suffix,
+        //        dbFilesSmartSchema);
+        //}
+
+        //await _messagesDataManager.SendMessage(request.UserName, $"RestoreDatabaseFromBackup {request.DatabaseName}",
+        //    cancellationToken);
+
+        //var restoreDatabaseFromBackupResult = await createDatabaseManagerResult.AsT0.RestoreDatabaseFromBackup(
+        //    new BackupFileParameters(null, request.Name, request.Prefix, request.Suffix, request.DateMask),
+        //    request.DatabaseName, request.DbServerFoldersSetName, null, cancellationToken);
+        //if (restoreDatabaseFromBackupResult.IsSome)
+        //    return Err.RecreateErrors((Err[])restoreDatabaseFromBackupResult,
+        //        DbApiErrors.CannotRestoreDatabase(request.DatabaseName, request.Name));
         return new Unit();
     }
 }
