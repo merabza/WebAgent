@@ -62,9 +62,17 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         if (databasesBackupFilesExchangeParameters is null)
             return new[] { DatabaseApiClientErrors.DatabasesBackupFilesExchangeParametersIsNotConfigured };
 
+        var databaseServerData = appSettings.DatabaseServerData;
+        if (databaseServerData is null)
+            return await Task.FromResult(new[] { DatabaseApiClientErrors.DatabaseServerDataIsNotConfigured });
+
         var restoreDatabaseParameters = new DatabasesParameters
         {
-            DatabaseName = request.DatabaseName, DbServerFoldersSetName = request.DbServerFoldersSetName
+            DatabaseName = request.DatabaseName,
+            DbServerFoldersSetName = request.DbServerFoldersSetName,
+            DbConnectionName = databaseServerData.DbConnectionName,
+            FileStorageName = databaseServerData.DatabaseBackupsFileStorageName,
+            SmartSchemaName = databaseServerData.DbSmartSchemaName
         };
 
         var databaseServerConnections = new DatabaseServerConnections(appSettings.DatabaseServerConnections);
