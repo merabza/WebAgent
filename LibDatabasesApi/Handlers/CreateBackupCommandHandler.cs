@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
 using SystemToolsShared.Errors;
+using WebAgentDatabasesApiContracts.Errors;
 using WebAgentDatabasesApiContracts.V1.Responses;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -42,13 +43,26 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
     public async Task<OneOf<BackupFileParameters, IEnumerable<Err>>> Handle(CreateBackupCommandRequest request,
         CancellationToken cancellationToken = default)
     {
+        var fromDatabaseParameters = new DatabasesParameters
+        {
+            DatabaseName = request.DatabaseName, DbServerFoldersSetName = request.DbServerFoldersSetName
+        };
+
+        var appSettings = AppSettings.Create(_config);
+        if (appSettings is null)
+            return await Task.FromResult(new[] { DatabaseApiClientErrors.AppSettingsIsNotCreated });
+
+        var databaseServerConnections = new DatabaseServerConnections(appSettings.DatabaseServerConnections);
+        var apiClients = new ApiClients(appSettings.ApiClients);
+        var fileStorages = FileStorages.Create(_config);
+        var smartSchemas = new SmartSchemas(appSettings.SmartSchemas);
+        var localPath = appSettings.BaseBackupsLocalPatch;
+
         //var sourceBaseBackupParameters = await CreateBaseBackupParametersFabric.CreateBaseBackupParameters(_logger,
         //    _httpClientFactory, fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages,
         //    smartSchemas, localPath, downloadTempExtension, localSmartSchemaName, exchangeFileStorageName,
         //    uploadTempExtension);
 
-
-        var appSettings = AppSettings.Create(_config);
 
         if (string.IsNullOrWhiteSpace(appSettings?.BaseBackupsLocalPatch))
             return new[] { DbApiErrors.BaseBackupsLocalPatchIsEmpty };
@@ -63,7 +77,6 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         var databaseServerData = appSettings.DatabaseServerData;
 
 
-        var fileStorages = FileStorages.Create(_config);
 
         //თუ გაცვლის სერვერის პარამეტრები გვაქვს,
         //შევქმნათ შესაბამისი ფაილმენეჯერი
@@ -118,7 +131,6 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         var needDownloadFromSource = !FileStorageData.IsSameToLocal(databaseBackupsFileStorage,
             appSettings.BaseBackupsLocalPatch); //, _messagesDataManager, request.UserName
 
-        SmartSchemas smartSchemas = new(appSettings.SmartSchemas);
 
 
         if (needDownloadFromSource)
