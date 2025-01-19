@@ -18,8 +18,6 @@ using SystemToolsShared.Errors;
 using WebAgentDatabasesApiContracts.Errors;
 using WebAgentDatabasesApiContracts.V1.Responses;
 
-// ReSharper disable ConvertToPrimaryConstructor
-
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -30,6 +28,7 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
     private readonly ILogger<CreateBackupCommandHandler> _logger;
     private readonly IMessagesDataManager _messagesDataManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public CreateBackupCommandHandler(IConfiguration config, ILogger<CreateBackupCommandHandler> logger,
         IHttpClientFactory httpClientFactory, IMessagesDataManager messagesDataManager)
     {
@@ -76,17 +75,20 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         var exchangeFileStorageName = databasesBackupFilesExchangeParameters.ExchangeFileStorageName;
         var uploadTempExtension = databasesBackupFilesExchangeParameters.UploadTempExtension;
 
-        var baseBackupRestoreParameters = await CreateBaseBackupParametersFabric.CreateBaseBackupParameters(_logger,
+        var createBaseBackupParametersFabric =
+            new CreateBaseBackupParametersFabric(_logger, _messagesDataManager, request.UserName, false);
+        var baseBackupRestoreParametersResult = await createBaseBackupParametersFabric.CreateBaseBackupParameters(
             _httpClientFactory, fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages,
             smartSchemas, localPath, downloadTempExtension, localSmartSchemaName, exchangeFileStorageName,
-            uploadTempExtension);
+            uploadTempExtension, cancellationToken);
 
-        if (baseBackupRestoreParameters is null)
-            return await Task.FromResult(new[] { DatabaseApiClientErrors.BaseBackupParametersIsNotCreated });
+        if (baseBackupRestoreParametersResult.IsT1)
+            return Err.RecreateErrors(baseBackupRestoreParametersResult.AsT1,
+                DatabaseApiClientErrors.BaseBackupParametersIsNotCreated);
 
         _logger.LogInformation("Create Backup for source Database");
 
-        var sourceBaseBackupCreator = new BaseBackupRestorer(_logger, baseBackupRestoreParameters);
+        var sourceBaseBackupCreator = new BaseBackupRestorer(_logger, baseBackupRestoreParametersResult.AsT0);
         var backupFileParameters = await sourceBaseBackupCreator.CreateDatabaseBackup(cancellationToken);
 
         if (backupFileParameters is null)

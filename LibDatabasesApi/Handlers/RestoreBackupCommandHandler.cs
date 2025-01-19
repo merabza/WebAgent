@@ -77,15 +77,19 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         var exchangeFileStorageName = databasesBackupFilesExchangeParameters.ExchangeFileStorageName;
         var uploadTempExtension = databasesBackupFilesExchangeParameters.UploadTempExtension;
 
-        var baseBackupRestoreParameters = await CreateBaseBackupParametersFabric.CreateBaseBackupParameters(_logger,
+        var createBaseBackupParametersFabric =
+            new CreateBaseBackupParametersFabric(_logger, _messagesDataManager, request.UserName, false);
+
+        var createBaseBackupParametersResult = await createBaseBackupParametersFabric.CreateBaseBackupParameters(
             _httpClientFactory, restoreDatabaseParameters, databaseServerConnections, apiClients, fileStorages,
             smartSchemas, localPath, downloadTempExtension, localSmartSchemaName, exchangeFileStorageName,
-            uploadTempExtension);
+            uploadTempExtension, cancellationToken);
 
-        if (baseBackupRestoreParameters is null)
-            return await Task.FromResult(new[] { DatabaseApiClientErrors.BaseBackupParametersIsNotCreated });
+        if (createBaseBackupParametersResult.IsT1)
+            return Err.RecreateErrors(createBaseBackupParametersResult.AsT1,
+                DatabaseApiClientErrors.BaseBackupParametersIsNotCreated);
 
-        var destinationBaseBackupRestorer = new BaseBackupRestorer(_logger, baseBackupRestoreParameters);
+        var destinationBaseBackupRestorer = new BaseBackupRestorer(_logger, createBaseBackupParametersResult.AsT0);
         await destinationBaseBackupRestorer.CreateDatabaseBackup(cancellationToken);
 
         var backupFileParameters = new BackupFileParameters(null, request.Name, request.Prefix, request.Suffix,
