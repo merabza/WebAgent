@@ -42,6 +42,12 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
     public async Task<OneOf<BackupFileParameters, IEnumerable<Err>>> Handle(CreateBackupCommandRequest request,
         CancellationToken cancellationToken = default)
     {
+        //var sourceBaseBackupParameters = await CreateBaseBackupParametersFabric.CreateBaseBackupParameters(_logger,
+        //    _httpClientFactory, fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages,
+        //    smartSchemas, localPath, downloadTempExtension, localSmartSchemaName, exchangeFileStorageName,
+        //    uploadTempExtension);
+
+
         var appSettings = AppSettings.Create(_config);
 
         if (string.IsNullOrWhiteSpace(appSettings?.BaseBackupsLocalPatch))

@@ -178,7 +178,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
             cancellationToken);
 
         var restoreDatabaseFromBackupResult = await createDatabaseManagerResult.AsT0.RestoreDatabaseFromBackup(
-            new BackupFileParameters(request.Name, request.Prefix, request.Suffix, request.DateMask),
+            new BackupFileParameters(null, request.Name, request.Prefix, request.Suffix, request.DateMask),
             //request.DestinationDbServerSideDataFolderPath, request.DestinationDbServerSideLogFolderPath,
             request.DatabaseName, request.DbServerFoldersSetName, null, cancellationToken);
         if (restoreDatabaseFromBackupResult.IsSome)
