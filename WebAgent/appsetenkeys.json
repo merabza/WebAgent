@@ -1,7 +1,7 @@
 {
     "Keys": [
         "Serilog:WriteTo:1:Args:path",
-        "AppSettings:BaseBackupsLocalPatch",
+        "AppSettings:DatabasesBackupFilesExchangeParameters:LocalPath",
         "AppSettings:DatabaseServerConnections:*:ServerAddress",
         "AppSettings:DatabaseServerConnections:*:ServerUser",
         "AppSettings:DatabaseServerConnections:*:ServerPass",
@@ -18,8 +18,8 @@
         "InstallerSettings:ServiceUserName",
         "InstallerSettings:FilesUserName",
         "InstallerSettings:FilesUsersGroupName",
-        "FileStorages:*:FileStoragePath",
-        "FileStorages:*:UserName",
-        "FileStorages:*:Password"
+        "AppSettings:FileStorages:*:FileStoragePath",
+        "AppSettings:FileStorages:*:UserName",
+        "AppSettings:FileStorages:*:Password"
     ]
 }

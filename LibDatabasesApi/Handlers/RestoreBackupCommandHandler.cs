@@ -9,6 +9,7 @@ using LibApiClientParameters;
 using LibDatabaseParameters;
 using LibDatabasesApi.CommandRequests;
 using LibFileParameters.Models;
+using LibProjectsApi;
 using LibWebAgentData;
 using LibWebAgentData.ErrorModels;
 using MediatR;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
 using SystemToolsShared.Errors;
+using WebAgentDatabasesApiContracts.Errors;
 using WebAgentDatabasesApiContracts.V1.Responses;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -54,8 +56,17 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         await _messagesDataManager.SendMessage(request.UserName, "Create AppSettings", cancellationToken);
 
         var appSettings = AppSettings.Create(_config);
+        if (appSettings is null)
+            return await Task.FromResult(new[] { ProjectsErrors.AppSettingsIsNotCreated });
 
-        if (string.IsNullOrWhiteSpace(appSettings?.BaseBackupsLocalPatch))
+        var databasesBackupFilesExchangeParameters = appSettings.DatabasesBackupFilesExchangeParameters;
+        if (databasesBackupFilesExchangeParameters is null)
+            return await Task.FromResult(new[]
+            {
+                DatabaseApiClientErrors.DatabasesBackupFilesExchangeParametersIsNotConfigured
+            });
+
+        if (string.IsNullOrWhiteSpace(databasesBackupFilesExchangeParameters.LocalPath))
             return new[] { DbApiErrors.BaseBackupsLocalPatchIsEmpty };
 
         if (appSettings.DatabaseServerData is null)
@@ -67,7 +78,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
 
         var databaseServerData = appSettings.DatabaseServerData;
 
-        var fileStorages = FileStorages.Create(_config);
+        var fileStorages = new FileStorages(appSettings.FileStorages);
 
         await _messagesDataManager.SendMessage(request.UserName, "Create CreateDatabaseManagementClient",
             cancellationToken);
@@ -179,7 +190,6 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
 
         var restoreDatabaseFromBackupResult = await createDatabaseManagerResult.AsT0.RestoreDatabaseFromBackup(
             new BackupFileParameters(null, request.Name, request.Prefix, request.Suffix, request.DateMask),
-            //request.DestinationDbServerSideDataFolderPath, request.DestinationDbServerSideLogFolderPath,
             request.DatabaseName, request.DbServerFoldersSetName, null, cancellationToken);
         if (restoreDatabaseFromBackupResult.IsSome)
             return Err.RecreateErrors((Err[])restoreDatabaseFromBackupResult,

@@ -6,7 +6,7 @@ namespace LibDatabasesApi.CommandRequests;
 public sealed class CreateBackupCommandRequest : ICommand<BackupFileParameters>
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CreateBackupCommandRequest(string databaseName, string dbServerFoldersSetName, string? userName)
+    private CreateBackupCommandRequest(string databaseName, string dbServerFoldersSetName, string? userName)
     {
         DatabaseName = databaseName;
         DbServerFoldersSetName = dbServerFoldersSetName;

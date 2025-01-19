@@ -2,12 +2,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using LibDatabasesApi.CommandRequests;
+using LibProjectsApi;
 using LibWebAgentData;
 using MessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using OneOf;
 using SystemToolsShared.Errors;
-using WebAgentDatabasesApiContracts.Errors;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -30,7 +30,7 @@ public sealed class GetDatabaseConnectionNamesCommandHandler : ICommandHandler<G
         var appSettings = AppSettings.Create(_config);
 
         if (appSettings is null)
-            return await Task.FromResult(new[] { DatabaseApiClientErrors.AppSettingsIsNotCreated });
+            return await Task.FromResult(new[] { ProjectsErrors.AppSettingsIsNotCreated });
 
         return await Task.FromResult(appSettings.DatabaseServerConnections.Keys);
     }

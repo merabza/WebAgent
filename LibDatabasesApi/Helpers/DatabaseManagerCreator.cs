@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DatabasesManagement;
 using LibApiClientParameters;
 using LibDatabaseParameters;
+using LibProjectsApi;
 using LibWebAgentData;
 using LibWebAgentData.ErrorModels;
 using LibWebAgentData.Models;
@@ -13,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
 using SystemToolsShared.Errors;
-using WebAgentDatabasesApiContracts.Errors;
 
 namespace LibDatabasesApi.Helpers;
 
@@ -26,7 +26,7 @@ public static class DatabaseManagerCreator
         var appSettings = AppSettings.Create(config);
 
         if (appSettings is null)
-            return await Task.FromResult(new[] { DatabaseApiClientErrors.AppSettingsIsNotCreated });
+            return await Task.FromResult(new[] { ProjectsErrors.AppSettingsIsNotCreated });
 
         if (appSettings.DatabaseServerData is null)
         {
@@ -50,7 +50,7 @@ public static class DatabaseManagerCreator
         var appSettings = AppSettings.Create(config);
 
         if (appSettings is null)
-            return await Task.FromResult(new[] { DatabaseApiClientErrors.AppSettingsIsNotCreated });
+            return await Task.FromResult(new[] { ProjectsErrors.AppSettingsIsNotCreated });
 
         var databaseManagementClient = await DatabaseManagersFabric.CreateDatabaseManager(logger, httpClientFactory,
             false, databaseServerData.DbConnectionName,
