@@ -56,7 +56,7 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         if (databaseServerData is null)
             return await Task.FromResult(new[] { DatabaseApiClientErrors.DatabaseServerDataIsNotConfigured });
 
-        var fromDatabaseParameters = new DatabasesParameters
+        var fromDatabaseParameters = new DatabaseParameters
         {
             DatabaseName = request.DatabaseName,
             DbServerFoldersSetName = request.DbServerFoldersSetName,

@@ -66,7 +66,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         if (databaseServerData is null)
             return await Task.FromResult(new[] { DatabaseApiClientErrors.DatabaseServerDataIsNotConfigured });
 
-        var restoreDatabaseParameters = new DatabasesParameters
+        var restoreDatabaseParameters = new DatabaseParameters
         {
             DatabaseName = request.DatabaseName,
             DbServerFoldersSetName = request.DbServerFoldersSetName,

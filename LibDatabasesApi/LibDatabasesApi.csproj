@@ -15,7 +15,6 @@
     <ProjectReference Include="..\..\ParametersManagement\LibDatabaseParameters\LibDatabaseParameters.csproj" />
     <ProjectReference Include="..\..\SystemTools\MessagingAbstractions\MessagingAbstractions.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\DatabasesManagement\DatabasesManagement.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\FileManagersMain\FileManagersMain.csproj" />
     <ProjectReference Include="..\..\WebAgentContracts\WebAgentDatabasesApiContracts\WebAgentDatabasesApiContracts.csproj" />
     <ProjectReference Include="..\..\WebAgentShared\LibProjectsApi\LibProjectsApi.csproj" />
     <ProjectReference Include="..\..\WebAgentShared\LibWebAgentData\LibWebAgentData.csproj" />
