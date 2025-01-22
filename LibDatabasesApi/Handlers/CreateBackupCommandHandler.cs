@@ -96,6 +96,5 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
             return await Task.FromResult(new[] { DatabaseApiClientErrors.BackupFileParametersIsNull });
 
         return backupFileParameters;
-
     }
 }

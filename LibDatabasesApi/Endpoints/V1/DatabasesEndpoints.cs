@@ -82,7 +82,8 @@ public sealed class DatabasesEndpoints : IInstaller
         await messagesDataManager.SendMessage(userName, $"{nameof(CreateBackup)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(CreateBackupCommandHandler)} from {nameof(CreateBackup)}");
 
-        var command = new CreateBackupCommandRequest(databaseName, dbServerFoldersSetName, dbBackupParameters, userName);
+        var command =
+            new CreateBackupCommandRequest(databaseName, dbServerFoldersSetName, dbBackupParameters, userName);
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(CreateBackup)} finished", cancellationToken);
