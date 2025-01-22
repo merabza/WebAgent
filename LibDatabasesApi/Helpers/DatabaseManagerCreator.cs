@@ -51,10 +51,10 @@ public static class DatabaseManagerCreator
         if (appSettings is null)
             return await Task.FromResult(new[] { ProjectsErrors.AppSettingsIsNotCreated });
 
-        var databaseManagementClient = await DatabaseManagersFabric.CreateDatabaseManager(logger, httpClientFactory,
-            false, databaseServerData.DbConnectionName,
-            new DatabaseServerConnections(appSettings.DatabaseServerConnections),
-            new ApiClients(appSettings.ApiClients), messagesDataManager, userName, cancellationToken);
+        var databaseManagementClient = await DatabaseManagersFabric.CreateDatabaseManager(logger, false,
+            databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
+            new ApiClients(appSettings.ApiClients), httpClientFactory, messagesDataManager, userName,
+            cancellationToken);
         return databaseManagementClient;
     }
 }

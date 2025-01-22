@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using ApiContracts.Errors;
+using LibDatabaseParameters;
 using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Handlers;
 using LibDatabasesApi.Mappers;
@@ -73,14 +74,15 @@ public sealed class DatabasesEndpoints : IInstaller
 
     // POST api/database/createbackup/{databaseName}/{dbServerFoldersSetName}
     private static async Task<IResult> CreateBackup([FromRoute] string databaseName,
-        [FromRoute] string dbServerFoldersSetName, HttpRequest httpRequest, IMediator mediator,
-        IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
+        [FromRoute] string dbServerFoldersSetName, [FromBody] DatabaseBackupParametersModel? dbBackupParameters,
+        HttpRequest httpRequest, IMediator mediator, IMessagesDataManager messagesDataManager,
+        CancellationToken cancellationToken = default)
     {
         var userName = httpRequest.HttpContext.User.Identity?.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(CreateBackup)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(CreateBackupCommandHandler)} from {nameof(CreateBackup)}");
 
-        var command = CreateBackupCommandRequest.Create(databaseName, dbServerFoldersSetName, userName);
+        var command = new CreateBackupCommandRequest(databaseName, dbServerFoldersSetName, dbBackupParameters, userName);
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(CreateBackup)} finished", cancellationToken);
