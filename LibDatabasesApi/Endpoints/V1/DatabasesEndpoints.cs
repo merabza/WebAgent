@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using ApiContracts.Errors;
+using ApiKeyIdentity;
 using LibDatabaseParameters;
 using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Handlers;
@@ -58,10 +59,11 @@ public sealed class DatabasesEndpoints : IInstaller
     }
 
     // POST api/database/checkrepairdatabase/{databaseName}
-    private static async Task<IResult> CheckRepairDatabase([FromRoute] string databaseName, HttpRequest httpRequest,
-        IMediator mediator, IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
+    private static async Task<IResult> CheckRepairDatabase([FromRoute] string databaseName,
+        ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
+        CancellationToken cancellationToken = default)
     {
-        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        var userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(CheckRepairDatabase)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(CheckRepairDatabaseCommandHandler)} from {nameof(CheckRepairDatabase)}");
 
@@ -75,10 +77,10 @@ public sealed class DatabasesEndpoints : IInstaller
     // POST api/database/createbackup/{databaseName}/{dbServerFoldersSetName}
     private static async Task<IResult> CreateBackup([FromRoute] string databaseName,
         [FromRoute] string dbServerFoldersSetName, [FromBody] DatabaseBackupParametersModel? dbBackupParameters,
-        HttpRequest httpRequest, IMediator mediator, IMessagesDataManager messagesDataManager,
+        ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
         CancellationToken cancellationToken = default)
     {
-        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        var userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(CreateBackup)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(CreateBackupCommandHandler)} from {nameof(CreateBackup)}");
 
@@ -91,11 +93,11 @@ public sealed class DatabasesEndpoints : IInstaller
     }
 
     // POST api/database/executecommand/{databaseName}
-    private static async Task<IResult> ExecuteCommand([FromRoute] string databaseName, HttpRequest httpRequest,
-        [FromBody] string? commandText, IMediator mediator, IMessagesDataManager messagesDataManager,
-        CancellationToken cancellationToken = default)
+    private static async Task<IResult> ExecuteCommand([FromRoute] string databaseName,
+        ICurrentUserByApiKey currentUserByApiKey, [FromBody] string? commandText, IMediator mediator,
+        IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
     {
-        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        var userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(ExecuteCommand)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(ExecuteCommandCommandHandler)} from {nameof(ExecuteCommand)}");
 
@@ -108,10 +110,10 @@ public sealed class DatabasesEndpoints : IInstaller
     }
 
     // GET api/database/getdatabaseconnectionnames
-    private static async Task<IResult> GetDatabaseConnectionNames(HttpRequest httpRequest, IMediator mediator,
-        IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
+    private static async Task<IResult> GetDatabaseConnectionNames(ICurrentUserByApiKey currentUserByApiKey,
+        IMediator mediator, IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
     {
-        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        var userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseConnectionNames)} started",
             cancellationToken);
         Debug.WriteLine(
@@ -127,10 +129,10 @@ public sealed class DatabasesEndpoints : IInstaller
     }
 
     // GET api/database/getdatabasefolderssetnames
-    private static async Task<IResult> GetDatabaseFoldersSetNames(HttpRequest httpRequest, IMediator mediator,
-        IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
+    private static async Task<IResult> GetDatabaseFoldersSetNames(ICurrentUserByApiKey currentUserByApiKey,
+        IMediator mediator, IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
     {
-        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        var userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseFoldersSetNames)} started",
             cancellationToken);
         Debug.WriteLine(
@@ -146,10 +148,10 @@ public sealed class DatabasesEndpoints : IInstaller
     }
 
     // GET api/database/getdatabasenames
-    private static async Task<IResult> GetDatabaseNames(HttpRequest httpRequest, IMediator mediator,
+    private static async Task<IResult> GetDatabaseNames(ICurrentUserByApiKey currentUserByApiKey, IMediator mediator,
         IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
     {
-        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        var userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseNames)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(GetDatabaseNamesCommandHandler)} from {nameof(GetDatabaseNames)}");
 
@@ -162,10 +164,11 @@ public sealed class DatabasesEndpoints : IInstaller
     }
 
     // GET api/database/isdatabaseexists/{databaseName}
-    private static async Task<IResult> IsDatabaseExists([FromRoute] string databaseName, HttpRequest httpRequest,
-        IMediator mediator, IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
+    private static async Task<IResult> IsDatabaseExists([FromRoute] string databaseName,
+        ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
+        CancellationToken cancellationToken = default)
     {
-        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        var userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(IsDatabaseExists)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(IsDatabaseExistsCommandHandler)} from {nameof(IsDatabaseExists)}");
 
@@ -179,10 +182,11 @@ public sealed class DatabasesEndpoints : IInstaller
     }
 
     // POST api/database/recompileprocedures/{databaseName}
-    private static async Task<IResult> RecompileProcedures([FromRoute] string databaseName, HttpRequest httpRequest,
-        IMediator mediator, IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
+    private static async Task<IResult> RecompileProcedures([FromRoute] string databaseName,
+        ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
+        CancellationToken cancellationToken = default)
     {
-        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        var userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(RecompileProcedures)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(RecompileProceduresCommandHandler)} from {nameof(RecompileProcedures)}");
 
@@ -197,10 +201,11 @@ public sealed class DatabasesEndpoints : IInstaller
 
     // PUT restorebackup/{databaseName}/{dbServerFoldersSetName}
     private static async Task<IResult> RestoreBackup([FromRoute] string databaseName,
-        [FromRoute] string dbServerFoldersSetName, HttpRequest httpRequest, [FromBody] RestoreBackupRequest? request,
-        IMediator mediator, IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
+        [FromRoute] string dbServerFoldersSetName, ICurrentUserByApiKey currentUserByApiKey,
+        [FromBody] RestoreBackupRequest? request, IMediator mediator, IMessagesDataManager messagesDataManager,
+        CancellationToken cancellationToken = default)
     {
-        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        var userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(RestoreBackup)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(RestoreBackupCommandHandler)} from {nameof(RestoreBackup)}");
 
@@ -218,10 +223,11 @@ public sealed class DatabasesEndpoints : IInstaller
     }
 
     // GET api/database/testconnection/{databaseName?}
-    private static async Task<IResult> TestConnection([FromRoute] string? databaseName, HttpRequest httpRequest,
-        IMediator mediator, IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
+    private static async Task<IResult> TestConnection([FromRoute] string? databaseName,
+        ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
+        CancellationToken cancellationToken = default)
     {
-        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        var userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(TestConnection)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(TestConnectionCommandHandler)} from {nameof(TestConnection)}");
 
@@ -235,10 +241,11 @@ public sealed class DatabasesEndpoints : IInstaller
     }
 
     // POST api/database/updatestatistics/{databaseName}
-    private static async Task<IResult> UpdateStatistics([FromRoute] string databaseName, HttpRequest httpRequest,
-        IMediator mediator, IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
+    private static async Task<IResult> UpdateStatistics([FromRoute] string databaseName,
+        ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
+        CancellationToken cancellationToken = default)
     {
-        var userName = httpRequest.HttpContext.User.Identity?.Name;
+        var userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(UpdateStatistics)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(UpdateStatisticsCommandHandler)} from {nameof(UpdateStatistics)}");
 
