@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ApiContracts.Errors;
 using DatabasesManagement;
+using DbTools;
 using LibApiClientParameters;
 using LibDatabaseParameters;
 using LibDatabasesApi.CommandRequests;
@@ -79,19 +80,13 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         var apiClients = new ApiClients(appSettings.ApiClients);
         var smartSchemas = new SmartSchemas(appSettings.SmartSchemas);
         var fileStorages = new FileStorages(appSettings.FileStorages);
-        var localPath = databasesBackupFilesExchangeParameters.LocalPath;
-        var downloadTempExtension = databasesBackupFilesExchangeParameters.DownloadTempExtension;
-        var localSmartSchemaName = databasesBackupFilesExchangeParameters.LocalSmartSchemaName;
-        var exchangeFileStorageName = databasesBackupFilesExchangeParameters.ExchangeFileStorageName;
-        var uploadTempExtension = databasesBackupFilesExchangeParameters.UploadTempExtension;
 
         var createBaseBackupParametersFabric =
             new CreateBaseBackupParametersFabric(_logger, _messagesDataManager, request.UserName, false);
 
         var createBaseBackupParametersResult = await createBaseBackupParametersFabric.CreateBaseBackupParameters(
             _httpClientFactory, restoreDatabaseParameters, databaseServerConnections, apiClients, fileStorages,
-            smartSchemas, localPath, downloadTempExtension, localSmartSchemaName, exchangeFileStorageName,
-            uploadTempExtension, cancellationToken);
+            smartSchemas, databasesBackupFilesExchangeParameters, cancellationToken);
 
         if (createBaseBackupParametersResult.IsT1)
             return Err.RecreateErrors(createBaseBackupParametersResult.AsT1,
@@ -103,7 +98,8 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         var backupFileParameters = new BackupFileParameters(null, request.Name, request.Prefix, request.Suffix,
             request.DateMask);
 
-        if (!await destinationBaseBackupRestorer.RestoreDatabaseFromBackup(backupFileParameters, cancellationToken))
+        if (!await destinationBaseBackupRestorer.RestoreDatabaseFromBackup(backupFileParameters,
+                request.DatabaseRecoveryModel ?? EDatabaseRecoveryModel.Full, cancellationToken))
             return new[] { DbApiErrors.CannotRestoreDatabase(request.DatabaseName, request.Name) };
 
         return new Unit();

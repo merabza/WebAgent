@@ -62,26 +62,24 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
             DbServerFoldersSetName = request.DbServerFoldersSetName,
             DbConnectionName = databaseServerData.DbConnectionName,
             FileStorageName = databaseServerData.DatabaseBackupsFileStorageName,
-            SmartSchemaName = databaseServerData.DbSmartSchemaName,
-            DatabaseBackupParameters = request.DbBackupParameters
+            SmartSchemaName = databaseServerData.DbSmartSchemaName
         };
 
         var databaseServerConnections = new DatabaseServerConnections(appSettings.DatabaseServerConnections);
         var apiClients = new ApiClients(appSettings.ApiClients);
         var fileStorages = new FileStorages(appSettings.FileStorages);
         var smartSchemas = new SmartSchemas(appSettings.SmartSchemas);
-        var localPath = databasesBackupFilesExchangeParameters.LocalPath;
-        var downloadTempExtension = databasesBackupFilesExchangeParameters.DownloadTempExtension;
-        var localSmartSchemaName = databasesBackupFilesExchangeParameters.LocalSmartSchemaName;
-        var exchangeFileStorageName = databasesBackupFilesExchangeParameters.ExchangeFileStorageName;
-        var uploadTempExtension = databasesBackupFilesExchangeParameters.UploadTempExtension;
+        //var localPath = databasesBackupFilesExchangeParameters.LocalPath;
+        //var downloadTempExtension = databasesBackupFilesExchangeParameters.DownloadTempExtension;
+        //var localSmartSchemaName = databasesBackupFilesExchangeParameters.LocalSmartSchemaName;
+        //var exchangeFileStorageName = databasesBackupFilesExchangeParameters.ExchangeFileStorageName;
+        //var uploadTempExtension = databasesBackupFilesExchangeParameters.UploadTempExtension;
 
         var createBaseBackupParametersFabric =
             new CreateBaseBackupParametersFabric(_logger, _messagesDataManager, request.UserName, false);
         var baseBackupRestoreParametersResult = await createBaseBackupParametersFabric.CreateBaseBackupParameters(
             _httpClientFactory, fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages,
-            smartSchemas, localPath, downloadTempExtension, localSmartSchemaName, exchangeFileStorageName,
-            uploadTempExtension, cancellationToken);
+            smartSchemas, databasesBackupFilesExchangeParameters, cancellationToken);
 
         if (baseBackupRestoreParametersResult.IsT1)
             return Err.RecreateErrors(baseBackupRestoreParametersResult.AsT1,

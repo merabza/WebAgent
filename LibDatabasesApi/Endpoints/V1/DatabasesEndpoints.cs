@@ -76,7 +76,7 @@ public sealed class DatabasesEndpoints : IInstaller
 
     // POST api/database/createbackup/{databaseName}/{dbServerFoldersSetName}
     private static async Task<IResult> CreateBackup([FromRoute] string databaseName,
-        [FromRoute] string dbServerFoldersSetName, [FromBody] DatabaseBackupParametersModel? dbBackupParameters,
+        [FromRoute] string dbServerFoldersSetName, [FromBody] DatabaseBackupParametersDomain? dbBackupParameters,
         ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
         CancellationToken cancellationToken = default)
     {

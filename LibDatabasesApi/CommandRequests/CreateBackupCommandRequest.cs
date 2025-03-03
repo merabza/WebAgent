@@ -8,7 +8,7 @@ public sealed class CreateBackupCommandRequest : ICommand<BackupFileParameters>
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public CreateBackupCommandRequest(string databaseName, string dbServerFoldersSetName,
-        DatabaseBackupParametersModel? dbBackupParameters, string? userName)
+        DatabaseBackupParametersDomain? dbBackupParameters, string? userName)
     {
         DatabaseName = databaseName;
         DbServerFoldersSetName = dbServerFoldersSetName;
@@ -18,7 +18,7 @@ public sealed class CreateBackupCommandRequest : ICommand<BackupFileParameters>
 
     public string DatabaseName { get; set; }
     public string DbServerFoldersSetName { get; set; }
-    public DatabaseBackupParametersModel? DbBackupParameters { get; }
+    public DatabaseBackupParametersDomain? DbBackupParameters { get; }
     public string? UserName { get; set; }
 
     //public static CreateBackupCommandRequest Create(string databaseName, string dbServerFoldersSetName,

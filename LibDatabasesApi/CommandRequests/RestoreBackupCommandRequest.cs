@@ -1,4 +1,5 @@
-﻿using MessagingAbstractions;
+﻿using DbTools;
+using MessagingAbstractions;
 
 namespace LibDatabasesApi.CommandRequests;
 
@@ -6,7 +7,7 @@ public sealed class RestoreBackupCommandRequest : ICommand
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public RestoreBackupCommandRequest(string databaseName, string dbServerFoldersSetName, string? prefix,
-        string? suffix, string? name, string? dateMask, string? userName)
+        string? suffix, string? name, string? dateMask, string? userName, EDatabaseRecoveryModel? databaseRecoveryModel)
     {
         DatabaseName = databaseName;
         DbServerFoldersSetName = dbServerFoldersSetName;
@@ -15,6 +16,7 @@ public sealed class RestoreBackupCommandRequest : ICommand
         Name = name;
         DateMask = dateMask;
         UserName = userName;
+        DatabaseRecoveryModel = databaseRecoveryModel;
     }
 
     public string DatabaseName { get; set; }
@@ -24,4 +26,5 @@ public sealed class RestoreBackupCommandRequest : ICommand
     public string? Name { get; set; }
     public string? DateMask { get; set; }
     public string? UserName { get; set; }
+    public EDatabaseRecoveryModel? DatabaseRecoveryModel { get; }
 }
