@@ -9,7 +9,7 @@ using LibDatabasesApi.CommandRequests;
 using LibFileParameters.Models;
 using LibProjectsApi;
 using LibWebAgentData;
-using MessagingAbstractions;
+using MediatRMessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;

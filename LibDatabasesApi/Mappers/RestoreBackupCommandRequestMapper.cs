@@ -9,6 +9,7 @@ public static class RestoreBackupCommandRequestMapper
         string databaseName, string dbServerFoldersSetName, string? userName)
     {
         return new RestoreBackupCommandRequest(databaseName, dbServerFoldersSetName, restoreBackupRequest.Prefix,
-            restoreBackupRequest.Suffix, restoreBackupRequest.Name, restoreBackupRequest.DateMask, userName, restoreBackupRequest.DatabaseRecoveryModel);
+            restoreBackupRequest.Suffix, restoreBackupRequest.Name, restoreBackupRequest.DateMask, userName,
+            restoreBackupRequest.DatabaseRecoveryModel);
     }
 }

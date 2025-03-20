@@ -30,7 +30,6 @@ try
         //{ SwaggerInstaller.UseSwaggerWithJwtBearerKey, string.Empty },//Allow Swagger
     };
 
-
     var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     {
         ContentRootPath = AppContext.BaseDirectory, Args = args

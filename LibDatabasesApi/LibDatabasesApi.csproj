@@ -8,12 +8,13 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.11.0" />
+    <PackageReference Include="MediatR" Version="12.4.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\DatabaseTools\DbTools\DbTools.csproj" />
     <ProjectReference Include="..\..\ParametersManagement\LibDatabaseParameters\LibDatabaseParameters.csproj" />
-    <ProjectReference Include="..\..\SystemTools\MessagingAbstractions\MessagingAbstractions.csproj" />
+    <ProjectReference Include="..\..\SystemTools\MediatRMessagingAbstractions\MediatRMessagingAbstractions.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\DatabasesManagement\DatabasesManagement.csproj" />
     <ProjectReference Include="..\..\WebAgentContracts\WebAgentDatabasesApiContracts\WebAgentDatabasesApiContracts.csproj" />
     <ProjectReference Include="..\..\WebAgentShared\LibProjectsApi\LibProjectsApi.csproj" />

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using LibDatabasesApi.CommandRequests;
 using LibProjectsApi;
 using LibWebAgentData;
-using MessagingAbstractions;
+using MediatRMessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using OneOf;
 using SystemToolsShared.Errors;

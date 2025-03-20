@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
-using MessagingAbstractions;
+using MediatRMessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;

@@ -1,5 +1,5 @@
 ﻿using LibDatabaseParameters;
-using MessagingAbstractions;
+using MediatRMessagingAbstractions;
 using WebAgentDatabasesApiContracts.V1.Responses;
 
 namespace LibDatabasesApi.CommandRequests;

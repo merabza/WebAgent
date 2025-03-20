@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using DbTools.Models;
 using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
-using MessagingAbstractions;
+using MediatRMessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
@@ -47,7 +47,6 @@ public sealed class
         var getDatabaseNamesResult = await databaseManagementClient.GetDatabaseNames(cancellationToken);
         return getDatabaseNamesResult.Match<OneOf<IEnumerable<DatabaseInfoModel>, IEnumerable<Err>>>(f0 => f0,
             f1 => (Err[])f1);
-
 
         //ასეთი კონსტრუქცია ვერ გავმართე
         //return await Task.FromResult(result.Match(x => x.GetDatabaseNames(request.ServerName).Result, er => er.ToArray()));

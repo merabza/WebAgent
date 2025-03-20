@@ -18,7 +18,6 @@
 //            string.IsNullOrWhiteSpace(createBackupRequest.BackupNameMiddlePart))
 //            return new[] { ApiErrors.SomeRequestParametersAreNotValid };
 
-
 //        return new DatabaseBackupParametersDomain(createBackupRequest.BackupNamePrefix,
 //            string.IsNullOrWhiteSpace(createBackupRequest.DateMask) ? "yyyyMMddHHmmss" : createBackupRequest.DateMask,
 //            createBackupRequest.BackupFileExtension, createBackupRequest.BackupNameMiddlePart,
@@ -33,7 +32,6 @@
 //            string.IsNullOrWhiteSpace(createBackupRequest.BackupFileExtension) ||
 //            string.IsNullOrWhiteSpace(createBackupRequest.BackupNameMiddlePart))
 //            return new[] { ApiErrors.SomeRequestParametersAreNotValid };
-
 
 //        return new DatabaseBackupParametersDomain(createBackupRequest.BackupNamePrefix,
 //            string.IsNullOrWhiteSpace(createBackupRequest.DateMask) ? "yyyyMMddHHmmss" : createBackupRequest.DateMask,

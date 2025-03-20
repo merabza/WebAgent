@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using MessagingAbstractions;
+using MediatRMessagingAbstractions;
 
 namespace LibDatabasesApi.CommandRequests;
 

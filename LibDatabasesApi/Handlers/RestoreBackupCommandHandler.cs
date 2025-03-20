@@ -13,7 +13,7 @@ using LibProjectsApi;
 using LibWebAgentData;
 using LibWebAgentData.ErrorModels;
 using MediatR;
-using MessagingAbstractions;
+using MediatRMessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;

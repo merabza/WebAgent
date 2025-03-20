@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using DbTools.Models;
-using MessagingAbstractions;
+using MediatRMessagingAbstractions;
 
 namespace LibDatabasesApi.CommandRequests;
 
