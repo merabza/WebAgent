@@ -10,7 +10,6 @@ using Serilog;
 using SwaggerTools;
 using SystemToolsShared;
 using WebInstallers;
-using AssemblyReference = ApiExceptionHandler.AssemblyReference;
 
 const string appName = "WebAgent";
 const string appKey = "E0FFB24C-7561-4DBA-8E0F-02CA585A3C9C";
@@ -38,12 +37,20 @@ try
     var debugMode = builder.Environment.IsDevelopment();
 
     if (!builder.InstallServices(debugMode, args, parameters,
+            
+            // @formatter:off
+
             //WebSystemTools
-            AssemblyReference.Assembly, ApiKeyIdentity.AssemblyReference.Assembly,
-            ConfigurationEncrypt.AssemblyReference.Assembly, FluentValidationInstaller.AssemblyReference.Assembly,
-            HttpClientInstaller.AssemblyReference.Assembly, SerilogLogger.AssemblyReference.Assembly,
-            SignalRMessages.AssemblyReference.Assembly, SwaggerTools.AssemblyReference.Assembly,
-            TestToolsApi.AssemblyReference.Assembly, WindowsServiceTools.AssemblyReference.Assembly,
+            ApiExceptionHandler.AssemblyReference.Assembly, 
+            ApiKeyIdentity.AssemblyReference.Assembly,
+            ConfigurationEncrypt.AssemblyReference.Assembly, 
+            FluentValidationInstaller.AssemblyReference.Assembly,
+            HttpClientInstaller.AssemblyReference.Assembly, 
+            SerilogLogger.AssemblyReference.Assembly,
+            SignalRMessages.AssemblyReference.Assembly, 
+            SwaggerTools.AssemblyReference.Assembly,
+            TestToolsApi.AssemblyReference.Assembly, 
+            WindowsServiceTools.AssemblyReference.Assembly,
 
             //WebAgentShared
             LibProjectsApi.AssemblyReference.Assembly,
