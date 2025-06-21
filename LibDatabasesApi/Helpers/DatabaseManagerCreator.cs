@@ -51,7 +51,7 @@ public static class DatabaseManagerCreator
         if (appSettings is null)
             return await Task.FromResult(new[] { ProjectsErrors.AppSettingsIsNotCreated });
 
-        var databaseManagementClient = await DatabaseManagersFabric.CreateDatabaseManager(logger, false,
+        var databaseManagementClient = await DatabaseManagersFactory.CreateDatabaseManager(logger, false,
             databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
             new ApiClients(appSettings.ApiClients), httpClientFactory, messagesDataManager, userName,
             cancellationToken);

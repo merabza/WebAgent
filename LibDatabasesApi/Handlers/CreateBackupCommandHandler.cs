@@ -75,9 +75,9 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         //var exchangeFileStorageName = databasesBackupFilesExchangeParameters.ExchangeFileStorageName;
         //var uploadTempExtension = databasesBackupFilesExchangeParameters.UploadTempExtension;
 
-        var createBaseBackupParametersFabric =
-            new CreateBaseBackupParametersFabric(_logger, _messagesDataManager, request.UserName, false);
-        var baseBackupRestoreParametersResult = await createBaseBackupParametersFabric.CreateBaseBackupParameters(
+        var createBaseBackupParametersFactory =
+            new CreateBaseBackupParametersFactory(_logger, _messagesDataManager, request.UserName, false);
+        var baseBackupRestoreParametersResult = await createBaseBackupParametersFactory.CreateBaseBackupParameters(
             _httpClientFactory, fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages,
             smartSchemas, databasesBackupFilesExchangeParameters, cancellationToken);
 

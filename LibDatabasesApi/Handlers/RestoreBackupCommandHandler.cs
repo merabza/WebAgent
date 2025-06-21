@@ -81,10 +81,10 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         var smartSchemas = new SmartSchemas(appSettings.SmartSchemas);
         var fileStorages = new FileStorages(appSettings.FileStorages);
 
-        var createBaseBackupParametersFabric =
-            new CreateBaseBackupParametersFabric(_logger, _messagesDataManager, request.UserName, false);
+        var createBaseBackupParametersFactory =
+            new CreateBaseBackupParametersFactory(_logger, _messagesDataManager, request.UserName, false);
 
-        var createBaseBackupParametersResult = await createBaseBackupParametersFabric.CreateBaseBackupParameters(
+        var createBaseBackupParametersResult = await createBaseBackupParametersFactory.CreateBaseBackupParameters(
             _httpClientFactory, restoreDatabaseParameters, databaseServerConnections, apiClients, fileStorages,
             smartSchemas, databasesBackupFilesExchangeParameters, cancellationToken);
 
