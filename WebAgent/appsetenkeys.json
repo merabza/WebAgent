@@ -1,6 +1,7 @@
 {
     "Keys": [
         "Serilog:WriteTo:1:Args:path",
+        "MediatRLicenseKey",
         "AppSettings:DatabasesBackupFilesExchangeParameters:LocalPath",
         "AppSettings:DatabaseServerConnections:*:ServerAddress",
         "AppSettings:DatabaseServerConnections:*:ServerUser",

@@ -4,12 +4,14 @@ using System.IO;
 using ConfigurationEncrypt;
 using FluentValidationInstaller;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using SwaggerTools;
 using SystemToolsShared;
 using WebInstallers;
+using AssemblyReference = ApiExceptionHandler.AssemblyReference;
 
 const string appName = "WebAgent";
 const string appKey = "E0FFB24C-7561-4DBA-8E0F-02CA585A3C9C";
@@ -41,7 +43,7 @@ try
             // @formatter:off
 
             //WebSystemTools
-            ApiExceptionHandler.AssemblyReference.Assembly, 
+            AssemblyReference.Assembly, 
             ApiKeyIdentity.AssemblyReference.Assembly,
             ConfigurationEncrypt.AssemblyReference.Assembly, 
             FluentValidationInstaller.AssemblyReference.Assembly,
@@ -59,8 +61,13 @@ try
             LibDatabasesApi.AssemblyReference.Assembly))
         return 2;
 
+    var mediatRSettings = builder.Configuration.GetSection("MediatRLicenseKey");
+
+    var mediatRLicenseKey = mediatRSettings.Get<string>();
+
     builder.Services.AddMediatR(cfg =>
     {
+        cfg.LicenseKey = mediatRLicenseKey;
         cfg.RegisterServicesFromAssembly(LibProjectsApi.AssemblyReference.Assembly);
         cfg.RegisterServicesFromAssembly(LibDatabasesApi.AssemblyReference.Assembly);
     });
