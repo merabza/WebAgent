@@ -87,7 +87,7 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
 
         _logger.LogInformation("Create Backup for source Database");
 
-        var sourceBaseBackupCreator = new BaseBackupRestorer(_logger, baseBackupRestoreParametersResult.AsT0);
+        var sourceBaseBackupCreator = new BaseBackupRestoreTool(_logger, baseBackupRestoreParametersResult.AsT0);
         var backupFileParameters = await sourceBaseBackupCreator.CreateDatabaseBackup(cancellationToken);
 
         if (backupFileParameters is null)

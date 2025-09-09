@@ -92,7 +92,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
             return Err.RecreateErrors(createBaseBackupParametersResult.AsT1,
                 DatabaseApiClientErrors.BaseBackupParametersIsNotCreated);
 
-        var destinationBaseBackupRestorer = new BaseBackupRestorer(_logger, createBaseBackupParametersResult.AsT0);
+        var destinationBaseBackupRestorer = new BaseBackupRestoreTool(_logger, createBaseBackupParametersResult.AsT0);
         await destinationBaseBackupRestorer.CreateDatabaseBackup(cancellationToken);
 
         var backupFileParameters = new BackupFileParameters(null, request.Name, request.Prefix, request.Suffix,
