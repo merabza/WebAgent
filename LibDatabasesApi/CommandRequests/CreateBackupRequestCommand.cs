@@ -4,10 +4,10 @@ using WebAgentDatabasesApiContracts.V1.Responses;
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class CreateBackupCommandRequest : ICommand<BackupFileParameters>
+public sealed class CreateBackupRequestCommand : ICommand<BackupFileParameters>
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CreateBackupCommandRequest(string databaseName, string dbServerFoldersSetName,
+    public CreateBackupRequestCommand(string databaseName, string dbServerFoldersSetName,
         DatabaseBackupParametersDomain? dbBackupParameters, string? userName)
     {
         DatabaseName = databaseName;

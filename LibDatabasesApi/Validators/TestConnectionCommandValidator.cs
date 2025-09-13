@@ -5,7 +5,7 @@ using LibProjectsApi.Validators;
 namespace LibDatabasesApi.Validators;
 
 // ReSharper disable once UnusedType.Global
-public sealed class TestConnectionCommandValidator : AbstractValidator<TestConnectionCommandRequest>
+public sealed class TestConnectionCommandValidator : AbstractValidator<TestConnectionRequestCommand>
 {
     public TestConnectionCommandValidator()
     {

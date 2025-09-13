@@ -5,7 +5,7 @@ using LibProjectsApi.Validators;
 namespace LibDatabasesApi.Validators;
 
 // ReSharper disable once UnusedType.Global
-public sealed class ExecuteCommandCommandValidator : AbstractValidator<ExecuteCommandCommandRequest>
+public sealed class ExecuteCommandCommandValidator : AbstractValidator<ExecuteCommandRequestCommand>
 {
     public ExecuteCommandCommandValidator()
     {

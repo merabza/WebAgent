@@ -21,7 +21,7 @@ using WebAgentDatabasesApiContracts.V1.Responses;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCommandRequest, BackupFileParameters>
+public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupRequestCommand, BackupFileParameters>
 {
     private readonly IConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -38,7 +38,7 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupCom
         _messagesDataManager = messagesDataManager;
     }
 
-    public async Task<OneOf<BackupFileParameters, IEnumerable<Err>>> Handle(CreateBackupCommandRequest request,
+    public async Task<OneOf<BackupFileParameters, IEnumerable<Err>>> Handle(CreateBackupRequestCommand request,
         CancellationToken cancellationToken = default)
     {
         var appSettings = AppSettings.Create(_config);

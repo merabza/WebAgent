@@ -19,7 +19,7 @@ namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class
-    GetDatabaseNamesCommandHandler : ICommandHandler<GetDatabaseNamesCommandRequest, IEnumerable<DatabaseInfoModel>>
+    GetDatabaseNamesCommandHandler : ICommandHandler<GetDatabaseNamesRequestCommand, IEnumerable<DatabaseInfoModel>>
 {
     private readonly IConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -36,7 +36,7 @@ public sealed class
     }
 
     public async Task<OneOf<IEnumerable<DatabaseInfoModel>, IEnumerable<Err>>> Handle(
-        GetDatabaseNamesCommandRequest request, CancellationToken cancellationToken = default)
+        GetDatabaseNamesRequestCommand request, CancellationToken cancellationToken = default)
     {
         var result = await DatabaseManagerCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
             request.UserName, cancellationToken);

@@ -19,7 +19,7 @@ using SystemToolsShared.Errors;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class ExecuteCommandCommandHandler : ICommandHandler<ExecuteCommandCommandRequest>
+public sealed class ExecuteCommandCommandHandler : ICommandHandler<ExecuteCommandRequestCommand>
 {
     private readonly IConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -35,7 +35,7 @@ public sealed class ExecuteCommandCommandHandler : ICommandHandler<ExecuteComman
         _messagesDataManager = messagesDataManager;
     }
 
-    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(ExecuteCommandCommandRequest request,
+    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(ExecuteCommandRequestCommand request,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(request.CommandText))

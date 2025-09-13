@@ -4,9 +4,9 @@
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class TestConnectionCommandRequest : ICommand
+public sealed class TestConnectionRequestCommand : ICommand
 {
-    public TestConnectionCommandRequest(string? databaseName, string? userName)
+    public TestConnectionRequestCommand(string? databaseName, string? userName)
     {
         DatabaseName = databaseName;
         UserName = userName;
@@ -15,8 +15,8 @@ public sealed class TestConnectionCommandRequest : ICommand
     public string? DatabaseName { get; set; }
     public string? UserName { get; set; }
 
-    public static TestConnectionCommandRequest Create(string? databaseName, string? userName)
+    public static TestConnectionRequestCommand Create(string? databaseName, string? userName)
     {
-        return new TestConnectionCommandRequest(databaseName, userName);
+        return new TestConnectionRequestCommand(databaseName, userName);
     }
 }

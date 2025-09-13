@@ -5,7 +5,7 @@ using LibProjectsApi.Validators;
 namespace LibDatabasesApi.Validators;
 
 // ReSharper disable once UnusedType.Global
-public sealed class IsDatabaseExistsCommandValidator : AbstractValidator<IsDatabaseExistsCommandRequest>
+public sealed class IsDatabaseExistsCommandValidator : AbstractValidator<IsDatabaseExistsRequestCommand>
 {
     public IsDatabaseExistsCommandValidator()
     {

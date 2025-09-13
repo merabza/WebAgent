@@ -19,7 +19,7 @@ using SystemToolsShared.Errors;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class UpdateStatisticsCommandHandler : ICommandHandler<UpdateStatisticsCommandRequest>
+public sealed class UpdateStatisticsCommandHandler : ICommandHandler<UpdateStatisticsRequestCommand>
 {
     private readonly IConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -35,7 +35,7 @@ public sealed class UpdateStatisticsCommandHandler : ICommandHandler<UpdateStati
         _messagesDataManager = messagesDataManager;
     }
 
-    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(UpdateStatisticsCommandRequest request,
+    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(UpdateStatisticsRequestCommand request,
         CancellationToken cancellationToken = default)
     {
         var result = await DatabaseManagerCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,

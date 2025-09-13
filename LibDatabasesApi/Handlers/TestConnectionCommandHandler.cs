@@ -19,7 +19,7 @@ using SystemToolsShared.Errors;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectionCommandRequest>
+public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectionRequestCommand>
 {
     private readonly IConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -35,7 +35,7 @@ public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectio
         _messagesDataManager = messagesDataManager;
     }
 
-    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(TestConnectionCommandRequest request,
+    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(TestConnectionRequestCommand request,
         CancellationToken cancellationToken = default)
     {
         var databaseClientCreatorResult = await DatabaseManagerCreator.Create(_config, _logger, _httpClientFactory,

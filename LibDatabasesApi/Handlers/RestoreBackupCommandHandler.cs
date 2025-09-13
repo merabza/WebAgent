@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using ApiContracts.Errors;
+﻿using ApiContracts.Errors;
 using DatabasesManagement;
+using DatabasesManagement.Errors;
 using DbTools;
+using FileManagersMain;
+using Installer.Domain;
+using Installer.Errors;
 using LibApiClientParameters;
 using LibDatabaseParameters;
 using LibDatabasesApi.CommandRequests;
@@ -17,6 +17,11 @@ using MediatRMessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
+using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemToolsShared;
 using SystemToolsShared.Errors;
 using WebAgentDatabasesApiContracts.Errors;
@@ -27,7 +32,7 @@ using WebAgentDatabasesApiContracts.V1.Responses;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupCommandRequest>
+public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupCommandRequestCommand>
 {
     private readonly IConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -43,18 +48,21 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         _messagesDataManager = messagesDataManager;
     }
 
-    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(RestoreBackupCommandRequest request,
+    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(RestoreBackupCommandRequestCommand request,
         CancellationToken cancellationToken = default)
     {
-        await _messagesDataManager.SendMessage(request.UserName,
-            $"{nameof(RestoreBackupCommandHandler)} Handle started", cancellationToken);
+
+        var messageLogger = new MessageLogger(_logger, _messagesDataManager, request.UserName, false);
+
+        await messageLogger.LogInfoAndSendMessage($"{nameof(RestoreBackupCommandHandler)} Handle started",
+            cancellationToken);
 
         //შევამოწმოთ მოთხოვნის პარამეტრები: სახელი, პრეფიქსი, თარიღის ფორმატი, სუფიქსი
         if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Prefix) ||
             string.IsNullOrWhiteSpace(request.DateMask) || string.IsNullOrWhiteSpace(request.Suffix))
             return new[] { ApiErrors.SomeRequestParametersAreNotValid };
 
-        await _messagesDataManager.SendMessage(request.UserName, "Create AppSettings", cancellationToken);
+        await messageLogger.LogInfoAndSendMessage("Create AppSettings", cancellationToken);
 
         //ჩავტვირთოთ კონფიგურაცია
         var appSettings = AppSettings.Create(_config);
@@ -96,8 +104,25 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
             return Err.RecreateErrors(createBaseBackupParametersResult.AsT1,
                 DatabaseApiClientErrors.BaseBackupParametersIsNotCreated);
 
-        var destinationBaseBackupRestorer = new BaseBackupRestoreTool(_logger, createBaseBackupParametersResult.AsT0);
+        var createBaseBackupParameters = createBaseBackupParametersResult.AsT0;
+
+        var destinationBaseBackupRestorer = new BaseBackupRestoreTool(_logger, createBaseBackupParameters);
         await destinationBaseBackupRestorer.CreateDatabaseBackup(cancellationToken);
+
+
+        var exchangeFileManager = createBaseBackupParameters.ExchangeFileManager;
+
+        if (exchangeFileManager is null)
+            return (Err[])await messageLogger.LogErrorAndSendMessageFromError(InstallerErrors.ExchangeFileManagerIsNull,
+                cancellationToken);
+
+        var localArchiveFileName =
+            Path.Combine(createBaseBackupParameters.LocalPath, request.Name);
+        //თუ ფაილი უკვე მოქაჩულია, მეორედ მისი მოქაჩვა საჭირო არ არის
+        if (!File.Exists(localArchiveFileName) && !exchangeFileManager.DownloadFile(request.Name,
+                createBaseBackupParameters.DownloadTempExtension)) //მოვქაჩოთ არჩეული საინსტალაციო არქივი
+            return (Err[])await messageLogger.LogErrorAndSendMessageFromError(InstallerErrors.ProjectArchiveFileWasNotDownloaded,
+                cancellationToken);
 
         var backupFileParameters = new BackupFileParameters(null, request.Name, request.Prefix, request.Suffix,
             request.DateMask);

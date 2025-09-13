@@ -14,7 +14,7 @@ using SystemToolsShared.Errors;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class GetDatabaseConnectionNamesCommandHandler : ICommandHandler<GetDatabaseConnectionNamesCommandRequest,
+public sealed class GetDatabaseConnectionNamesCommandHandler : ICommandHandler<GetDatabaseConnectionNamesRequestCommand,
     IEnumerable<string>>
 {
     private readonly IConfiguration _config;
@@ -25,7 +25,7 @@ public sealed class GetDatabaseConnectionNamesCommandHandler : ICommandHandler<G
     }
 
     public async Task<OneOf<IEnumerable<string>, IEnumerable<Err>>> Handle(
-        GetDatabaseConnectionNamesCommandRequest request, CancellationToken cancellationToken = default)
+        GetDatabaseConnectionNamesRequestCommand request, CancellationToken cancellationToken = default)
     {
         var appSettings = AppSettings.Create(_config);
 

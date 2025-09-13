@@ -67,7 +67,7 @@ public sealed class DatabasesEndpoints : IInstaller
         await messagesDataManager.SendMessage(userName, $"{nameof(CheckRepairDatabase)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(CheckRepairDatabaseCommandHandler)} from {nameof(CheckRepairDatabase)}");
 
-        var command = CheckRepairDatabaseCommandRequest.Create(databaseName, userName);
+        var command = CheckRepairDatabaseRequestCommand.Create(databaseName, userName);
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(CheckRepairDatabase)} finished", cancellationToken);
@@ -85,7 +85,7 @@ public sealed class DatabasesEndpoints : IInstaller
         Debug.WriteLine($"Call {nameof(CreateBackupCommandHandler)} from {nameof(CreateBackup)}");
 
         var command =
-            new CreateBackupCommandRequest(databaseName, dbServerFoldersSetName, dbBackupParameters, userName);
+            new CreateBackupRequestCommand(databaseName, dbServerFoldersSetName, dbBackupParameters, userName);
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(CreateBackup)} finished", cancellationToken);
@@ -102,7 +102,7 @@ public sealed class DatabasesEndpoints : IInstaller
         Debug.WriteLine($"Call {nameof(ExecuteCommandCommandHandler)} from {nameof(ExecuteCommand)}");
 
         //ExecuteCommandCommandRequest
-        var command = ExecuteCommandCommandRequest.Create(databaseName, commandText, userName);
+        var command = ExecuteCommandRequestCommand.Create(databaseName, commandText, userName);
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(ExecuteCommand)} finished", cancellationToken);
@@ -120,7 +120,7 @@ public sealed class DatabasesEndpoints : IInstaller
             $"Call {nameof(GetDatabaseConnectionNamesCommandHandler)} from {nameof(GetDatabaseConnectionNames)}");
 
         //GetDatabaseConnectionNamesCommandRequest
-        var command = GetDatabaseConnectionNamesCommandRequest.Create(userName);
+        var command = GetDatabaseConnectionNamesRequestCommand.Create(userName);
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseConnectionNames)} finished",
@@ -139,7 +139,7 @@ public sealed class DatabasesEndpoints : IInstaller
             $"Call {nameof(GetDatabaseFoldersSetNamesCommandHandler)} from {nameof(GetDatabaseFoldersSetNames)}");
 
         //GetDatabaseFoldersSetsCommandRequest
-        var command = GetDatabaseFoldersSetNamesCommandRequest.Create(userName);
+        var command = GetDatabaseFoldersSetNamesRequestCommand.Create(userName);
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseFoldersSetNames)} finished",
@@ -156,7 +156,7 @@ public sealed class DatabasesEndpoints : IInstaller
         Debug.WriteLine($"Call {nameof(GetDatabaseNamesCommandHandler)} from {nameof(GetDatabaseNames)}");
 
         //GetDatabaseNamesCommandRequest
-        var command = GetDatabaseNamesCommandRequest.Create(userName);
+        var command = GetDatabaseNamesRequestCommand.Create(userName);
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseNames)} finished", cancellationToken);
@@ -174,7 +174,7 @@ public sealed class DatabasesEndpoints : IInstaller
 
         //IsDatabaseExistsCommandRequest
 
-        var command = IsDatabaseExistsCommandRequest.Create(databaseName, userName);
+        var command = IsDatabaseExistsRequestCommand.Create(databaseName, userName);
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(IsDatabaseExists)} finished", cancellationToken);
@@ -192,7 +192,7 @@ public sealed class DatabasesEndpoints : IInstaller
 
         //RecompileProceduresCommandRequest
 
-        var command = RecompileProceduresCommandRequest.Create(databaseName, userName);
+        var command = RecompileProceduresRequestCommand.Create(databaseName, userName);
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(RecompileProcedures)} finished", cancellationToken);
@@ -233,7 +233,7 @@ public sealed class DatabasesEndpoints : IInstaller
 
         //TestConnectionCommandRequest
 
-        var command = TestConnectionCommandRequest.Create(databaseName, userName);
+        var command = TestConnectionRequestCommand.Create(databaseName, userName);
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(TestConnection)} finished", cancellationToken);
@@ -251,7 +251,7 @@ public sealed class DatabasesEndpoints : IInstaller
 
         //UpdateStatisticsCommandRequest
 
-        var command = UpdateStatisticsCommandRequest.Create(databaseName, userName);
+        var command = UpdateStatisticsRequestCommand.Create(databaseName, userName);
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(UpdateStatistics)} finished", cancellationToken);

@@ -4,18 +4,18 @@ using MediatRMessagingAbstractions;
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class GetDatabaseNamesCommandRequest : ICommand<IEnumerable<DatabaseInfoModel>>
+public sealed class GetDatabaseNamesRequestCommand : ICommand<IEnumerable<DatabaseInfoModel>>
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GetDatabaseNamesCommandRequest(string? userName)
+    public GetDatabaseNamesRequestCommand(string? userName)
     {
         UserName = userName;
     }
 
     public string? UserName { get; set; }
 
-    public static GetDatabaseNamesCommandRequest Create(string? userName)
+    public static GetDatabaseNamesRequestCommand Create(string? userName)
     {
-        return new GetDatabaseNamesCommandRequest(userName);
+        return new GetDatabaseNamesRequestCommand(userName);
     }
 }

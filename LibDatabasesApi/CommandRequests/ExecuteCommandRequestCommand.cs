@@ -2,10 +2,10 @@
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class ExecuteCommandCommandRequest : ICommand
+public sealed class ExecuteCommandRequestCommand : ICommand
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ExecuteCommandCommandRequest(string databaseName, string? commandText, string? userName)
+    public ExecuteCommandRequestCommand(string databaseName, string? commandText, string? userName)
     {
         DatabaseName = databaseName;
         CommandText = commandText;
@@ -16,8 +16,8 @@ public sealed class ExecuteCommandCommandRequest : ICommand
     public string? CommandText { get; set; }
     public string? UserName { get; set; }
 
-    public static ExecuteCommandCommandRequest Create(string databaseName, string? commandText, string? userName)
+    public static ExecuteCommandRequestCommand Create(string databaseName, string? commandText, string? userName)
     {
-        return new ExecuteCommandCommandRequest(databaseName, commandText, userName);
+        return new ExecuteCommandRequestCommand(databaseName, commandText, userName);
     }
 }

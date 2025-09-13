@@ -3,10 +3,10 @@ using MediatRMessagingAbstractions;
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class RestoreBackupCommandRequest : ICommand
+public sealed class RestoreBackupCommandRequestCommand : ICommand
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public RestoreBackupCommandRequest(string databaseName, string dbServerFoldersSetName, string? prefix,
+    public RestoreBackupCommandRequestCommand(string databaseName, string dbServerFoldersSetName, string? prefix,
         string? suffix, string? name, string? dateMask, string? userName, EDatabaseRecoveryModel? databaseRecoveryModel)
     {
         DatabaseName = databaseName;
