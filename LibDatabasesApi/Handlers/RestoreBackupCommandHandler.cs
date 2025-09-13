@@ -49,20 +49,24 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         await _messagesDataManager.SendMessage(request.UserName,
             $"{nameof(RestoreBackupCommandHandler)} Handle started", cancellationToken);
 
+        //შევამოწმოთ მოთხოვნის პარამეტრები: სახელი, პრეფიქსი, თარიღის ფორმატი, სუფიქსი
         if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Prefix) ||
             string.IsNullOrWhiteSpace(request.DateMask) || string.IsNullOrWhiteSpace(request.Suffix))
             return new[] { ApiErrors.SomeRequestParametersAreNotValid };
 
         await _messagesDataManager.SendMessage(request.UserName, "Create AppSettings", cancellationToken);
 
+        //ჩავტვირთოთ კონფიგურაცია
         var appSettings = AppSettings.Create(_config);
         if (appSettings is null)
             return new[] { ProjectsErrors.AppSettingsIsNotCreated };
 
+        //ბაზების გაცვლის პარამეტრების შემოწმება
         var databasesBackupFilesExchangeParameters = appSettings.DatabasesBackupFilesExchangeParameters;
         if (databasesBackupFilesExchangeParameters is null)
             return new[] { DatabaseApiClientErrors.DatabasesBackupFilesExchangeParametersIsNotConfigured };
 
+        //მონაცემთა ბაზის სერვერის პარამეტრების შემოწმება
         var databaseServerData = appSettings.DatabaseServerData;
         if (databaseServerData is null)
             return await Task.FromResult(new[] { DatabaseApiClientErrors.DatabaseServerDataIsNotConfigured });
