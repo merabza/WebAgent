@@ -1,9 +1,11 @@
-﻿using ApiContracts.Errors;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using ApiContracts.Errors;
 using DatabasesManagement;
-using DatabasesManagement.Errors;
 using DbTools;
-using FileManagersMain;
-using Installer.Domain;
 using Installer.Errors;
 using LibApiClientParameters;
 using LibDatabaseParameters;
@@ -17,11 +19,6 @@ using MediatRMessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using SystemToolsShared;
 using SystemToolsShared.Errors;
 using WebAgentDatabasesApiContracts.Errors;
@@ -51,7 +48,6 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
     public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(RestoreBackupCommandRequestCommand request,
         CancellationToken cancellationToken = default)
     {
-
         var messageLogger = new MessageLogger(_logger, _messagesDataManager, request.UserName, false);
 
         await messageLogger.LogInfoAndSendMessage($"{nameof(RestoreBackupCommandHandler)} Handle started",
@@ -109,20 +105,18 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         var destinationBaseBackupRestorer = new BaseBackupRestoreTool(_logger, createBaseBackupParameters);
         await destinationBaseBackupRestorer.CreateDatabaseBackup(cancellationToken);
 
-
         var exchangeFileManager = createBaseBackupParameters.ExchangeFileManager;
 
         if (exchangeFileManager is null)
             return (Err[])await messageLogger.LogErrorAndSendMessageFromError(InstallerErrors.ExchangeFileManagerIsNull,
                 cancellationToken);
 
-        var localArchiveFileName =
-            Path.Combine(createBaseBackupParameters.LocalPath, request.Name);
+        var localArchiveFileName = Path.Combine(createBaseBackupParameters.LocalPath, request.Name);
         //თუ ფაილი უკვე მოქაჩულია, მეორედ მისი მოქაჩვა საჭირო არ არის
         if (!File.Exists(localArchiveFileName) && !exchangeFileManager.DownloadFile(request.Name,
                 createBaseBackupParameters.DownloadTempExtension)) //მოვქაჩოთ არჩეული საინსტალაციო არქივი
-            return (Err[])await messageLogger.LogErrorAndSendMessageFromError(InstallerErrors.ProjectArchiveFileWasNotDownloaded,
-                cancellationToken);
+            return (Err[])await messageLogger.LogErrorAndSendMessageFromError(
+                InstallerErrors.ProjectArchiveFileWasNotDownloaded, cancellationToken);
 
         var backupFileParameters = new BackupFileParameters(null, request.Name, request.Prefix, request.Suffix,
             request.DateMask);
