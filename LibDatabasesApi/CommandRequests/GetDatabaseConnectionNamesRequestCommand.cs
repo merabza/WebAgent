@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using MediatRMessagingAbstractions;
+﻿using MediatRMessagingAbstractions;
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class GetDatabaseConnectionNamesRequestCommand : ICommand<IEnumerable<string>>
+public sealed class GetDatabaseConnectionNamesRequestCommand : ICommand<string[]>
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public GetDatabaseConnectionNamesRequestCommand(string? userName)

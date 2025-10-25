@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DatabasesManagement;
@@ -19,9 +18,9 @@ namespace LibDatabasesApi.Helpers;
 
 public static class DatabaseManagerCreator
 {
-    public static async ValueTask<OneOf<IDatabaseManager, IEnumerable<Err>>> Create(IConfiguration config,
-        ILogger logger, IHttpClientFactory httpClientFactory, IMessagesDataManager? messagesDataManager,
-        string? userName, CancellationToken cancellationToken = default)
+    public static async ValueTask<OneOf<IDatabaseManager, Err[]>> Create(IConfiguration config, ILogger logger,
+        IHttpClientFactory httpClientFactory, IMessagesDataManager? messagesDataManager, string? userName,
+        CancellationToken cancellationToken = default)
     {
         var appSettings = AppSettings.Create(config);
 
@@ -41,10 +40,9 @@ public static class DatabaseManagerCreator
             userName, cancellationToken);
     }
 
-    private static async ValueTask<OneOf<IDatabaseManager, IEnumerable<Err>>> GetDatabaseConnectionSettings(
-        ILogger logger, IHttpClientFactory httpClientFactory, IConfiguration config,
-        DatabaseServerData databaseServerData, IMessagesDataManager? messagesDataManager, string? userName,
-        CancellationToken cancellationToken = default)
+    private static async ValueTask<OneOf<IDatabaseManager, Err[]>> GetDatabaseConnectionSettings(ILogger logger,
+        IHttpClientFactory httpClientFactory, IConfiguration config, DatabaseServerData databaseServerData,
+        IMessagesDataManager? messagesDataManager, string? userName, CancellationToken cancellationToken = default)
     {
         var appSettings = AppSettings.Create(config);
 

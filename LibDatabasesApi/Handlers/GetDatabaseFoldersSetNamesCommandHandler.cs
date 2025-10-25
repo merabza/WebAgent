@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +17,7 @@ namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class GetDatabaseFoldersSetNamesCommandHandler : ICommandHandler<GetDatabaseFoldersSetNamesRequestCommand,
-    IEnumerable<string>>
+    string[]>
 {
     private readonly IConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -35,7 +34,7 @@ public sealed class GetDatabaseFoldersSetNamesCommandHandler : ICommandHandler<G
         _messagesDataManager = messagesDataManager;
     }
 
-    public async Task<OneOf<IEnumerable<string>, Err[]>> Handle(GetDatabaseFoldersSetNamesRequestCommand request,
+    public async Task<OneOf<string[], Err[]>> Handle(GetDatabaseFoldersSetNamesRequestCommand request,
         CancellationToken cancellationToken = default)
     {
         var result = await DatabaseManagerCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
@@ -46,6 +45,6 @@ public sealed class GetDatabaseFoldersSetNamesCommandHandler : ICommandHandler<G
 
         var getDatabaseFoldersSetNamesResult =
             await databaseManagementClient.GetDatabaseFoldersSetNames(cancellationToken);
-        return getDatabaseFoldersSetNamesResult.Match<OneOf<IEnumerable<string>, Err[]>>(f0 => f0, f1 => (Err[])f1);
+        return getDatabaseFoldersSetNamesResult.Match<OneOf<string[], Err[]>>(f0 => f0.ToArray(), f1 => f1);
     }
 }

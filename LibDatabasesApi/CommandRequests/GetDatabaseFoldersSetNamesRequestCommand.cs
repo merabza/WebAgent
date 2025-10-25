@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using MediatRMessagingAbstractions;
+﻿using MediatRMessagingAbstractions;
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class GetDatabaseFoldersSetNamesRequestCommand : ICommand<IEnumerable<string>>
+public sealed class GetDatabaseFoldersSetNamesRequestCommand : ICommand<string[]>
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public GetDatabaseFoldersSetNamesRequestCommand(string? userName)

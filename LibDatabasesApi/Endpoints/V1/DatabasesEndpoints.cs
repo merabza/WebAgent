@@ -11,9 +11,12 @@ using LibDatabasesApi.Mappers;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using SystemToolsShared;
+using SystemToolsShared.Errors;
 using WebAgentDatabasesApiContracts.V1.Requests;
+using WebAgentDatabasesApiContracts.V1.Responses;
 using WebAgentDatabasesApiContracts.V1.Routes;
 using WebInstallers;
 
@@ -58,7 +61,7 @@ public sealed class DatabasesEndpoints : IInstaller
     }
 
     // POST api/database/checkrepairdatabase/{databaseName}
-    private static async Task<IResult> CheckRepairDatabase([FromRoute] string databaseName,
+    private static async Task<Results<Ok, BadRequest<Err[]>>> CheckRepairDatabase([FromRoute] string databaseName,
         ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
         CancellationToken cancellationToken = default)
     {
@@ -70,14 +73,16 @@ public sealed class DatabasesEndpoints : IInstaller
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(CheckRepairDatabase)} finished", cancellationToken);
-        return result.Match(_ => Results.Ok(), Results.BadRequest);
+        //return result.Match(_ => Results.Ok(), Results.BadRequest);
+        return result.Match<Results<Ok, BadRequest<Err[]>>>(_ => TypedResults.Ok(),
+            errors => TypedResults.BadRequest(errors));
     }
 
     // POST api/database/createbackup/{databaseName}/{dbServerFoldersSetName}
-    private static async Task<IResult> CreateBackup([FromRoute] string databaseName,
-        [FromRoute] string dbServerFoldersSetName, [FromBody] CreateDatabaseBackupRequest dbBackupParameters,
-        ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
-        CancellationToken cancellationToken = default)
+    private static async Task<Results<Ok<BackupFileParameters>, BadRequest<Err[]>>> CreateBackup(
+        [FromRoute] string databaseName, [FromRoute] string dbServerFoldersSetName,
+        [FromBody] CreateDatabaseBackupRequest dbBackupParameters, ICurrentUserByApiKey currentUserByApiKey,
+        IMediator mediator, IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
     {
         var userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(CreateBackup)} started", cancellationToken);
@@ -88,11 +93,12 @@ public sealed class DatabasesEndpoints : IInstaller
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(CreateBackup)} finished", cancellationToken);
-        return result.Match(Results.Ok, Results.BadRequest);
+        return result.Match<Results<Ok<BackupFileParameters>, BadRequest<Err[]>>>(success => TypedResults.Ok(success),
+            errors => TypedResults.BadRequest(errors));
     }
 
     // POST api/database/executecommand/{databaseName}
-    private static async Task<IResult> ExecuteCommand([FromRoute] string databaseName,
+    private static async Task<Results<Ok, BadRequest<Err[]>>> ExecuteCommand([FromRoute] string databaseName,
         ICurrentUserByApiKey currentUserByApiKey, [FromBody] string? commandText, IMediator mediator,
         IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
     {
@@ -105,12 +111,15 @@ public sealed class DatabasesEndpoints : IInstaller
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(ExecuteCommand)} finished", cancellationToken);
-        return result.Match(_ => Results.Ok(), Results.BadRequest);
+        //return result.Match(_ => Results.Ok(), Results.BadRequest);
+        return result.Match<Results<Ok, BadRequest<Err[]>>>(_ => TypedResults.Ok(),
+            errors => TypedResults.BadRequest(errors));
     }
 
     // GET api/database/getdatabaseconnectionnames
-    private static async Task<IResult> GetDatabaseConnectionNames(ICurrentUserByApiKey currentUserByApiKey,
-        IMediator mediator, IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
+    private static async Task<Results<Ok<string[]>, BadRequest<Err[]>>> GetDatabaseConnectionNames(
+        ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
+        CancellationToken cancellationToken = default)
     {
         var userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseConnectionNames)} started",
@@ -124,12 +133,14 @@ public sealed class DatabasesEndpoints : IInstaller
 
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseConnectionNames)} finished",
             cancellationToken);
-        return result.Match(Results.Ok, Results.BadRequest);
+        return result.Match<Results<Ok<string[]>, BadRequest<Err[]>>>(success => TypedResults.Ok(success),
+            errors => TypedResults.BadRequest(errors));
     }
 
     // GET api/database/getdatabasefolderssetnames
-    private static async Task<IResult> GetDatabaseFoldersSetNames(ICurrentUserByApiKey currentUserByApiKey,
-        IMediator mediator, IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
+    private static async Task<Results<Ok<string[]>, BadRequest<Err[]>>> GetDatabaseFoldersSetNames(
+        ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
+        CancellationToken cancellationToken = default)
     {
         var userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseFoldersSetNames)} started",
@@ -143,7 +154,8 @@ public sealed class DatabasesEndpoints : IInstaller
 
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseFoldersSetNames)} finished",
             cancellationToken);
-        return result.Match(Results.Ok, Results.BadRequest);
+        return result.Match<Results<Ok<string[]>, BadRequest<Err[]>>>(success => TypedResults.Ok(success),
+            errors => TypedResults.BadRequest(errors));
     }
 
     // GET api/database/getdatabasenames

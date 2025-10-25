@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LibDatabasesApi.CommandRequests;
@@ -15,7 +15,7 @@ namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class GetDatabaseConnectionNamesCommandHandler : ICommandHandler<GetDatabaseConnectionNamesRequestCommand,
-    IEnumerable<string>>
+    string[]>
 {
     private readonly IConfiguration _config;
 
@@ -24,7 +24,7 @@ public sealed class GetDatabaseConnectionNamesCommandHandler : ICommandHandler<G
         _config = config;
     }
 
-    public async Task<OneOf<IEnumerable<string>, Err[]>> Handle(GetDatabaseConnectionNamesRequestCommand request,
+    public async Task<OneOf<string[], Err[]>> Handle(GetDatabaseConnectionNamesRequestCommand request,
         CancellationToken cancellationToken = default)
     {
         var appSettings = AppSettings.Create(_config);
@@ -32,6 +32,6 @@ public sealed class GetDatabaseConnectionNamesCommandHandler : ICommandHandler<G
         if (appSettings is null)
             return await Task.FromResult(new[] { ProjectsErrors.AppSettingsIsNotCreated });
 
-        return await Task.FromResult(appSettings.DatabaseServerConnections.Keys);
+        return await Task.FromResult(appSettings.DatabaseServerConnections.Keys.ToArray());
     }
 }
