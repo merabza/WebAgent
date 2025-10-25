@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,7 +34,7 @@ public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectio
         _messagesDataManager = messagesDataManager;
     }
 
-    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(TestConnectionRequestCommand request,
+    public async Task<OneOf<Unit, Err[]>> Handle(TestConnectionRequestCommand request,
         CancellationToken cancellationToken = default)
     {
         var databaseClientCreatorResult = await DatabaseManagerCreator.Create(_config, _logger, _httpClientFactory,

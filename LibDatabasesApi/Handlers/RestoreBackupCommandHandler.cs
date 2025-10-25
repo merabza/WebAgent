@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,7 +44,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         _messagesDataManager = messagesDataManager;
     }
 
-    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(RestoreBackupCommandRequestCommand request,
+    public async Task<OneOf<Unit, Err[]>> Handle(RestoreBackupCommandRequestCommand request,
         CancellationToken cancellationToken = default)
     {
         var messageLogger = new MessageLogger(_logger, _messagesDataManager, request.UserName, false);
@@ -108,14 +107,14 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         var exchangeFileManager = createBaseBackupParameters.ExchangeFileManager;
 
         if (exchangeFileManager is null)
-            return (Err[])await messageLogger.LogErrorAndSendMessageFromError(InstallerErrors.ExchangeFileManagerIsNull,
+            return await messageLogger.LogErrorAndSendMessageFromError(InstallerErrors.ExchangeFileManagerIsNull,
                 cancellationToken);
 
         var localArchiveFileName = Path.Combine(createBaseBackupParameters.LocalPath, request.Name);
         //თუ ფაილი უკვე მოქაჩულია, მეორედ მისი მოქაჩვა საჭირო არ არის
         if (!File.Exists(localArchiveFileName) && !exchangeFileManager.DownloadFile(request.Name,
                 createBaseBackupParameters.DownloadTempExtension)) //მოვქაჩოთ არჩეული საინსტალაციო არქივი
-            return (Err[])await messageLogger.LogErrorAndSendMessageFromError(
+            return await messageLogger.LogErrorAndSendMessageFromError(
                 InstallerErrors.ProjectArchiveFileWasNotDownloaded, cancellationToken);
 
         var backupFileParameters = new BackupFileParameters(null, request.Name, request.Prefix, request.Suffix,

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DatabasesManagement;
@@ -38,7 +37,7 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupReq
         _messagesDataManager = messagesDataManager;
     }
 
-    public async Task<OneOf<BackupFileParameters, IEnumerable<Err>>> Handle(CreateBackupRequestCommand request,
+    public async Task<OneOf<BackupFileParameters, Err[]>> Handle(CreateBackupRequestCommand request,
         CancellationToken cancellationToken = default)
     {
         var appSettings = AppSettings.Create(_config);

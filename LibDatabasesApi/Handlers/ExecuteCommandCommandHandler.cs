@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,7 +34,7 @@ public sealed class ExecuteCommandCommandHandler : ICommandHandler<ExecuteComman
         _messagesDataManager = messagesDataManager;
     }
 
-    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(ExecuteCommandRequestCommand request,
+    public async Task<OneOf<Unit, Err[]>> Handle(ExecuteCommandRequestCommand request,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(request.CommandText))

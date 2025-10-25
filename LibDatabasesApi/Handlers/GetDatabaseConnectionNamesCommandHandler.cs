@@ -24,8 +24,8 @@ public sealed class GetDatabaseConnectionNamesCommandHandler : ICommandHandler<G
         _config = config;
     }
 
-    public async Task<OneOf<IEnumerable<string>, IEnumerable<Err>>> Handle(
-        GetDatabaseConnectionNamesRequestCommand request, CancellationToken cancellationToken = default)
+    public async Task<OneOf<IEnumerable<string>, Err[]>> Handle(GetDatabaseConnectionNamesRequestCommand request,
+        CancellationToken cancellationToken = default)
     {
         var appSettings = AppSettings.Create(_config);
 

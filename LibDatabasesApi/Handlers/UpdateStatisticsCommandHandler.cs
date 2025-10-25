@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,7 +34,7 @@ public sealed class UpdateStatisticsCommandHandler : ICommandHandler<UpdateStati
         _messagesDataManager = messagesDataManager;
     }
 
-    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(UpdateStatisticsRequestCommand request,
+    public async Task<OneOf<Unit, Err[]>> Handle(UpdateStatisticsRequestCommand request,
         CancellationToken cancellationToken = default)
     {
         var result = await DatabaseManagerCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
