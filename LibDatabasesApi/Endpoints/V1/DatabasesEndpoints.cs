@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,33 +12,24 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using SystemToolsShared;
 using SystemToolsShared.Errors;
 using WebAgentDatabasesApiContracts.V1.Requests;
 using WebAgentDatabasesApiContracts.V1.Responses;
 using WebAgentDatabasesApiContracts.V1.Routes;
-using WebInstallers;
 
 namespace LibDatabasesApi.Endpoints.V1;
 
 // ReSharper disable once UnusedType.Global
-public sealed class DatabasesEndpoints : IInstaller
+public static class DatabasesEndpoints
 {
-    public int InstallPriority => 50;
-    public int ServiceUsePriority => 50;
-
-    public bool InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args,
-        Dictionary<string, string> parameters)
-    {
-        return true;
-    }
-
-    public bool UseServices(WebApplication app, bool debugMode)
+    public static bool UseDatabasesEndpoints(this IEndpointRouteBuilder endpoints, bool debugMode)
     {
         if (debugMode)
-            Console.WriteLine($"{GetType().Name}.{nameof(UseServices)} Started");
+            Console.WriteLine($"{nameof(UseDatabasesEndpoints)} Started");
 
-        var group = app.MapGroup(DatabaseApiRoutes.ApiBase + DatabaseApiRoutes.Database.DatabaseBase)
+        var group = endpoints.MapGroup(DatabaseApiRoutes.ApiBase + DatabaseApiRoutes.Database.DatabaseBase)
             .RequireAuthorization();
 
         group.MapPost(DatabaseApiRoutes.Database.CheckRepairDatabase, CheckRepairDatabase);
@@ -55,7 +45,7 @@ public sealed class DatabasesEndpoints : IInstaller
         group.MapPost(DatabaseApiRoutes.Database.UpdateStatistics, UpdateStatistics);
 
         if (debugMode)
-            Console.WriteLine($"{GetType().Name}.{nameof(UseServices)} Finished");
+            Console.WriteLine($"{nameof(UseDatabasesEndpoints)} Finished");
 
         return true;
     }

@@ -1,35 +1,43 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
+using ApiKeyIdentity.DependencyInjection;
 using ConfigurationEncrypt;
-using FluentValidationInstaller;
+using Figgle.Fonts;
+using LibDatabasesApi.DependencyInjection;
+using LibProjectsApi;
+using LibProjectsApi.DependencyInjection;
+using MediatorTools.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using SwaggerTools;
-using SystemToolsShared;
-using WebInstallers;
-using AssemblyReference = ApiExceptionHandler.AssemblyReference;
+using SerilogLogger;
+using SignalRMessages.DependencyInjection;
+using SwaggerTools.DependencyInjection;
+using System;
+using System.IO;
+using System.Reflection;
+using TestToolsApi.DependencyInjection;
+using WindowsServiceTools;
 
-const string appName = "WebAgent";
-const string appKey = "E0FFB24C-7561-4DBA-8E0F-02CA585A3C9C";
-
-//პროგრამის ატრიბუტების დაყენება 
-ProgramAttributes.Instance.AppName = appName;
-ProgramAttributes.Instance.AppName = appKey;
+//using AssemblyReference = ApiExceptionHandler.AssemblyReference;
 
 try
 {
-    var parameters = new Dictionary<string, string>
-    {
-        //{ SignalRMessagesInstaller.SignalRReCounterKey, string.Empty },//Allow SignalRReCounterKey
-        { ConfigurationEncryptInstaller.AppKeyKey, appKey },
-        { SwaggerInstaller.AppNameKey, appName },
-        { SwaggerInstaller.VersionCountKey, 1.ToString() }
-        //{ SwaggerInstaller.UseSwaggerWithJwtBearerKey, string.Empty },//Allow Swagger
-    };
+    Console.WriteLine("Loading...");
+
+    const string appName = "WebAgent";
+    const int versionCount = 1;
+
+    var header = $"{appName} {Assembly.GetEntryAssembly()?.GetName().Version}";
+    Console.WriteLine(FiggleFonts.Standard.Render(header));
+
+    //var parameters = new Dictionary<string, string>
+    //{
+    //    //{ SignalRMessagesInstaller.SignalRReCounterKey, string.Empty },//Allow SignalRReCounterKey
+    //    { ConfigurationEncryptInstaller.AppKeyKey, appKey },
+    //    { SwaggerInstaller.AppNameKey, appName },
+    //    { SwaggerInstaller.VersionCountKey, 1.ToString() }
+    //    //{ SwaggerInstaller.UseSwaggerWithJwtBearerKey, string.Empty },//Allow Swagger
+    //};
 
     var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     {
@@ -38,48 +46,82 @@ try
 
     var debugMode = builder.Environment.IsDevelopment();
 
-    if (!builder.InstallServices(debugMode, args, parameters,
-            
-            // @formatter:off
+    builder.Host.UseSerilogLogger(builder.Configuration, debugMode); //+
+    builder.Host.UseWindowsServiceOnWindows(debugMode, args); //+
 
-            //WebSystemTools
+    builder.Configuration.AddConfigurationEncryption(debugMode, "E0FFB24C-7561-4DBA-8E0F-02CA585A3C9C"); //+
+
+    // @formatter:off
+    builder.Services.AddHttpClient()
+        .AddSwagger(debugMode, true, versionCount, appName) //+
+        .AddApiKeyIdentity(debugMode)
+        .AddSignalRMessages(debugMode)
+        //.AddSupportToolsServerRepositories(debugMode)
+        //.AddSupportToolsServerPersistence(builder.Configuration, debugMode)
+        .AddMediator(
+            builder.Configuration, 
+            debugMode, 
             AssemblyReference.Assembly, 
-            ApiKeyIdentity.AssemblyReference.Assembly,
-            ConfigurationEncrypt.AssemblyReference.Assembly, 
-            FluentValidationInstaller.AssemblyReference.Assembly,
-            HttpClientInstaller.AssemblyReference.Assembly, 
-            SerilogLogger.AssemblyReference.Assembly,
-            SignalRMessages.AssemblyReference.Assembly, 
-            SwaggerTools.AssemblyReference.Assembly,
-            TestToolsApi.AssemblyReference.Assembly, 
-            WindowsServiceTools.AssemblyReference.Assembly,
+            LibDatabasesApi.AssemblyReference.Assembly);
+        //.AddSupportToolsServerApiKeyIdentity(debugMode)
+        //.AddAllScopedServiceSupportToolsServerApplication()
+        //.AddSupportToolsServerQueryRepositories(debugMode)
+        //.AddSupportToolsServerCommandRepositories(debugMode)
+        //.AddSupportToolsServerForCommandsDatabase(builder.Configuration, debugMode)
+        //.AddSupportToolsServer_Repositories(debugMode)
+        //.AddSupportToolsServerDb(builder.Configuration, debugMode);
+    // @formatter:on
 
-            //WebAgentShared
-            LibProjectsApi.AssemblyReference.Assembly,
+    //if (!builder.InstallServices(debugMode, args, parameters,
 
-            //WebAgent
-            LibDatabasesApi.AssemblyReference.Assembly))
-        return 2;
+    //        // @formatter:off
 
-    var mediatRSettings = builder.Configuration.GetSection("MediatRLicenseKey");
+    //        //WebSystemTools
+    //        AssemblyReference.Assembly, 
+    //        ApiKeyIdentity.AssemblyReference.Assembly,
+    //        ConfigurationEncrypt.AssemblyReference.Assembly, 
+    //        FluentValidationInstaller.AssemblyReference.Assembly,
+    //        HttpClientInstaller.AssemblyReference.Assembly, 
+    //        SerilogLogger.AssemblyReference.Assembly,
+    //        SignalRMessages.AssemblyReference.Assembly, 
+    //        SwaggerTools.AssemblyReference.Assembly,
+    //        TestToolsApi.AssemblyReference.Assembly, 
+    //        WindowsServiceTools.AssemblyReference.Assembly,
 
-    var mediatRLicenseKey = mediatRSettings.Get<string>();
+    //        //WebAgentShared
+    //        LibProjectsApi.AssemblyReference.Assembly,
 
-    builder.Services.AddMediatR(cfg =>
-    {
-        cfg.LicenseKey = mediatRLicenseKey;
-        cfg.RegisterServicesFromAssembly(LibProjectsApi.AssemblyReference.Assembly);
-        cfg.RegisterServicesFromAssembly(LibDatabasesApi.AssemblyReference.Assembly);
-    });
+    //        //WebAgent
+    //        LibDatabasesApi.AssemblyReference.Assembly))
+    //    return 2;
 
-    // FluentValidationInstaller
-    builder.Services.InstallValidation(LibProjectsApi.AssemblyReference.Assembly);
+    //var mediatRSettings = builder.Configuration.GetSection("MediatRLicenseKey");
+
+    //var mediatRLicenseKey = mediatRSettings.Get<string>();
+
+    //builder.Services.AddMediatR(cfg =>
+    //{
+    //    cfg.LicenseKey = mediatRLicenseKey;
+    //    cfg.RegisterServicesFromAssembly(LibProjectsApi.AssemblyReference.Assembly);
+    //    cfg.RegisterServicesFromAssembly(LibDatabasesApi.AssemblyReference.Assembly);
+    //});
+
+    //// FluentValidationInstaller
+    //builder.Services.InstallValidation(LibProjectsApi.AssemblyReference.Assembly);
 
     // ReSharper disable once using
     using var app = builder.Build();
 
-    if (!app.UseServices(debugMode))
-        return 3;
+    // ReSharper disable once RedundantArgumentDefaultValue
+    app.UseSwaggerServices(debugMode, versionCount);
+    app.UseTestToolsApiEndpoints(debugMode);
+    //app.UseSignalRRecounterMessages(debugMode);
+
+    app.UseLibProjectsApi(debugMode);
+    app.UseLibDatabasesApi(debugMode);
+
+    //if (!app.UseServices(debugMode))
+    //    return 3;
 
     Log.Information("Directory.GetCurrentDirectory() = {0}", Directory.GetCurrentDirectory());
     Log.Information("AppContext.BaseDirectory = {0}", AppContext.BaseDirectory);
