@@ -1,6 +1,6 @@
-﻿using LibDatabaseParameters;
-using MediatRMessagingAbstractions;
-using WebAgentDatabasesApiContracts.V1.Responses;
+﻿using ParametersManagement.LibDatabaseParameters;
+using SystemTools.MediatRMessagingAbstractions;
+using WebAgentContracts.WebAgentDatabasesApiContracts.V1.Responses;
 
 namespace LibDatabasesApi.CommandRequests;
 

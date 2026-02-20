@@ -1,5 +1,5 @@
-﻿using DbTools.Models;
-using MediatRMessagingAbstractions;
+﻿using DatabaseTools.DbTools.Models;
+using SystemTools.MediatRMessagingAbstractions;
 
 namespace LibDatabasesApi.CommandRequests;
 

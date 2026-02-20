@@ -6,12 +6,12 @@ using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
 using LibWebAgentData.ErrorModels;
 using MediatR;
-using MediatRMessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
-using SystemToolsShared;
-using SystemToolsShared.Errors;
+using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.SystemToolsShared;
+using SystemTools.SystemToolsShared.Errors;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -35,20 +35,25 @@ public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectio
     }
 
     public async Task<OneOf<Unit, Err[]>> Handle(TestConnectionRequestCommand request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         var databaseClientCreatorResult = await DatabaseManagerCreator.Create(_config, _logger, _httpClientFactory,
             _messagesDataManager, request.UserName, cancellationToken);
         if (databaseClientCreatorResult.IsT1)
+        {
             return databaseClientCreatorResult.AsT1.ToArray();
+        }
+
         var databaseManagementClient = databaseClientCreatorResult.AsT0;
 
         var testResult = await databaseManagementClient.TestConnection(request.DatabaseName, cancellationToken);
         if (testResult.IsNone)
+        {
             return new Unit();
+        }
 
         var err = DbApiErrors.TestConnectionFailed(request.DatabaseName);
-        _logger.LogError(err.ErrorMessage);
+        _logger.LogError("{ErrorMessage}", err.ErrorMessage);
         return await Task.FromResult(Err.RecreateErrors((Err[])testResult, err));
     }
 }

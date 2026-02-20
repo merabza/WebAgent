@@ -2,8 +2,8 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using ApiContracts.Errors;
 using ApiKeyIdentity;
+using DatabaseTools.DbTools.Models;
 using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Handlers;
 using LibDatabasesApi.Mappers;
@@ -13,11 +13,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using SystemToolsShared;
-using SystemToolsShared.Errors;
-using WebAgentDatabasesApiContracts.V1.Requests;
-using WebAgentDatabasesApiContracts.V1.Responses;
-using WebAgentDatabasesApiContracts.V1.Routes;
+using OneOf;
+using SystemTools.ApiContracts.Errors;
+using SystemTools.SystemToolsShared;
+using SystemTools.SystemToolsShared.Errors;
+using WebAgentContracts.WebAgentDatabasesApiContracts.V1.Requests;
+using WebAgentContracts.WebAgentDatabasesApiContracts.V1.Responses;
+using WebAgentContracts.WebAgentDatabasesApiContracts.V1.Routes;
 
 namespace LibDatabasesApi.Endpoints.V1;
 
@@ -27,10 +29,12 @@ public static class DatabasesEndpoints
     public static bool UseDatabasesEndpoints(this IEndpointRouteBuilder endpoints, bool debugMode)
     {
         if (debugMode)
+        {
             Console.WriteLine($"{nameof(UseDatabasesEndpoints)} Started");
+        }
 
-        var group = endpoints.MapGroup(DatabaseApiRoutes.ApiBase + DatabaseApiRoutes.Database.DatabaseBase)
-            .RequireAuthorization();
+        RouteGroupBuilder group = endpoints
+            .MapGroup(DatabaseApiRoutes.ApiBase + DatabaseApiRoutes.Database.DatabaseBase).RequireAuthorization();
 
         group.MapPost(DatabaseApiRoutes.Database.CheckRepairDatabase, CheckRepairDatabase);
         group.MapPost(DatabaseApiRoutes.Database.CreateBackup, CreateBackup);
@@ -45,7 +49,9 @@ public static class DatabasesEndpoints
         group.MapPost(DatabaseApiRoutes.Database.UpdateStatistics, UpdateStatistics);
 
         if (debugMode)
+        {
             Console.WriteLine($"{nameof(UseDatabasesEndpoints)} Finished");
+        }
 
         return true;
     }
@@ -55,12 +61,12 @@ public static class DatabasesEndpoints
         ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
         CancellationToken cancellationToken = default)
     {
-        var userName = currentUserByApiKey.Name;
+        string userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(CheckRepairDatabase)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(CheckRepairDatabaseCommandHandler)} from {nameof(CheckRepairDatabase)}");
 
         var command = CheckRepairDatabaseRequestCommand.Create(databaseName, userName);
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(CheckRepairDatabase)} finished", cancellationToken);
         //return result.Match(_ => Results.Ok(), Results.BadRequest);
@@ -74,13 +80,13 @@ public static class DatabasesEndpoints
         [FromBody] CreateDatabaseBackupRequest dbBackupParameters, ICurrentUserByApiKey currentUserByApiKey,
         IMediator mediator, IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
     {
-        var userName = currentUserByApiKey.Name;
+        string userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(CreateBackup)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(CreateBackupCommandHandler)} from {nameof(CreateBackup)}");
 
         var command = new CreateBackupRequestCommand(databaseName, dbServerFoldersSetName, dbBackupParameters.AdaptTo(),
             userName);
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<BackupFileParameters, Err[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(CreateBackup)} finished", cancellationToken);
         return result.Match<Results<Ok<BackupFileParameters>, BadRequest<Err[]>>>(success => TypedResults.Ok(success),
@@ -92,13 +98,13 @@ public static class DatabasesEndpoints
         ICurrentUserByApiKey currentUserByApiKey, [FromBody] string? commandText, IMediator mediator,
         IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
     {
-        var userName = currentUserByApiKey.Name;
+        string userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(ExecuteCommand)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(ExecuteCommandCommandHandler)} from {nameof(ExecuteCommand)}");
 
         //ExecuteCommandCommandRequest
         var command = ExecuteCommandRequestCommand.Create(databaseName, commandText, userName);
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(ExecuteCommand)} finished", cancellationToken);
         //return result.Match(_ => Results.Ok(), Results.BadRequest);
@@ -111,7 +117,7 @@ public static class DatabasesEndpoints
         ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
         CancellationToken cancellationToken = default)
     {
-        var userName = currentUserByApiKey.Name;
+        string userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseConnectionNames)} started",
             cancellationToken);
         Debug.WriteLine(
@@ -119,7 +125,7 @@ public static class DatabasesEndpoints
 
         //GetDatabaseConnectionNamesCommandRequest
         var command = GetDatabaseConnectionNamesRequestCommand.Create(userName);
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<string[], Err[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseConnectionNames)} finished",
             cancellationToken);
@@ -132,7 +138,7 @@ public static class DatabasesEndpoints
         ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
         CancellationToken cancellationToken = default)
     {
-        var userName = currentUserByApiKey.Name;
+        string userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseFoldersSetNames)} started",
             cancellationToken);
         Debug.WriteLine(
@@ -140,7 +146,7 @@ public static class DatabasesEndpoints
 
         //GetDatabaseFoldersSetsCommandRequest
         var command = GetDatabaseFoldersSetNamesRequestCommand.Create(userName);
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<string[], Err[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseFoldersSetNames)} finished",
             cancellationToken);
@@ -152,13 +158,13 @@ public static class DatabasesEndpoints
     private static async Task<IResult> GetDatabaseNames(ICurrentUserByApiKey currentUserByApiKey, IMediator mediator,
         IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
     {
-        var userName = currentUserByApiKey.Name;
+        string userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseNames)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(GetDatabaseNamesCommandHandler)} from {nameof(GetDatabaseNames)}");
 
         //GetDatabaseNamesCommandRequest
         var command = GetDatabaseNamesRequestCommand.Create(userName);
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<DatabaseInfoModel[], Err[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseNames)} finished", cancellationToken);
         return result.Match(Results.Ok, Results.BadRequest);
@@ -169,14 +175,14 @@ public static class DatabasesEndpoints
         ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
         CancellationToken cancellationToken = default)
     {
-        var userName = currentUserByApiKey.Name;
+        string userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(IsDatabaseExists)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(IsDatabaseExistsCommandHandler)} from {nameof(IsDatabaseExists)}");
 
         //IsDatabaseExistsCommandRequest
 
         var command = IsDatabaseExistsRequestCommand.Create(databaseName, userName);
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<bool, Err[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(IsDatabaseExists)} finished", cancellationToken);
         return result.Match(Results.Ok, Results.BadRequest);
@@ -187,14 +193,14 @@ public static class DatabasesEndpoints
         ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
         CancellationToken cancellationToken = default)
     {
-        var userName = currentUserByApiKey.Name;
+        string userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(RecompileProcedures)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(RecompileProceduresCommandHandler)} from {nameof(RecompileProcedures)}");
 
         //RecompileProceduresCommandRequest
 
         var command = RecompileProceduresRequestCommand.Create(databaseName, userName);
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(RecompileProcedures)} finished", cancellationToken);
         return result.Match(_ => Results.Ok(), Results.BadRequest);
@@ -206,18 +212,21 @@ public static class DatabasesEndpoints
         [FromBody] RestoreBackupRequest? request, IMediator mediator, IMessagesDataManager messagesDataManager,
         CancellationToken cancellationToken = default)
     {
-        var userName = currentUserByApiKey.Name;
+        string userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(RestoreBackup)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(RestoreBackupCommandHandler)} from {nameof(RestoreBackup)}");
 
         if (request is null)
+        {
             return Results.BadRequest(new[] { ApiErrors.RequestIsEmpty });
-        var command = request.AdaptTo(databaseName, dbServerFoldersSetName, userName);
+        }
+
+        RestoreBackupCommandRequestCommand command = request.AdaptTo(databaseName, dbServerFoldersSetName, userName);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(RestoreBackup)} mediator.Send command",
             cancellationToken);
 
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(RestoreBackup)} finished", cancellationToken);
         return result.Match(_ => Results.Ok(), Results.BadRequest);
@@ -228,14 +237,14 @@ public static class DatabasesEndpoints
         ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
         CancellationToken cancellationToken = default)
     {
-        var userName = currentUserByApiKey.Name;
+        string userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(TestConnection)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(TestConnectionCommandHandler)} from {nameof(TestConnection)}");
 
         //TestConnectionCommandRequest
 
         var command = TestConnectionRequestCommand.Create(databaseName, userName);
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(TestConnection)} finished", cancellationToken);
         return result.Match(_ => Results.Ok(), Results.BadRequest);
@@ -246,14 +255,14 @@ public static class DatabasesEndpoints
         ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
         CancellationToken cancellationToken = default)
     {
-        var userName = currentUserByApiKey.Name;
+        string userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(UpdateStatistics)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(UpdateStatisticsCommandHandler)} from {nameof(UpdateStatistics)}");
 
         //UpdateStatisticsCommandRequest
 
         var command = UpdateStatisticsRequestCommand.Create(databaseName, userName);
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(UpdateStatistics)} finished", cancellationToken);
         return result.Match(_ => Results.Ok(), Results.BadRequest);

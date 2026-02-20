@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Reflection;
 using ApiKeyIdentity.DependencyInjection;
 using ConfigurationEncrypt;
 using Figgle.Fonts;
@@ -12,9 +15,6 @@ using Serilog;
 using SerilogLogger;
 using SignalRMessages.DependencyInjection;
 using SwaggerTools.DependencyInjection;
-using System;
-using System.IO;
-using System.Reflection;
 using TestToolsApi.DependencyInjection;
 using WindowsServiceTools;
 
@@ -25,9 +25,10 @@ try
     Console.WriteLine("Loading...");
 
     const string appName = "WebAgent";
+    const string appKey = "E0FFB24C-7561-4DBA-8E0F-02CA585A3C9C";
     const int versionCount = 1;
 
-    var header = $"{appName} {Assembly.GetEntryAssembly()?.GetName().Version}";
+    string header = $"{appName} {Assembly.GetEntryAssembly()?.GetName().Version}";
     Console.WriteLine(FiggleFonts.Standard.Render(header));
 
     //var parameters = new Dictionary<string, string>
@@ -39,28 +40,29 @@ try
     //    //{ SwaggerInstaller.UseSwaggerWithJwtBearerKey, string.Empty },//Allow Swagger
     //};
 
-    var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+    WebApplicationBuilder builder = WebApplication.CreateBuilder(new WebApplicationOptions
     {
         ContentRootPath = AppContext.BaseDirectory, Args = args
     });
 
-    var debugMode = builder.Environment.IsDevelopment();
+    bool debugMode = builder.Environment.IsDevelopment();
 
-    builder.Host.UseSerilogLogger(builder.Configuration, debugMode); //+
-    builder.Host.UseWindowsServiceOnWindows(debugMode, args); //+
+    ILogger logger = builder.Host.UseSerilogLogger(debugMode, builder.Configuration);
+    ILogger? debugLogger = debugMode ? logger : null;
 
-    builder.Configuration.AddConfigurationEncryption(debugMode, "E0FFB24C-7561-4DBA-8E0F-02CA585A3C9C"); //+
+    builder.Host.UseWindowsServiceOnWindows(debugLogger, args);
+
+    builder.Configuration.AddConfigurationEncryption(debugLogger, appKey);
 
     // @formatter:off
     builder.Services.AddHttpClient()
-        .AddSwagger(debugMode, true, versionCount, appName) //+
-        .AddApiKeyIdentity(debugMode)
-        .AddSignalRMessages(debugMode)
+        .AddSwagger(debugLogger, true, versionCount, appName) //+
+        .AddApiKeyIdentity(debugLogger)
+        .AddSignalRMessages(debugLogger)
         //.AddSupportToolsServerRepositories(debugMode)
         //.AddSupportToolsServerPersistence(builder.Configuration, debugMode)
-        .AddMediator(
+        .AddMediator(debugLogger,
             builder.Configuration, 
-            debugMode, 
             AssemblyReference.Assembly, 
             LibDatabasesApi.AssemblyReference.Assembly);
         //.AddSupportToolsServerApiKeyIdentity(debugMode)
@@ -110,11 +112,11 @@ try
     //builder.Services.InstallValidation(LibProjectsApi.AssemblyReference.Assembly);
 
     // ReSharper disable once using
-    using var app = builder.Build();
+    using WebApplication app = builder.Build();
 
     // ReSharper disable once RedundantArgumentDefaultValue
-    app.UseSwaggerServices(debugMode, versionCount);
-    app.UseTestToolsApiEndpoints(debugMode);
+    app.UseSwaggerServices(debugLogger, versionCount);
+    app.UseTestToolsApiEndpoints(debugLogger);
     //app.UseSignalRRecounterMessages(debugMode);
 
     app.UseLibProjectsApi(debugMode);
@@ -126,7 +128,7 @@ try
     Log.Information("Directory.GetCurrentDirectory() = {0}", Directory.GetCurrentDirectory());
     Log.Information("AppContext.BaseDirectory = {0}", AppContext.BaseDirectory);
 
-    app.Run();
+    await app.RunAsync();
 
     Log.Information("Finish");
     return 0;
@@ -138,5 +140,5 @@ catch (Exception e)
 }
 finally
 {
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync();
 }

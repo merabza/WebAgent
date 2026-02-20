@@ -6,12 +6,13 @@ using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
 using LibWebAgentData.ErrorModels;
 using MediatR;
-using MediatRMessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
-using SystemToolsShared;
-using SystemToolsShared.Errors;
+using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.SystemToolsShared;
+using SystemTools.SystemToolsShared.Errors;
+using ToolsManagement.DatabasesManagement;
 
 namespace LibDatabasesApi.Handlers;
 
@@ -34,19 +35,25 @@ public sealed class CheckRepairDatabaseCommandHandler : ICommandHandler<CheckRep
     }
 
     public async Task<OneOf<Unit, Err[]>> Handle(CheckRepairDatabaseRequestCommand request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
-        var result = await DatabaseManagerCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
-            request.UserName, cancellationToken);
+        OneOf<IDatabaseManager, Err[]> result = await DatabaseManagerCreator.Create(_config, _logger,
+            _httpClientFactory, _messagesDataManager, request.UserName, cancellationToken);
         if (result.IsT1)
+        {
             return result.AsT1.ToArray();
-        var databaseManagementClient = result.AsT0;
+        }
+
+        IDatabaseManager? databaseManagementClient = result.AsT0;
 
         if (await databaseManagementClient.CheckRepairDatabase(request.DatabaseName, cancellationToken))
+        {
             return new Unit();
+        }
 
-        var err = DbApiErrors.CannotCheckAndRepairDatabase(request.DatabaseName);
-        _logger.LogError(err.ErrorMessage);
+        Err err = DbApiErrors.CannotCheckAndRepairDatabase(request.DatabaseName);
+        _logger.LogError("{ErrorMessage}", err.ErrorMessage);
+
         return new[] { err };
     }
 }

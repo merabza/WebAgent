@@ -2,15 +2,15 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using DbTools.Models;
+using DatabaseTools.DbTools.Models;
 using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
-using MediatRMessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
-using SystemToolsShared;
-using SystemToolsShared.Errors;
+using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.SystemToolsShared;
+using SystemTools.SystemToolsShared.Errors;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -35,12 +35,15 @@ public sealed class
     }
 
     public async Task<OneOf<DatabaseInfoModel[], Err[]>> Handle(GetDatabaseNamesRequestCommand request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         var result = await DatabaseManagerCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
             request.UserName, cancellationToken);
         if (result.IsT1)
+        {
             return result.AsT1.ToArray();
+        }
+
         var databaseManagementClient = result.AsT0;
 
         var getDatabaseNamesResult = await databaseManagementClient.GetDatabaseNames(cancellationToken);

@@ -7,16 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="12.1.1" />
-    <PackageReference Include="MediatR" Version="14.0.0" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="MediatR" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\DatabaseTools\DbTools\DbTools.csproj" />
-    <ProjectReference Include="..\..\ParametersManagement\LibDatabaseParameters\LibDatabaseParameters.csproj" />
-    <ProjectReference Include="..\..\SystemTools\MediatRMessagingAbstractions\MediatRMessagingAbstractions.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\DatabasesManagement\DatabasesManagement.csproj" />
-    <ProjectReference Include="..\..\WebAgentContracts\WebAgentDatabasesApiContracts\WebAgentDatabasesApiContracts.csproj" />
+    <ProjectReference Include="..\..\SystemTools\SystemTools.MediatRMessagingAbstractions\SystemTools.MediatRMessagingAbstractions.csproj" />
+    <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.DatabasesManagement\ToolsManagement.DatabasesManagement.csproj" />
+    <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.Installer\ToolsManagement.Installer.csproj" />
+    <ProjectReference Include="..\..\WebAgentContracts\WebAgentContracts.WebAgentDatabasesApiContracts\WebAgentContracts.WebAgentDatabasesApiContracts.csproj" />
     <ProjectReference Include="..\..\WebAgentShared\LibProjectsApi\LibProjectsApi.csproj" />
     <ProjectReference Include="..\..\WebAgentShared\LibWebAgentData\LibWebAgentData.csproj" />
   </ItemGroup>

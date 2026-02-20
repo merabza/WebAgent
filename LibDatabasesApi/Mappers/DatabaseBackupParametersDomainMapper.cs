@@ -1,5 +1,5 @@
-﻿using LibDatabaseParameters;
-using WebAgentDatabasesApiContracts.V1.Requests;
+﻿using ParametersManagement.LibDatabaseParameters;
+using WebAgentContracts.WebAgentDatabasesApiContracts.V1.Requests;
 
 namespace LibDatabasesApi.Mappers;
 

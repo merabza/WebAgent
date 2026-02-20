@@ -1,21 +1,21 @@
 ﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using DatabasesManagement;
-using LibApiClientParameters;
-using LibDatabaseParameters;
 using LibDatabasesApi.CommandRequests;
-using LibFileParameters.Models;
 using LibProjectsApi;
 using LibWebAgentData;
-using MediatRMessagingAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
-using SystemToolsShared;
-using SystemToolsShared.Errors;
-using WebAgentDatabasesApiContracts.Errors;
-using WebAgentDatabasesApiContracts.V1.Responses;
+using ParametersManagement.LibApiClientParameters;
+using ParametersManagement.LibDatabaseParameters;
+using ParametersManagement.LibFileParameters.Models;
+using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.SystemToolsShared;
+using SystemTools.SystemToolsShared.Errors;
+using ToolsManagement.DatabasesManagement;
+using WebAgentContracts.WebAgentDatabasesApiContracts.Errors;
+using WebAgentContracts.WebAgentDatabasesApiContracts.V1.Responses;
 
 namespace LibDatabasesApi.Handlers;
 
@@ -38,22 +38,28 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupReq
     }
 
     public async Task<OneOf<BackupFileParameters, Err[]>> Handle(CreateBackupRequestCommand request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         var appSettings = AppSettings.Create(_config);
         if (appSettings is null)
+        {
             return await Task.FromResult(new[] { ProjectsErrors.AppSettingsIsNotCreated });
+        }
 
         var databasesBackupFilesExchangeParameters = appSettings.DatabasesBackupFilesExchangeParameters;
         if (databasesBackupFilesExchangeParameters is null)
+        {
             return await Task.FromResult(new[]
             {
                 DatabaseApiClientErrors.DatabasesBackupFilesExchangeParametersIsNotConfigured
             });
+        }
 
         var databaseServerData = appSettings.DatabaseServerData;
         if (databaseServerData is null)
+        {
             return await Task.FromResult(new[] { DatabaseApiClientErrors.DatabaseServerDataIsNotConfigured });
+        }
 
         var fromDatabaseParameters = new DatabaseParameters
         {
@@ -81,8 +87,10 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupReq
             smartSchemas, databasesBackupFilesExchangeParameters, cancellationToken);
 
         if (baseBackupRestoreParametersResult.IsT1)
+        {
             return Err.RecreateErrors(baseBackupRestoreParametersResult.AsT1,
                 DatabaseApiClientErrors.BaseBackupParametersIsNotCreated);
+        }
 
         _logger.LogInformation("Create Backup for source Database");
 
@@ -90,7 +98,9 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupReq
         var backupFileParameters = await sourceBaseBackupCreator.CreateDatabaseBackup(cancellationToken);
 
         if (backupFileParameters is null)
+        {
             return await Task.FromResult(new[] { DatabaseApiClientErrors.BackupFileParametersIsNull });
+        }
 
         return backupFileParameters;
     }
