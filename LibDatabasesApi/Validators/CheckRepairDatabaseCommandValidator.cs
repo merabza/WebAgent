@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using LibDatabasesApi.CommandRequests;
-using LibProjectsApi.Validators;
+using WebAgentShared.LibProjectsApi.Validators;
 
 namespace LibDatabasesApi.Validators;
 

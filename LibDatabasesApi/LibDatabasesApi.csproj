@@ -16,8 +16,8 @@
     <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.DatabasesManagement\ToolsManagement.DatabasesManagement.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.Installer\ToolsManagement.Installer.csproj" />
     <ProjectReference Include="..\..\WebAgentContracts\WebAgentContracts.WebAgentDatabasesApiContracts\WebAgentContracts.WebAgentDatabasesApiContracts.csproj" />
-    <ProjectReference Include="..\..\WebAgentShared\LibProjectsApi\LibProjectsApi.csproj" />
-    <ProjectReference Include="..\..\WebAgentShared\LibWebAgentData\LibWebAgentData.csproj" />
+    <ProjectReference Include="..\..\WebAgentShared\WebAgentShared.LibProjectsApi\WebAgentShared.LibProjectsApi.csproj" />
+    <ProjectReference Include="..\..\WebAgentShared\WebAgentShared.LibWebAgentData\WebAgentShared.LibWebAgentData.csproj" />
   </ItemGroup>
 
 </Project>

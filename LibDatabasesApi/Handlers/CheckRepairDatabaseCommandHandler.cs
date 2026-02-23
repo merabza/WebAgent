@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
-using LibWebAgentData.ErrorModels;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -13,6 +12,7 @@ using SystemTools.MediatRMessagingAbstractions;
 using SystemTools.SystemToolsShared;
 using SystemTools.SystemToolsShared.Errors;
 using ToolsManagement.DatabasesManagement;
+using WebAgentShared.LibWebAgentData.ErrorModels;
 
 namespace LibDatabasesApi.Handlers;
 

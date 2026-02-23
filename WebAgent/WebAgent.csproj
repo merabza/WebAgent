@@ -12,15 +12,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\WebAgentShared\LibProjectsApi\LibProjectsApi.csproj" />
-    <ProjectReference Include="..\..\WebSystemTools\ApiKeyIdentity\ApiKeyIdentity.csproj" />
-    <ProjectReference Include="..\..\WebSystemTools\ConfigurationEncrypt\ConfigurationEncrypt.csproj" />
-    <ProjectReference Include="..\..\WebSystemTools\MediatorTools\MediatorTools.csproj" />
-    <ProjectReference Include="..\..\WebSystemTools\SerilogLogger\SerilogLogger.csproj" />
-    <ProjectReference Include="..\..\WebSystemTools\SignalRMessages\SignalRMessages.csproj" />
-    <ProjectReference Include="..\..\WebSystemTools\SwaggerTools\SwaggerTools.csproj" />
-    <ProjectReference Include="..\..\WebSystemTools\TestToolsApi\TestToolsApi.csproj" />
-    <ProjectReference Include="..\..\WebSystemTools\WindowsServiceTools\WindowsServiceTools.csproj" />
+    <ProjectReference Include="..\..\WebAgentShared\WebAgentShared.LibProjectsApi\WebAgentShared.LibProjectsApi.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.ApiKeyIdentity\WebSystemTools.ApiKeyIdentity.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.ConfigurationEncrypt\WebSystemTools.ConfigurationEncrypt.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.MediatorTools\WebSystemTools.MediatorTools.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.SerilogLogger\WebSystemTools.SerilogLogger.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.SignalRMessages\WebSystemTools.SignalRMessages.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.SwaggerTools\WebSystemTools.SwaggerTools.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.TestToolsApi\WebSystemTools.TestToolsApi.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.WindowsServiceTools\WebSystemTools.WindowsServiceTools.csproj" />
     <ProjectReference Include="..\LibDatabasesApi\LibDatabasesApi.csproj" />
   </ItemGroup>
 

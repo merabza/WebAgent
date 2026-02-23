@@ -4,9 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using DatabaseTools.DbTools;
 using LibDatabasesApi.CommandRequests;
-using LibProjectsApi;
-using LibWebAgentData;
-using LibWebAgentData.ErrorModels;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -19,9 +16,15 @@ using SystemTools.MediatRMessagingAbstractions;
 using SystemTools.SystemToolsShared;
 using SystemTools.SystemToolsShared.Errors;
 using ToolsManagement.DatabasesManagement;
+using ToolsManagement.DatabasesManagement.Models;
+using ToolsManagement.FileManagersMain;
 using ToolsManagement.Installer.Errors;
 using WebAgentContracts.WebAgentDatabasesApiContracts.Errors;
 using WebAgentContracts.WebAgentDatabasesApiContracts.V1.Responses;
+using WebAgentShared.LibProjectsApi;
+using WebAgentShared.LibWebAgentData;
+using WebAgentShared.LibWebAgentData.ErrorModels;
+using WebAgentShared.LibWebAgentData.Models;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -69,14 +72,15 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         }
 
         //ბაზების გაცვლის პარამეტრების შემოწმება
-        var databasesBackupFilesExchangeParameters = appSettings.DatabasesBackupFilesExchangeParameters;
+        DatabasesBackupFilesExchangeParameters? databasesBackupFilesExchangeParameters =
+            appSettings.DatabasesBackupFilesExchangeParameters;
         if (databasesBackupFilesExchangeParameters is null)
         {
             return new[] { DatabaseApiClientErrors.DatabasesBackupFilesExchangeParametersIsNotConfigured };
         }
 
         //მონაცემთა ბაზის სერვერის პარამეტრების შემოწმება
-        var databaseServerData = appSettings.DatabaseServerData;
+        DatabaseServerData? databaseServerData = appSettings.DatabaseServerData;
         if (databaseServerData is null)
         {
             return await Task.FromResult(new[] { DatabaseApiClientErrors.DatabaseServerDataIsNotConfigured });
@@ -99,9 +103,10 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         var createBaseBackupParametersFactory =
             new CreateBaseBackupParametersFactory(_logger, _messagesDataManager, request.UserName, false);
 
-        var createBaseBackupParametersResult = await createBaseBackupParametersFactory.CreateBaseBackupParameters(
-            _httpClientFactory, restoreDatabaseParameters, databaseServerConnections, apiClients, fileStorages,
-            smartSchemas, databasesBackupFilesExchangeParameters, cancellationToken);
+        OneOf<BaseBackupParameters, Err[]> createBaseBackupParametersResult =
+            await createBaseBackupParametersFactory.CreateBaseBackupParameters(_httpClientFactory,
+                restoreDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
+                databasesBackupFilesExchangeParameters, cancellationToken);
 
         if (createBaseBackupParametersResult.IsT1)
         {
@@ -109,12 +114,12 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
                 DatabaseApiClientErrors.BaseBackupParametersIsNotCreated);
         }
 
-        var createBaseBackupParameters = createBaseBackupParametersResult.AsT0;
+        BaseBackupParameters? createBaseBackupParameters = createBaseBackupParametersResult.AsT0;
 
         var destinationBaseBackupRestorer = new BaseBackupRestoreTool(_logger, createBaseBackupParameters);
         await destinationBaseBackupRestorer.CreateDatabaseBackup(cancellationToken);
 
-        var exchangeFileManager = createBaseBackupParameters.ExchangeFileManager;
+        FileManager? exchangeFileManager = createBaseBackupParameters.ExchangeFileManager;
 
         if (exchangeFileManager is null)
         {
@@ -122,7 +127,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
                 cancellationToken);
         }
 
-        var localArchiveFileName = Path.Combine(createBaseBackupParameters.LocalPath, request.Name);
+        string localArchiveFileName = Path.Combine(createBaseBackupParameters.LocalPath, request.Name);
         //თუ ფაილი უკვე მოქაჩულია, მეორედ მისი მოქაჩვა საჭირო არ არის
         if (!File.Exists(localArchiveFileName) && !exchangeFileManager.DownloadFile(request.Name,
                 createBaseBackupParameters.DownloadTempExtension)) //მოვქაჩოთ არჩეული საინსტალაციო არქივი

@@ -2,8 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using LibDatabasesApi.CommandRequests;
-using LibProjectsApi;
-using LibWebAgentData;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
@@ -14,8 +12,12 @@ using SystemTools.MediatRMessagingAbstractions;
 using SystemTools.SystemToolsShared;
 using SystemTools.SystemToolsShared.Errors;
 using ToolsManagement.DatabasesManagement;
+using ToolsManagement.DatabasesManagement.Models;
 using WebAgentContracts.WebAgentDatabasesApiContracts.Errors;
 using WebAgentContracts.WebAgentDatabasesApiContracts.V1.Responses;
+using WebAgentShared.LibProjectsApi;
+using WebAgentShared.LibWebAgentData;
+using WebAgentShared.LibWebAgentData.Models;
 
 namespace LibDatabasesApi.Handlers;
 
@@ -46,7 +48,8 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupReq
             return await Task.FromResult(new[] { ProjectsErrors.AppSettingsIsNotCreated });
         }
 
-        var databasesBackupFilesExchangeParameters = appSettings.DatabasesBackupFilesExchangeParameters;
+        DatabasesBackupFilesExchangeParameters? databasesBackupFilesExchangeParameters =
+            appSettings.DatabasesBackupFilesExchangeParameters;
         if (databasesBackupFilesExchangeParameters is null)
         {
             return await Task.FromResult(new[]
@@ -55,7 +58,7 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupReq
             });
         }
 
-        var databaseServerData = appSettings.DatabaseServerData;
+        DatabaseServerData? databaseServerData = appSettings.DatabaseServerData;
         if (databaseServerData is null)
         {
             return await Task.FromResult(new[] { DatabaseApiClientErrors.DatabaseServerDataIsNotConfigured });
@@ -82,9 +85,10 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupReq
 
         var createBaseBackupParametersFactory =
             new CreateBaseBackupParametersFactory(_logger, _messagesDataManager, request.UserName, false);
-        var baseBackupRestoreParametersResult = await createBaseBackupParametersFactory.CreateBaseBackupParameters(
-            _httpClientFactory, fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages,
-            smartSchemas, databasesBackupFilesExchangeParameters, cancellationToken);
+        OneOf<BaseBackupParameters, Err[]> baseBackupRestoreParametersResult =
+            await createBaseBackupParametersFactory.CreateBaseBackupParameters(_httpClientFactory,
+                fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
+                databasesBackupFilesExchangeParameters, cancellationToken);
 
         if (baseBackupRestoreParametersResult.IsT1)
         {
@@ -95,7 +99,8 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupReq
         _logger.LogInformation("Create Backup for source Database");
 
         var sourceBaseBackupCreator = new BaseBackupRestoreTool(_logger, baseBackupRestoreParametersResult.AsT0);
-        var backupFileParameters = await sourceBaseBackupCreator.CreateDatabaseBackup(cancellationToken);
+        BackupFileParameters? backupFileParameters =
+            await sourceBaseBackupCreator.CreateDatabaseBackup(cancellationToken);
 
         if (backupFileParameters is null)
         {

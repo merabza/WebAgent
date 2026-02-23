@@ -2,12 +2,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using LibDatabasesApi.CommandRequests;
-using LibProjectsApi;
-using LibWebAgentData;
 using Microsoft.Extensions.Configuration;
 using OneOf;
 using SystemTools.MediatRMessagingAbstractions;
 using SystemTools.SystemToolsShared.Errors;
+using WebAgentShared.LibProjectsApi;
+using WebAgentShared.LibWebAgentData;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

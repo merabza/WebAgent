@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
-using LibWebAgentData.ErrorModels;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -12,6 +11,8 @@ using OneOf;
 using SystemTools.MediatRMessagingAbstractions;
 using SystemTools.SystemToolsShared;
 using SystemTools.SystemToolsShared.Errors;
+using ToolsManagement.DatabasesManagement;
+using WebAgentShared.LibWebAgentData.ErrorModels;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -37,21 +38,21 @@ public sealed class UpdateStatisticsCommandHandler : ICommandHandler<UpdateStati
     public async Task<OneOf<Unit, Err[]>> Handle(UpdateStatisticsRequestCommand request,
         CancellationToken cancellationToken)
     {
-        var result = await DatabaseManagerCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
-            request.UserName, cancellationToken);
+        OneOf<IDatabaseManager, Err[]> result = await DatabaseManagerCreator.Create(_config, _logger,
+            _httpClientFactory, _messagesDataManager, request.UserName, cancellationToken);
         if (result.IsT1)
         {
             return result.AsT1.ToArray();
         }
 
-        var databaseManagementClient = result.AsT0;
+        IDatabaseManager? databaseManagementClient = result.AsT0;
 
         if (await databaseManagementClient.UpdateStatistics(request.DatabaseName, cancellationToken))
         {
             return new Unit();
         }
 
-        var err = DbApiErrors.CannotCheckAndRepairDatabase(request.DatabaseName);
+        Err err = DbApiErrors.CannotCheckAndRepairDatabase(request.DatabaseName);
         _logger.LogError("{ErrorMessage}", err.ErrorMessage);
         return new[] { err };
     }

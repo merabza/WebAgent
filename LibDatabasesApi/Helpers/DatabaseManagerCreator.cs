@@ -1,10 +1,6 @@
 ﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using LibProjectsApi;
-using LibWebAgentData;
-using LibWebAgentData.ErrorModels;
-using LibWebAgentData.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
@@ -13,6 +9,10 @@ using ParametersManagement.LibDatabaseParameters;
 using SystemTools.SystemToolsShared;
 using SystemTools.SystemToolsShared.Errors;
 using ToolsManagement.DatabasesManagement;
+using WebAgentShared.LibProjectsApi;
+using WebAgentShared.LibWebAgentData;
+using WebAgentShared.LibWebAgentData.ErrorModels;
+using WebAgentShared.LibWebAgentData.Models;
 
 namespace LibDatabasesApi.Helpers;
 
@@ -31,12 +31,12 @@ public static class DatabaseManagerCreator
 
         if (appSettings.DatabaseServerData is null)
         {
-            var err1 = DbApiErrors.DatabaseSettingsDoesNotSpecified;
+            Err err1 = DbApiErrors.DatabaseSettingsDoesNotSpecified;
             logger.LogError("{ErrorMessage}", err1.ErrorMessage);
             return new[] { err1 };
         }
 
-        var dbServerData = appSettings.DatabaseServerData;
+        DatabaseServerData? dbServerData = appSettings.DatabaseServerData;
 
         return await GetDatabaseConnectionSettings(logger, httpClientFactory, config, dbServerData, messagesDataManager,
             userName, cancellationToken);
@@ -53,8 +53,9 @@ public static class DatabaseManagerCreator
             return await Task.FromResult(new[] { ProjectsErrors.AppSettingsIsNotCreated });
         }
 
-        var databaseManagementClient = await DatabaseManagersFactory.CreateDatabaseManager(logger, false,
-            databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
+        OneOf<IDatabaseManager, Err[]> databaseManagementClient = await DatabaseManagersFactory.CreateDatabaseManager(
+            logger, false, databaseServerData.DbConnectionName,
+            new DatabaseServerConnections(appSettings.DatabaseServerConnections),
             new ApiClients(appSettings.ApiClients), httpClientFactory, messagesDataManager, userName,
             cancellationToken);
         return databaseManagementClient;
