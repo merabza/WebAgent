@@ -39,7 +39,7 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupReq
         _messagesDataManager = messagesDataManager;
     }
 
-    public async Task<OneOf<BackupFileParameters, Err[]>> Handle(CreateBackupRequestCommand request,
+    public async Task<OneOf<BackupFileParameters, Error[]>> Handle(CreateBackupRequestCommand request,
         CancellationToken cancellationToken)
     {
         var appSettings = AppSettings.Create(_config);
@@ -85,14 +85,14 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupReq
 
         var createBaseBackupParametersFactory =
             new CreateBaseBackupParametersFactory(_logger, _messagesDataManager, request.UserName, false);
-        OneOf<BaseBackupParameters, Err[]> baseBackupRestoreParametersResult =
+        OneOf<BaseBackupParameters, Error[]> baseBackupRestoreParametersResult =
             await createBaseBackupParametersFactory.CreateBaseBackupParameters(_httpClientFactory,
                 fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
                 databasesBackupFilesExchangeParameters, cancellationToken);
 
         if (baseBackupRestoreParametersResult.IsT1)
         {
-            return Err.RecreateErrors(baseBackupRestoreParametersResult.AsT1,
+            return Error.RecreateErrors(baseBackupRestoreParametersResult.AsT1,
                 DatabaseApiClientErrors.BaseBackupParametersIsNotCreated);
         }
 

@@ -36,10 +36,10 @@ public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectio
         _messagesDataManager = messagesDataManager;
     }
 
-    public async Task<OneOf<Unit, Err[]>> Handle(TestConnectionRequestCommand request,
+    public async Task<OneOf<Unit, Error[]>> Handle(TestConnectionRequestCommand request,
         CancellationToken cancellationToken)
     {
-        OneOf<IDatabaseManager, Err[]> databaseClientCreatorResult = await DatabaseManagerCreator.Create(_config,
+        OneOf<IDatabaseManager, Error[]> databaseClientCreatorResult = await DatabaseManagerCreator.Create(_config,
             _logger, _httpClientFactory, _messagesDataManager, request.UserName, cancellationToken);
         if (databaseClientCreatorResult.IsT1)
         {
@@ -48,15 +48,15 @@ public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectio
 
         IDatabaseManager? databaseManagementClient = databaseClientCreatorResult.AsT0;
 
-        Option<Err[]> testResult =
+        Option<Error[]> testResult =
             await databaseManagementClient.TestConnection(request.DatabaseName, cancellationToken);
         if (testResult.IsNone)
         {
             return new Unit();
         }
 
-        Err err = DbApiErrors.TestConnectionFailed(request.DatabaseName);
-        _logger.LogError("{ErrorMessage}", err.ErrorMessage);
-        return await Task.FromResult(Err.RecreateErrors((Err[])testResult, err));
+        Error err = DbApiErrors.TestConnectionFailed(request.DatabaseName);
+        _logger.LogError("{Name}", err.Name);
+        return await Task.FromResult(Error.RecreateErrors((Error[])testResult, err));
     }
 }

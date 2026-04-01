@@ -35,10 +35,10 @@ public sealed class UpdateStatisticsCommandHandler : ICommandHandler<UpdateStati
         _messagesDataManager = messagesDataManager;
     }
 
-    public async Task<OneOf<Unit, Err[]>> Handle(UpdateStatisticsRequestCommand request,
+    public async Task<OneOf<Unit, Error[]>> Handle(UpdateStatisticsRequestCommand request,
         CancellationToken cancellationToken)
     {
-        OneOf<IDatabaseManager, Err[]> result = await DatabaseManagerCreator.Create(_config, _logger,
+        OneOf<IDatabaseManager, Error[]> result = await DatabaseManagerCreator.Create(_config, _logger,
             _httpClientFactory, _messagesDataManager, request.UserName, cancellationToken);
         if (result.IsT1)
         {
@@ -52,8 +52,8 @@ public sealed class UpdateStatisticsCommandHandler : ICommandHandler<UpdateStati
             return new Unit();
         }
 
-        Err err = DbApiErrors.CannotCheckAndRepairDatabase(request.DatabaseName);
-        _logger.LogError("{ErrorMessage}", err.ErrorMessage);
+        Error err = DbApiErrors.CannotCheckAndRepairDatabase(request.DatabaseName);
+        _logger.LogError("{Name}", err.Name);
         return new[] { err };
     }
 }

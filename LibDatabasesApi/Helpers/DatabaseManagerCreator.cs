@@ -18,7 +18,7 @@ namespace LibDatabasesApi.Helpers;
 
 public static class DatabaseManagerCreator
 {
-    public static async ValueTask<OneOf<IDatabaseManager, Err[]>> Create(IConfiguration config, ILogger logger,
+    public static async ValueTask<OneOf<IDatabaseManager, Error[]>> Create(IConfiguration config, ILogger logger,
         IHttpClientFactory httpClientFactory, IMessagesDataManager? messagesDataManager, string? userName,
         CancellationToken cancellationToken = default)
     {
@@ -31,8 +31,8 @@ public static class DatabaseManagerCreator
 
         if (appSettings.DatabaseServerData is null)
         {
-            Err err1 = DbApiErrors.DatabaseSettingsDoesNotSpecified;
-            logger.LogError("{ErrorMessage}", err1.ErrorMessage);
+            Error err1 = DbApiErrors.DatabaseSettingsDoesNotSpecified;
+            logger.LogError("{Name}", err1.Name);
             return new[] { err1 };
         }
 
@@ -42,7 +42,7 @@ public static class DatabaseManagerCreator
             userName, cancellationToken);
     }
 
-    private static async ValueTask<OneOf<IDatabaseManager, Err[]>> GetDatabaseConnectionSettings(ILogger logger,
+    private static async ValueTask<OneOf<IDatabaseManager, Error[]>> GetDatabaseConnectionSettings(ILogger logger,
         IHttpClientFactory httpClientFactory, IConfiguration config, DatabaseServerData databaseServerData,
         IMessagesDataManager? messagesDataManager, string? userName, CancellationToken cancellationToken = default)
     {
@@ -53,7 +53,7 @@ public static class DatabaseManagerCreator
             return await Task.FromResult(new[] { ProjectsErrors.AppSettingsIsNotCreated });
         }
 
-        OneOf<IDatabaseManager, Err[]> databaseManagementClient = await DatabaseManagersFactory.CreateDatabaseManager(
+        OneOf<IDatabaseManager, Error[]> databaseManagementClient = await DatabaseManagersFactory.CreateDatabaseManager(
             logger, false, databaseServerData.DbConnectionName,
             new DatabaseServerConnections(appSettings.DatabaseServerConnections),
             new ApiClients(appSettings.ApiClients), httpClientFactory, messagesDataManager, userName,

@@ -57,7 +57,7 @@ public static class DatabasesEndpoints
     }
 
     // POST api/database/checkrepairdatabase/{databaseName}
-    private static async Task<Results<Ok, BadRequest<Err[]>>> CheckRepairDatabase([FromRoute] string databaseName,
+    private static async Task<Results<Ok, BadRequest<Error[]>>> CheckRepairDatabase([FromRoute] string databaseName,
         ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
         CancellationToken cancellationToken = default)
     {
@@ -66,16 +66,16 @@ public static class DatabasesEndpoints
         Debug.WriteLine($"Call {nameof(CheckRepairDatabaseCommandHandler)} from {nameof(CheckRepairDatabase)}");
 
         var command = CheckRepairDatabaseRequestCommand.Create(databaseName, userName);
-        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Error[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(CheckRepairDatabase)} finished", cancellationToken);
         //return result.Match(_ => Results.Ok(), Results.BadRequest);
-        return result.Match<Results<Ok, BadRequest<Err[]>>>(_ => TypedResults.Ok(),
+        return result.Match<Results<Ok, BadRequest<Error[]>>>(_ => TypedResults.Ok(),
             errors => TypedResults.BadRequest(errors));
     }
 
     // POST api/database/createbackup/{databaseName}/{dbServerFoldersSetName}
-    private static async Task<Results<Ok<BackupFileParameters>, BadRequest<Err[]>>> CreateBackup(
+    private static async Task<Results<Ok<BackupFileParameters>, BadRequest<Error[]>>> CreateBackup(
         [FromRoute] string databaseName, [FromRoute] string dbServerFoldersSetName,
         [FromBody] CreateDatabaseBackupRequest dbBackupParameters, ICurrentUserByApiKey currentUserByApiKey,
         IMediator mediator, IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
@@ -86,15 +86,15 @@ public static class DatabasesEndpoints
 
         var command = new CreateBackupRequestCommand(databaseName, dbServerFoldersSetName, dbBackupParameters.AdaptTo(),
             userName);
-        OneOf<BackupFileParameters, Err[]> result = await mediator.Send(command, cancellationToken);
+        OneOf<BackupFileParameters, Error[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(CreateBackup)} finished", cancellationToken);
-        return result.Match<Results<Ok<BackupFileParameters>, BadRequest<Err[]>>>(success => TypedResults.Ok(success),
+        return result.Match<Results<Ok<BackupFileParameters>, BadRequest<Error[]>>>(success => TypedResults.Ok(success),
             errors => TypedResults.BadRequest(errors));
     }
 
     // POST api/database/executecommand/{databaseName}
-    private static async Task<Results<Ok, BadRequest<Err[]>>> ExecuteCommand([FromRoute] string databaseName,
+    private static async Task<Results<Ok, BadRequest<Error[]>>> ExecuteCommand([FromRoute] string databaseName,
         ICurrentUserByApiKey currentUserByApiKey, [FromBody] string? commandText, IMediator mediator,
         IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
     {
@@ -104,16 +104,16 @@ public static class DatabasesEndpoints
 
         //ExecuteCommandCommandRequest
         var command = ExecuteCommandRequestCommand.Create(databaseName, commandText, userName);
-        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Error[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(ExecuteCommand)} finished", cancellationToken);
         //return result.Match(_ => Results.Ok(), Results.BadRequest);
-        return result.Match<Results<Ok, BadRequest<Err[]>>>(_ => TypedResults.Ok(),
+        return result.Match<Results<Ok, BadRequest<Error[]>>>(_ => TypedResults.Ok(),
             errors => TypedResults.BadRequest(errors));
     }
 
     // GET api/database/getdatabaseconnectionnames
-    private static async Task<Results<Ok<string[]>, BadRequest<Err[]>>> GetDatabaseConnectionNames(
+    private static async Task<Results<Ok<string[]>, BadRequest<Error[]>>> GetDatabaseConnectionNames(
         ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
         CancellationToken cancellationToken = default)
     {
@@ -125,16 +125,16 @@ public static class DatabasesEndpoints
 
         //GetDatabaseConnectionNamesCommandRequest
         var command = GetDatabaseConnectionNamesRequestCommand.Create(userName);
-        OneOf<string[], Err[]> result = await mediator.Send(command, cancellationToken);
+        OneOf<string[], Error[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseConnectionNames)} finished",
             cancellationToken);
-        return result.Match<Results<Ok<string[]>, BadRequest<Err[]>>>(success => TypedResults.Ok(success),
+        return result.Match<Results<Ok<string[]>, BadRequest<Error[]>>>(success => TypedResults.Ok(success),
             errors => TypedResults.BadRequest(errors));
     }
 
     // GET api/database/getdatabasefolderssetnames
-    private static async Task<Results<Ok<string[]>, BadRequest<Err[]>>> GetDatabaseFoldersSetNames(
+    private static async Task<Results<Ok<string[]>, BadRequest<Error[]>>> GetDatabaseFoldersSetNames(
         ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
         CancellationToken cancellationToken = default)
     {
@@ -146,11 +146,11 @@ public static class DatabasesEndpoints
 
         //GetDatabaseFoldersSetsCommandRequest
         var command = GetDatabaseFoldersSetNamesRequestCommand.Create(userName);
-        OneOf<string[], Err[]> result = await mediator.Send(command, cancellationToken);
+        OneOf<string[], Error[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseFoldersSetNames)} finished",
             cancellationToken);
-        return result.Match<Results<Ok<string[]>, BadRequest<Err[]>>>(success => TypedResults.Ok(success),
+        return result.Match<Results<Ok<string[]>, BadRequest<Error[]>>>(success => TypedResults.Ok(success),
             errors => TypedResults.BadRequest(errors));
     }
 
@@ -164,7 +164,7 @@ public static class DatabasesEndpoints
 
         //GetDatabaseNamesCommandRequest
         var command = GetDatabaseNamesRequestCommand.Create(userName);
-        OneOf<DatabaseInfoModel[], Err[]> result = await mediator.Send(command, cancellationToken);
+        OneOf<DatabaseInfoModel[], Error[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(GetDatabaseNames)} finished", cancellationToken);
         return result.Match(Results.Ok, Results.BadRequest);
@@ -182,7 +182,7 @@ public static class DatabasesEndpoints
         //IsDatabaseExistsCommandRequest
 
         var command = IsDatabaseExistsRequestCommand.Create(databaseName, userName);
-        OneOf<bool, Err[]> result = await mediator.Send(command, cancellationToken);
+        OneOf<bool, Error[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(IsDatabaseExists)} finished", cancellationToken);
         return result.Match(Results.Ok, Results.BadRequest);
@@ -200,7 +200,7 @@ public static class DatabasesEndpoints
         //RecompileProceduresCommandRequest
 
         var command = RecompileProceduresRequestCommand.Create(databaseName, userName);
-        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Error[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(RecompileProcedures)} finished", cancellationToken);
         return result.Match(_ => Results.Ok(), Results.BadRequest);
@@ -226,7 +226,7 @@ public static class DatabasesEndpoints
         await messagesDataManager.SendMessage(userName, $"{nameof(RestoreBackup)} mediator.Send command",
             cancellationToken);
 
-        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Error[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(RestoreBackup)} finished", cancellationToken);
         return result.Match(_ => Results.Ok(), Results.BadRequest);
@@ -244,7 +244,7 @@ public static class DatabasesEndpoints
         //TestConnectionCommandRequest
 
         var command = TestConnectionRequestCommand.Create(databaseName, userName);
-        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Error[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(TestConnection)} finished", cancellationToken);
         return result.Match(_ => Results.Ok(), Results.BadRequest);
@@ -262,7 +262,7 @@ public static class DatabasesEndpoints
         //UpdateStatisticsCommandRequest
 
         var command = UpdateStatisticsRequestCommand.Create(databaseName, userName);
-        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Error[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(UpdateStatistics)} finished", cancellationToken);
         return result.Match(_ => Results.Ok(), Results.BadRequest);

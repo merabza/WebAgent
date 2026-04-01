@@ -34,7 +34,7 @@ public sealed class GetDatabaseFoldersSetNamesCommandHandler : ICommandHandler<G
         _messagesDataManager = messagesDataManager;
     }
 
-    public async Task<OneOf<string[], Err[]>> Handle(GetDatabaseFoldersSetNamesRequestCommand request,
+    public async Task<OneOf<string[], Error[]>> Handle(GetDatabaseFoldersSetNamesRequestCommand request,
         CancellationToken cancellationToken)
     {
         var result = await DatabaseManagerCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
@@ -48,6 +48,6 @@ public sealed class GetDatabaseFoldersSetNamesCommandHandler : ICommandHandler<G
 
         var getDatabaseFoldersSetNamesResult =
             await databaseManagementClient.GetDatabaseFoldersSetNames(cancellationToken);
-        return getDatabaseFoldersSetNamesResult.Match<OneOf<string[], Err[]>>(f0 => f0.ToArray(), f1 => f1);
+        return getDatabaseFoldersSetNamesResult.Match<OneOf<string[], Error[]>>(f0 => f0.ToArray(), f1 => f1);
     }
 }
