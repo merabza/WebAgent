@@ -18,9 +18,9 @@ namespace LibDatabasesApi.Helpers;
 
 public static class DatabaseManagerCreator
 {
-    public static async ValueTask<OneOf<IDatabaseManager, Error[]>> Create(IConfiguration config, ILogger logger,
-        IHttpClientFactory httpClientFactory, IMessagesDataManager? messagesDataManager, string? userName,
-        CancellationToken cancellationToken = default)
+    public static async ValueTask<OneOf<IDatabaseManager, Error[]>> Create(string appName, IConfiguration config,
+        ILogger logger, IHttpClientFactory httpClientFactory, IMessagesDataManager? messagesDataManager,
+        string? userName, CancellationToken cancellationToken = default)
     {
         var appSettings = AppSettings.Create(config);
 
@@ -38,13 +38,14 @@ public static class DatabaseManagerCreator
 
         DatabaseServerData? dbServerData = appSettings.DatabaseServerData;
 
-        return await GetDatabaseConnectionSettings(logger, httpClientFactory, config, dbServerData, messagesDataManager,
-            userName, cancellationToken);
+        return await GetDatabaseConnectionSettings(appName, logger, httpClientFactory, config, dbServerData,
+            messagesDataManager, userName, cancellationToken);
     }
 
-    private static async ValueTask<OneOf<IDatabaseManager, Error[]>> GetDatabaseConnectionSettings(ILogger logger,
-        IHttpClientFactory httpClientFactory, IConfiguration config, DatabaseServerData databaseServerData,
-        IMessagesDataManager? messagesDataManager, string? userName, CancellationToken cancellationToken = default)
+    private static async ValueTask<OneOf<IDatabaseManager, Error[]>> GetDatabaseConnectionSettings(string appName,
+        ILogger logger, IHttpClientFactory httpClientFactory, IConfiguration config,
+        DatabaseServerData databaseServerData, IMessagesDataManager? messagesDataManager, string? userName,
+        CancellationToken cancellationToken = default)
     {
         var appSettings = AppSettings.Create(config);
 
@@ -54,7 +55,7 @@ public static class DatabaseManagerCreator
         }
 
         OneOf<IDatabaseManager, Error[]> databaseManagementClient = await DatabaseManagersFactory.CreateDatabaseManager(
-            logger, false, databaseServerData.DbConnectionName,
+            appName, logger, false, databaseServerData.DbConnectionName,
             new DatabaseServerConnections(appSettings.DatabaseServerConnections),
             new ApiClients(appSettings.ApiClients), httpClientFactory, messagesDataManager, userName,
             cancellationToken);

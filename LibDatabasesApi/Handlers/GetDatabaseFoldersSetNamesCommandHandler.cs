@@ -19,6 +19,7 @@ namespace LibDatabasesApi.Handlers;
 public sealed class GetDatabaseFoldersSetNamesCommandHandler : ICommandHandler<GetDatabaseFoldersSetNamesRequestCommand,
     string[]>
 {
+    private readonly IApplication _application;
     private readonly IConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<GetDatabaseFoldersSetNamesCommandHandler> _logger;
@@ -26,19 +27,20 @@ public sealed class GetDatabaseFoldersSetNamesCommandHandler : ICommandHandler<G
 
     public GetDatabaseFoldersSetNamesCommandHandler(IConfiguration config,
         ILogger<GetDatabaseFoldersSetNamesCommandHandler> logger, IHttpClientFactory httpClientFactory,
-        IMessagesDataManager messagesDataManager)
+        IMessagesDataManager messagesDataManager, IApplication application)
     {
         _config = config;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _messagesDataManager = messagesDataManager;
+        _application = application;
     }
 
     public async Task<OneOf<string[], Error[]>> Handle(GetDatabaseFoldersSetNamesRequestCommand request,
         CancellationToken cancellationToken)
     {
-        var result = await DatabaseManagerCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
-            request.UserName, cancellationToken);
+        var result = await DatabaseManagerCreator.Create(_application.AppName, _config, _logger, _httpClientFactory,
+            _messagesDataManager, request.UserName, cancellationToken);
         if (result.IsT1)
         {
             return result.AsT1.ToArray();

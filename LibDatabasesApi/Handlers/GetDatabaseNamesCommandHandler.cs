@@ -20,25 +20,27 @@ namespace LibDatabasesApi.Handlers;
 public sealed class
     GetDatabaseNamesCommandHandler : ICommandHandler<GetDatabaseNamesRequestCommand, DatabaseInfoModel[]>
 {
+    private readonly IApplication _application;
     private readonly IConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<GetDatabaseNamesCommandHandler> _logger;
     private readonly IMessagesDataManager _messagesDataManager;
 
     public GetDatabaseNamesCommandHandler(IConfiguration config, ILogger<GetDatabaseNamesCommandHandler> logger,
-        IHttpClientFactory httpClientFactory, IMessagesDataManager messagesDataManager)
+        IHttpClientFactory httpClientFactory, IMessagesDataManager messagesDataManager, IApplication application)
     {
         _config = config;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _messagesDataManager = messagesDataManager;
+        _application = application;
     }
 
     public async Task<OneOf<DatabaseInfoModel[], Error[]>> Handle(GetDatabaseNamesRequestCommand request,
         CancellationToken cancellationToken)
     {
-        var result = await DatabaseManagerCreator.Create(_config, _logger, _httpClientFactory, _messagesDataManager,
-            request.UserName, cancellationToken);
+        var result = await DatabaseManagerCreator.Create(_application.AppName, _config, _logger, _httpClientFactory,
+            _messagesDataManager, request.UserName, cancellationToken);
         if (result.IsT1)
         {
             return result.AsT1.ToArray();

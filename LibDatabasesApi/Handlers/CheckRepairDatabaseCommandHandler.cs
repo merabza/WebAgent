@@ -19,6 +19,7 @@ namespace LibDatabasesApi.Handlers;
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class CheckRepairDatabaseCommandHandler : ICommandHandler<CheckRepairDatabaseRequestCommand>
 {
+    private readonly IApplication _application;
     private readonly IConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<CheckRepairDatabaseCommandHandler> _logger;
@@ -26,19 +27,20 @@ public sealed class CheckRepairDatabaseCommandHandler : ICommandHandler<CheckRep
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public CheckRepairDatabaseCommandHandler(IConfiguration config, ILogger<CheckRepairDatabaseCommandHandler> logger,
-        IHttpClientFactory httpClientFactory, IMessagesDataManager messagesDataManager)
+        IHttpClientFactory httpClientFactory, IMessagesDataManager messagesDataManager, IApplication application)
     {
         _config = config;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _messagesDataManager = messagesDataManager;
+        _application = application;
     }
 
     public async Task<OneOf<Unit, Error[]>> Handle(CheckRepairDatabaseRequestCommand request,
         CancellationToken cancellationToken)
     {
-        OneOf<IDatabaseManager, Error[]> result = await DatabaseManagerCreator.Create(_config, _logger,
-            _httpClientFactory, _messagesDataManager, request.UserName, cancellationToken);
+        OneOf<IDatabaseManager, Error[]> result = await DatabaseManagerCreator.Create(_application.AppName, _config,
+            _logger, _httpClientFactory, _messagesDataManager, request.UserName, cancellationToken);
         if (result.IsT1)
         {
             return result.AsT1.ToArray();

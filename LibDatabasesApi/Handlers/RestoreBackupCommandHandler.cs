@@ -33,18 +33,20 @@ namespace LibDatabasesApi.Handlers;
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupCommandRequestCommand>
 {
+    private readonly IApplication _application;
     private readonly IConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<RestoreBackupCommandHandler> _logger;
     private readonly IMessagesDataManager _messagesDataManager;
 
     public RestoreBackupCommandHandler(IConfiguration config, ILogger<RestoreBackupCommandHandler> logger,
-        IHttpClientFactory httpClientFactory, IMessagesDataManager messagesDataManager)
+        IHttpClientFactory httpClientFactory, IMessagesDataManager messagesDataManager, IApplication application)
     {
         _config = config;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _messagesDataManager = messagesDataManager;
+        _application = application;
     }
 
     public async Task<OneOf<Unit, Error[]>> Handle(RestoreBackupCommandRequestCommand request,
@@ -100,8 +102,8 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         var smartSchemas = new SmartSchemas(appSettings.SmartSchemas);
         var fileStorages = new FileStorages(appSettings.FileStorages);
 
-        var createBaseBackupParametersFactory =
-            new CreateBaseBackupParametersFactory(_logger, _messagesDataManager, request.UserName, false);
+        var createBaseBackupParametersFactory = new CreateBaseBackupParametersFactory(_application.AppName, _logger,
+            _messagesDataManager, request.UserName, false);
 
         OneOf<BaseBackupParameters, Error[]> createBaseBackupParametersResult =
             await createBaseBackupParametersFactory.CreateBaseBackupParameters(_httpClientFactory,

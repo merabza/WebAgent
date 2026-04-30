@@ -24,6 +24,7 @@ namespace LibDatabasesApi.Handlers;
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupRequestCommand, BackupFileParameters>
 {
+    private readonly IApplication _application;
     private readonly IConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<CreateBackupCommandHandler> _logger;
@@ -31,12 +32,13 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupReq
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public CreateBackupCommandHandler(IConfiguration config, ILogger<CreateBackupCommandHandler> logger,
-        IHttpClientFactory httpClientFactory, IMessagesDataManager messagesDataManager)
+        IHttpClientFactory httpClientFactory, IMessagesDataManager messagesDataManager, IApplication application)
     {
         _config = config;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _messagesDataManager = messagesDataManager;
+        _application = application;
     }
 
     public async Task<OneOf<BackupFileParameters, Error[]>> Handle(CreateBackupRequestCommand request,
@@ -83,8 +85,8 @@ public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupReq
         //var exchangeFileStorageName = databasesBackupFilesExchangeParameters.ExchangeFileStorageName;
         //var uploadTempExtension = databasesBackupFilesExchangeParameters.UploadTempExtension;
 
-        var createBaseBackupParametersFactory =
-            new CreateBaseBackupParametersFactory(_logger, _messagesDataManager, request.UserName, false);
+        var createBaseBackupParametersFactory = new CreateBaseBackupParametersFactory(_application.AppName, _logger,
+            _messagesDataManager, request.UserName, false);
         OneOf<BaseBackupParameters, Error[]> baseBackupRestoreParametersResult =
             await createBaseBackupParametersFactory.CreateBaseBackupParameters(_httpClientFactory,
                 fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
