@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using SystemTools.SystemToolsShared.DependencyInjection;
 using WebAgentShared.LibProjectsApi;
 using WebAgentShared.LibProjectsApi.DependencyInjection;
 using WebSystemTools.ApiKeyIdentity.DependencyInjection;
@@ -64,14 +65,18 @@ try
         .AddMediator(debugLogger,
             builder.Configuration, 
             AssemblyReference.Assembly, 
-            LibDatabasesApi.AssemblyReference.Assembly);
-        //.AddSupportToolsServerApiKeyIdentity(debugMode)
-        //.AddAllScopedServiceSupportToolsServerApplication()
-        //.AddSupportToolsServerQueryRepositories(debugMode)
-        //.AddSupportToolsServerCommandRepositories(debugMode)
-        //.AddSupportToolsServerForCommandsDatabase(builder.Configuration, debugMode)
-        //.AddSupportToolsServer_Repositories(debugMode)
-        //.AddSupportToolsServerDb(builder.Configuration, debugMode);
+            LibDatabasesApi.AssemblyReference.Assembly)
+        .AddApplication(x =>
+        {
+            x.AppName = appName;
+        });
+    //.AddSupportToolsServerApiKeyIdentity(debugMode)
+    //.AddAllScopedServiceSupportToolsServerApplication()
+    //.AddSupportToolsServerQueryRepositories(debugMode)
+    //.AddSupportToolsServerCommandRepositories(debugMode)
+    //.AddSupportToolsServerForCommandsDatabase(builder.Configuration, debugMode)
+    //.AddSupportToolsServer_Repositories(debugMode)
+    //.AddSupportToolsServerDb(builder.Configuration, debugMode);
     // @formatter:on
 
     //if (!builder.InstallServices(debugMode, args, parameters,
@@ -112,7 +117,7 @@ try
     //builder.Services.InstallValidation(LibProjectsApi.AssemblyReference.Assembly);
 
     // ReSharper disable once using
-    using WebApplication app = builder.Build();
+    await using WebApplication app = builder.Build();
 
     // ReSharper disable once RedundantArgumentDefaultValue
     app.UseSwaggerServices(debugLogger, versionCount);
