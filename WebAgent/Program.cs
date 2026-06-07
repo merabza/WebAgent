@@ -15,6 +15,7 @@ using WebSystemTools.ConfigurationEncrypt;
 using WebSystemTools.MediatorTools.DependencyInjection;
 using WebSystemTools.SerilogLogger;
 using WebSystemTools.SignalRMessages.DependencyInjection;
+using WebSystemTools.SignalRMessages.Endpoints.V1;
 using WebSystemTools.SwaggerTools.DependencyInjection;
 using WebSystemTools.TestToolsApi.DependencyInjection;
 using WebSystemTools.WindowsServiceTools;
@@ -26,7 +27,7 @@ try
     Console.WriteLine("Loading...");
 
     const string appName = "WebAgent";
-    const string appKey = "E0FFB24C-7561-4DBA-8E0F-02CA585A3C9C";
+    //const string appKey = "E0FFB24C-7561-4DBA-8E0F-02CA585A3C9C";
     const int versionCount = 1;
 
     string header = $"{appName} {Assembly.GetEntryAssembly()?.GetName().Version}";
@@ -53,10 +54,11 @@ try
 
     builder.Host.UseWindowsServiceOnWindows(debugLogger, args);
 
-    builder.Configuration.AddConfigurationEncryption(debugLogger, appKey);
+    //builder.Configuration.AddConfigurationEncryption(debugLogger, appKey);
 
     // @formatter:off
-    builder.Services.AddHttpClient()
+    builder.Services
+        .AddHttpClient()
         .AddSwagger(debugLogger, true, versionCount, appName) //+
         .AddApiKeyIdentity(debugLogger)
         .AddSignalRMessages(debugLogger)
@@ -126,6 +128,7 @@ try
 
     app.UseLibProjectsApi(debugMode);
     app.UseLibDatabasesApi(debugMode);
+    app.UseSignalRMessagesHub(debugMode);
 
     //if (!app.UseServices(debugMode))
     //    return 3;
