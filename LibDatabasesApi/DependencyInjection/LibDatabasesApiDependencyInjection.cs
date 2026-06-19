@@ -1,24 +1,19 @@
 ﻿using System;
 using LibDatabasesApi.Endpoints.V1;
 using Microsoft.AspNetCore.Routing;
+using Serilog;
 
 namespace LibDatabasesApi.DependencyInjection;
 
 public static class LibDatabasesApiDependencyInjection
 {
-    public static bool UseLibDatabasesApi(this IEndpointRouteBuilder endpoints, bool debugMode)
+    public static bool UseLibDatabasesApi(this IEndpointRouteBuilder endpoints, ILogger? debugLogger)
     {
-        if (debugMode)
-        {
-            Console.WriteLine($"{nameof(UseLibDatabasesApi)} Started");
-        }
+        debugLogger?.Information("{MethodName} Started", nameof(UseLibDatabasesApi));
 
-        endpoints.UseDatabasesEndpoints(debugMode);
+        endpoints.UseDatabasesEndpoints(debugLogger);
 
-        if (debugMode)
-        {
-            Console.WriteLine($"{nameof(UseLibDatabasesApi)} Finished");
-        }
+        debugLogger?.Information("{MethodName} Finished", nameof(UseLibDatabasesApi));
 
         return true;
     }

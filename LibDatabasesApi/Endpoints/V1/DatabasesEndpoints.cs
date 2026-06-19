@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using OneOf;
+using Serilog;
 using SystemTools.ApiContracts.Errors;
 using SystemTools.SystemToolsShared;
 using SystemTools.SystemToolsShared.Errors;
@@ -26,12 +27,9 @@ namespace LibDatabasesApi.Endpoints.V1;
 // ReSharper disable once UnusedType.Global
 public static class DatabasesEndpoints
 {
-    public static bool UseDatabasesEndpoints(this IEndpointRouteBuilder endpoints, bool debugMode)
+    public static bool UseDatabasesEndpoints(this IEndpointRouteBuilder endpoints, ILogger? debugLogger)
     {
-        if (debugMode)
-        {
-            Console.WriteLine($"{nameof(UseDatabasesEndpoints)} Started");
-        }
+        debugLogger?.Information("{MethodName} Started", nameof(UseDatabasesEndpoints));
 
         RouteGroupBuilder group = endpoints
             .MapGroup(DatabaseApiRoutes.ApiBase + DatabaseApiRoutes.Database.DatabaseBase).RequireAuthorization();
@@ -48,10 +46,7 @@ public static class DatabasesEndpoints
         group.MapGet(DatabaseApiRoutes.Database.TestConnection, TestConnection);
         group.MapPost(DatabaseApiRoutes.Database.UpdateStatistics, UpdateStatistics);
 
-        if (debugMode)
-        {
-            Console.WriteLine($"{nameof(UseDatabasesEndpoints)} Finished");
-        }
+        debugLogger?.Information("{MethodName} Finished", nameof(UseDatabasesEndpoints));
 
         return true;
     }

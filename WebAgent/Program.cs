@@ -126,9 +126,9 @@ try
     app.UseTestToolsApiEndpoints(debugLogger);
     //app.UseSignalRRecounterMessages(debugMode);
 
-    app.UseLibProjectsApi(debugMode);
-    app.UseLibDatabasesApi(debugMode);
-    app.UseSignalRMessagesHub(debugMode);
+    app.UseLibProjectsApi(debugLogger);
+    app.UseLibDatabasesApi(debugLogger);
+    app.UseSignalRMessagesHub(debugLogger);
 
     //if (!app.UseServices(debugMode))
     //    return 3;
