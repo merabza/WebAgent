@@ -10,14 +10,11 @@
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="SystemTools.MediatRMessagingAbstractions" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.DatabasesManagement\ToolsManagement.DatabasesManagement.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.Installer\ToolsManagement.Installer.csproj" />
-    <ProjectReference Include="..\..\WebAgentContracts\WebAgentContracts.WebAgentDatabasesApiContracts\WebAgentContracts.WebAgentDatabasesApiContracts.csproj" />
-    <ProjectReference Include="..\..\WebAgentShared\WebAgentShared.LibProjectsApi\WebAgentShared.LibProjectsApi.csproj" />
-    <ProjectReference Include="..\..\WebAgentShared\WebAgentShared.LibWebAgentData\WebAgentShared.LibWebAgentData.csproj" />
+    <PackageReference Include="ToolsManagement.DatabasesManagement" />
+    <PackageReference Include="ToolsManagement.Installer" />
+    <PackageReference Include="WebAgentContracts.WebAgentDatabasesApiContracts" />
+    <PackageReference Include="WebAgentShared.LibProjectsApi" />
+    <PackageReference Include="WebAgentShared.LibWebAgentData" />
   </ItemGroup>
 
 </Project>
