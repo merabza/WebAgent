@@ -7,5 +7,6 @@
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="MediatR" Version="14.1.0" />
     <PackageVersion Include="Figgle.Fonts" Version="0.6.6" />
+    <PackageVersion Include="SystemTools.MediatRMessagingAbstractions" Version="1.0.9686.26889" />
   </ItemGroup>
 </Project>

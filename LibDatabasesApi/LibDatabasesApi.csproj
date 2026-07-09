@@ -9,10 +9,10 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="MediatR" />
+    <PackageReference Include="SystemTools.MediatRMessagingAbstractions" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SystemTools\SystemTools.MediatRMessagingAbstractions\SystemTools.MediatRMessagingAbstractions.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.DatabasesManagement\ToolsManagement.DatabasesManagement.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.Installer\ToolsManagement.Installer.csproj" />
     <ProjectReference Include="..\..\WebAgentContracts\WebAgentContracts.WebAgentDatabasesApiContracts\WebAgentContracts.WebAgentDatabasesApiContracts.csproj" />
