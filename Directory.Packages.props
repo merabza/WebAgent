@@ -8,7 +8,7 @@
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="MediatR" Version="14.1.0" />
     <PackageVersion Include="Figgle.Fonts" Version="0.6.6" />
-    <PackageVersion Include="SystemTools.MediatRMessagingAbstractions" Version="1.0.9686.33588" />
+    <PackageVersion Include="SystemTools.MediatRMessagingAbstractions" Version="1.0.9686.36050" />
     <PackageVersion Include="ToolsManagement.DatabasesManagement" Version="1.0.9686.35962" />
     <PackageVersion Include="ToolsManagement.Installer" Version="1.0.9686.35962" />
     <PackageVersion Include="WebAgentContracts.WebAgentDatabasesApiContracts" Version="1.0.9686.34669" />
