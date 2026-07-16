@@ -9,19 +9,19 @@
 
   <ItemGroup>
     <PackageReference Include="Figgle.Fonts" />
-    <PackageReference Include="WebAgentShared.LibProjectsApi" />
-    <PackageReference Include="WebSystemTools.ApiKeyIdentity" />
-    <PackageReference Include="WebSystemTools.ConfigurationEncrypt" />
-    <PackageReference Include="WebSystemTools.MediatorTools" />
-    <PackageReference Include="WebSystemTools.SerilogLogger" />
-    <PackageReference Include="WebSystemTools.SignalRMessages" />
-    <PackageReference Include="WebSystemTools.SwaggerTools" />
-    <PackageReference Include="WebSystemTools.TestToolsApi" />
-    <PackageReference Include="WebSystemTools.WindowsServiceTools" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\LibDatabasesApi\LibDatabasesApi.csproj" />
+    <ProjectReference Include="..\..\WebAgentShared\WebAgentShared.LibProjectsApi\WebAgentShared.LibProjectsApi.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.ApiKeyIdentity\WebSystemTools.ApiKeyIdentity.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.ConfigurationEncrypt\WebSystemTools.ConfigurationEncrypt.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.MediatorTools\WebSystemTools.MediatorTools.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.SerilogLogger\WebSystemTools.SerilogLogger.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.SignalRMessages\WebSystemTools.SignalRMessages.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.SwaggerTools\WebSystemTools.SwaggerTools.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.TestToolsApi\WebSystemTools.TestToolsApi.csproj" />
+    <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.WindowsServiceTools\WebSystemTools.WindowsServiceTools.csproj" />
   </ItemGroup>
 
 
