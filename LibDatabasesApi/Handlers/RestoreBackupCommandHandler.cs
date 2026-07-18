@@ -73,6 +73,8 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
             return new[] { ProjectsErrors.AppSettingsIsNotCreated };
         }
 
+        await messageLogger.LogInfoAndSendMessage("Checking database exchange settings", cancellationToken);
+
         //ბაზების გაცვლის პარამეტრების შემოწმება
         DatabasesBackupFilesExchangeParameters? databasesBackupFilesExchangeParameters =
             appSettings.DatabasesBackupFilesExchangeParameters;
@@ -80,6 +82,8 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         {
             return new[] { DatabaseApiClientErrors.DatabasesBackupFilesExchangeParametersIsNotConfigured };
         }
+
+        await messageLogger.LogInfoAndSendMessage("Checking database server settings", cancellationToken);
 
         //მონაცემთა ბაზის სერვერის პარამეტრების შემოწმება
         DatabaseServerData? databaseServerData = appSettings.DatabaseServerData;
@@ -105,6 +109,8 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         var createBaseBackupParametersFactory = new CreateBaseBackupParametersFactory(_application.AppName, _logger,
             _messagesDataManager, request.UserName, false);
 
+        await messageLogger.LogInfoAndSendMessage("Create Base Backup Parameters", cancellationToken);
+
         OneOf<BaseBackupParameters, Error[]> createBaseBackupParametersResult =
             await createBaseBackupParametersFactory.CreateBaseBackupParameters(_httpClientFactory,
                 restoreDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
@@ -117,6 +123,8 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         }
 
         BaseBackupParameters? createBaseBackupParameters = createBaseBackupParametersResult.AsT0;
+
+        await messageLogger.LogInfoAndSendMessage("Create existing Database Backup", cancellationToken);
 
         var destinationBaseBackupRestorer = new BaseBackupRestoreTool(_logger, createBaseBackupParameters);
         await destinationBaseBackupRestorer.CreateDatabaseBackup(cancellationToken);
@@ -141,11 +149,15 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         var backupFileParameters = new BackupFileParameters(null, request.Name, request.Prefix, request.Suffix,
             request.DateMask);
 
+        await messageLogger.LogInfoAndSendMessage("Restore Database from Backup", cancellationToken);
+
         if (!await destinationBaseBackupRestorer.RestoreDatabaseFromBackup(backupFileParameters,
                 request.DatabaseRecoveryModel ?? EDatabaseRecoveryModel.Full, cancellationToken))
         {
             return new[] { DbApiErrors.CannotRestoreDatabase(request.DatabaseName, request.Name) };
         }
+
+        await messageLogger.LogInfoAndSendMessage("Finish Database Restore", cancellationToken);
 
         return new Unit();
     }
