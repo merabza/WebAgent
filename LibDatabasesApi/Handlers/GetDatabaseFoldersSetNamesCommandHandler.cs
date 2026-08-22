@@ -36,7 +36,7 @@ public sealed class GetDatabaseFoldersSetNamesCommandHandler : ICommandHandler<G
         _application = application;
     }
 
-    public async Task<OneOf<string[], Error[]>> Handle(GetDatabaseFoldersSetNamesRequestCommand request,
+    public async Task<OneOf<string[], ErrorOmd[]>> Handle(GetDatabaseFoldersSetNamesRequestCommand request,
         CancellationToken cancellationToken)
     {
         var result = await DatabaseManagerCreator.Create(_application.AppName, _config, _logger, _httpClientFactory,
@@ -50,6 +50,6 @@ public sealed class GetDatabaseFoldersSetNamesCommandHandler : ICommandHandler<G
 
         var getDatabaseFoldersSetNamesResult =
             await databaseManagementClient.GetDatabaseFoldersSetNames(cancellationToken);
-        return getDatabaseFoldersSetNamesResult.Match<OneOf<string[], Error[]>>(f0 => f0.ToArray(), f1 => f1);
+        return getDatabaseFoldersSetNamesResult.Match<OneOf<string[], ErrorOmd[]>>(f0 => f0.ToArray(), f1 => f1);
     }
 }

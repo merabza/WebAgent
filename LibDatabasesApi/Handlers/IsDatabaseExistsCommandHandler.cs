@@ -34,7 +34,7 @@ public sealed class IsDatabaseExistsCommandHandler : ICommandHandler<IsDatabaseE
         _application = application;
     }
 
-    public async Task<OneOf<bool, Error[]>> Handle(IsDatabaseExistsRequestCommand request,
+    public async Task<OneOf<bool, ErrorOmd[]>> Handle(IsDatabaseExistsRequestCommand request,
         CancellationToken cancellationToken)
     {
         var result = await DatabaseManagerCreator.Create(_application.AppName, _config, _logger, _httpClientFactory,
@@ -49,6 +49,6 @@ public sealed class IsDatabaseExistsCommandHandler : ICommandHandler<IsDatabaseE
         var isDatabaseExistsResult =
             await databaseManagementClient.IsDatabaseExists(request.DatabaseName, cancellationToken);
 
-        return isDatabaseExistsResult.Match<OneOf<bool, Error[]>>(f0 => f0, f1 => f1);
+        return isDatabaseExistsResult.Match<OneOf<bool, ErrorOmd[]>>(f0 => f0, f1 => f1);
     }
 }

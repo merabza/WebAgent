@@ -10,7 +10,7 @@
 
 //public static class DatabaseBackupParametersDomainCreator
 //{
-//    public static OneOf<DatabaseBackupParametersDomain, Error[]> Create(
+//    public static OneOf<DatabaseBackupParametersDomain, ErrorOmd[]> Create(
 //        CreateBackupRequest? createBackupRequest)
 //    {
 //        if (createBackupRequest is null || string.IsNullOrWhiteSpace(createBackupRequest.BackupNamePrefix) ||
@@ -25,7 +25,7 @@
 //            createBackupRequest.DbServerSideBackupPath);
 //    }
 
-//    public static OneOf<DatabaseBackupParametersDomain, Error[]> Create(
+//    public static OneOf<DatabaseBackupParametersDomain, ErrorOmd[]> Create(
 //        CreateBackupCommandRequest? createBackupRequest)
 //    {
 //        if (createBackupRequest is null || string.IsNullOrWhiteSpace(createBackupRequest.BackupNamePrefix) ||

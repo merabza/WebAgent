@@ -38,10 +38,10 @@ public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectio
         _application = application;
     }
 
-    public async Task<OneOf<Unit, Error[]>> Handle(TestConnectionRequestCommand request,
+    public async Task<OneOf<Unit, ErrorOmd[]>> Handle(TestConnectionRequestCommand request,
         CancellationToken cancellationToken)
     {
-        OneOf<IDatabaseManager, Error[]> databaseClientCreatorResult =
+        OneOf<IDatabaseManager, ErrorOmd[]> databaseClientCreatorResult =
             await DatabaseManagerCreator.Create(_application.AppName, _config, _logger, _httpClientFactory,
                 _messagesDataManager, request.UserName, cancellationToken);
         if (databaseClientCreatorResult.IsT1)
@@ -51,15 +51,15 @@ public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectio
 
         IDatabaseManager? databaseManagementClient = databaseClientCreatorResult.AsT0;
 
-        Option<Error[]> testResult =
+        Option<ErrorOmd[]> testResult =
             await databaseManagementClient.TestConnection(request.DatabaseName, cancellationToken);
         if (testResult.IsNone)
         {
             return new Unit();
         }
 
-        Error err = DbApiErrors.TestConnectionFailed(request.DatabaseName);
+        ErrorOmd err = DbApiErrors.TestConnectionFailed(request.DatabaseName);
         _logger.LogError("{Name}", err.Name);
-        return await Task.FromResult(Error.RecreateErrors((Error[])testResult, err));
+        return await Task.FromResult(ErrorOmd.RecreateErrors((ErrorOmd[])testResult, err));
     }
 }

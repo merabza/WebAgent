@@ -36,7 +36,7 @@ public sealed class
         _application = application;
     }
 
-    public async Task<OneOf<DatabaseInfoModel[], Error[]>> Handle(GetDatabaseNamesRequestCommand request,
+    public async Task<OneOf<DatabaseInfoModel[], ErrorOmd[]>> Handle(GetDatabaseNamesRequestCommand request,
         CancellationToken cancellationToken)
     {
         var result = await DatabaseManagerCreator.Create(_application.AppName, _config, _logger, _httpClientFactory,
@@ -49,7 +49,7 @@ public sealed class
         var databaseManagementClient = result.AsT0;
 
         var getDatabaseNamesResult = await databaseManagementClient.GetDatabaseNames(cancellationToken);
-        return getDatabaseNamesResult.Match<OneOf<DatabaseInfoModel[], Error[]>>(f0 => f0.ToArray(), f1 => f1);
+        return getDatabaseNamesResult.Match<OneOf<DatabaseInfoModel[], ErrorOmd[]>>(f0 => f0.ToArray(), f1 => f1);
 
         //ასეთი კონსტრუქცია ვერ გავმართე
         //return await Task.FromResult(result.Match(x => x.GetDatabaseNames(request.ServerName).Result, er => er.ToArray()));

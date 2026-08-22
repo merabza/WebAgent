@@ -49,7 +49,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
         _application = application;
     }
 
-    public async Task<OneOf<Unit, Error[]>> Handle(RestoreBackupCommandRequestCommand request,
+    public async Task<OneOf<Unit, ErrorOmd[]>> Handle(RestoreBackupCommandRequestCommand request,
         CancellationToken cancellationToken)
     {
         var messageLogger = new MessageLogger(_logger, _messagesDataManager, request.UserName, false);
@@ -111,14 +111,14 @@ public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupC
 
         await messageLogger.LogInfoAndSendMessage("Create Base Backup Parameters", cancellationToken);
 
-        OneOf<BaseBackupParameters, Error[]> createBaseBackupParametersResult =
+        OneOf<BaseBackupParameters, ErrorOmd[]> createBaseBackupParametersResult =
             await createBaseBackupParametersFactory.CreateBaseBackupParameters(_httpClientFactory,
                 restoreDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
                 databasesBackupFilesExchangeParameters, cancellationToken);
 
         if (createBaseBackupParametersResult.IsT1)
         {
-            return Error.RecreateErrors(createBaseBackupParametersResult.AsT1,
+            return ErrorOmd.RecreateErrors(createBaseBackupParametersResult.AsT1,
                 DatabaseApiClientErrors.BaseBackupParametersIsNotCreated);
         }
 

@@ -37,7 +37,7 @@ public sealed class ExecuteCommandCommandHandler : ICommandHandler<ExecuteComman
         _application = application;
     }
 
-    public async Task<OneOf<Unit, Error[]>> Handle(ExecuteCommandRequestCommand request,
+    public async Task<OneOf<Unit, ErrorOmd[]>> Handle(ExecuteCommandRequestCommand request,
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.CommandText))
@@ -45,7 +45,7 @@ public sealed class ExecuteCommandCommandHandler : ICommandHandler<ExecuteComman
             return await Task.FromResult(new[] { DbApiErrors.CommandTextIsEmpty });
         }
 
-        OneOf<IDatabaseManager, Error[]> result = await DatabaseManagerCreator.Create(_application.AppName, _config,
+        OneOf<IDatabaseManager, ErrorOmd[]> result = await DatabaseManagerCreator.Create(_application.AppName, _config,
             _logger, _httpClientFactory, _messagesDataManager, request.UserName, cancellationToken);
         if (result.IsT1)
         {
@@ -59,7 +59,7 @@ public sealed class ExecuteCommandCommandHandler : ICommandHandler<ExecuteComman
             return new Unit();
         }
 
-        Error err = DbApiErrors.CouldNotExecuteCommand(request.DatabaseName);
+        ErrorOmd err = DbApiErrors.CouldNotExecuteCommand(request.DatabaseName);
         _logger.LogError("{Name}", err.Name);
         return await Task.FromResult(new[] { err });
     }
