@@ -19,7 +19,7 @@ using WebAgentShared.LibWebAgentData.ErrorModels;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class ExecuteCommandCommandHandler : ICommandHandler<ExecuteCommandRequestCommand>
+public sealed class ExecuteCommandCommandHandler : ICommandHandlerOmd<ExecuteCommandRequestCommand>
 {
     private readonly IApplication _application;
     private readonly IConfiguration _config;

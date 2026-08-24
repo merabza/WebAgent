@@ -18,7 +18,7 @@ namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class
-    GetDatabaseNamesCommandHandler : ICommandHandler<GetDatabaseNamesRequestCommand, DatabaseInfoModel[]>
+    GetDatabaseNamesCommandHandler : ICommandHandlerOmd<GetDatabaseNamesRequestCommand, DatabaseInfoModel[]>
 {
     private readonly IApplication _application;
     private readonly IConfiguration _config;

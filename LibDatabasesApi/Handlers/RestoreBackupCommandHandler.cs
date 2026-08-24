@@ -31,7 +31,7 @@ using WebAgentShared.LibWebAgentData.Models;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupCommandRequestCommand>
+public sealed class RestoreBackupCommandHandler : ICommandHandlerOmd<RestoreBackupCommandRequestCommand>
 {
     private readonly IApplication _application;
     private readonly IConfiguration _config;

@@ -16,8 +16,8 @@ using SystemTools.SystemToolsShared.Errors;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class GetDatabaseFoldersSetNamesCommandHandler : ICommandHandler<GetDatabaseFoldersSetNamesRequestCommand,
-    string[]>
+public sealed class
+    GetDatabaseFoldersSetNamesCommandHandler : ICommandHandlerOmd<GetDatabaseFoldersSetNamesRequestCommand, string[]>
 {
     private readonly IApplication _application;
     private readonly IConfiguration _config;

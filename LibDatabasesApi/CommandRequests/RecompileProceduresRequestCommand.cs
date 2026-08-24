@@ -2,7 +2,7 @@
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class RecompileProceduresRequestCommand : ICommand
+public sealed class RecompileProceduresRequestCommand : ICommandOmd
 {
     public RecompileProceduresRequestCommand(string databaseName, string? userName)
     {

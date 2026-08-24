@@ -2,7 +2,7 @@
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class GetDatabaseFoldersSetNamesRequestCommand : ICommand<string[]>
+public sealed class GetDatabaseFoldersSetNamesRequestCommand : ICommandOmd<string[]>
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public GetDatabaseFoldersSetNamesRequestCommand(string? userName)

@@ -2,7 +2,7 @@
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class UpdateStatisticsRequestCommand : ICommand
+public sealed class UpdateStatisticsRequestCommand : ICommandOmd
 {
     public UpdateStatisticsRequestCommand(string databaseName, string? userName)
     {

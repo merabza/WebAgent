@@ -2,7 +2,7 @@
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class GetDatabaseConnectionNamesRequestCommand : ICommand<string[]>
+public sealed class GetDatabaseConnectionNamesRequestCommand : ICommandOmd<string[]>
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public GetDatabaseConnectionNamesRequestCommand(string? userName)

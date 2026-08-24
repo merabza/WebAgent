@@ -20,7 +20,7 @@ using Unit = MediatR.Unit;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectionRequestCommand>
+public sealed class TestConnectionCommandHandler : ICommandHandlerOmd<TestConnectionRequestCommand>
 {
     private readonly IApplication _application;
     private readonly IConfiguration _config;

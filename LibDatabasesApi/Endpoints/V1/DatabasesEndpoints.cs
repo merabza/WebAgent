@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using DatabaseTools.DbTools.Models;
@@ -84,8 +83,8 @@ public static class DatabasesEndpoints
         OneOf<BackupFileParameters, ErrorOmd[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(CreateBackup)} finished", cancellationToken);
-        return result.Match<Results<Ok<BackupFileParameters>, BadRequest<ErrorOmd[]>>>(success => TypedResults.Ok(success),
-            errors => TypedResults.BadRequest(errors));
+        return result.Match<Results<Ok<BackupFileParameters>, BadRequest<ErrorOmd[]>>>(
+            success => TypedResults.Ok(success), errors => TypedResults.BadRequest(errors));
     }
 
     // POST api/database/executecommand/{databaseName}

@@ -16,7 +16,7 @@ using SystemTools.SystemToolsShared.Errors;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class IsDatabaseExistsCommandHandler : ICommandHandler<IsDatabaseExistsRequestCommand, bool>
+public sealed class IsDatabaseExistsCommandHandler : ICommandHandlerOmd<IsDatabaseExistsRequestCommand, bool>
 {
     private readonly IApplication _application;
     private readonly IConfiguration _config;

@@ -3,7 +3,7 @@ using SystemTools.MediatRMessagingAbstractions;
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class RestoreBackupCommandRequestCommand : ICommand
+public sealed class RestoreBackupCommandRequestCommand : ICommandOmd
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public RestoreBackupCommandRequestCommand(string databaseName, string dbServerFoldersSetName, string? prefix,

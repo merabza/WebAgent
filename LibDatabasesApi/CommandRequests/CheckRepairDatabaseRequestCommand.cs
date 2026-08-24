@@ -2,7 +2,7 @@
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class CheckRepairDatabaseRequestCommand : ICommand
+public sealed class CheckRepairDatabaseRequestCommand : ICommandOmd
 {
     public CheckRepairDatabaseRequestCommand(string databaseName, string? userName)
     {

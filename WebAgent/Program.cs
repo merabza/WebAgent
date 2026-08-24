@@ -11,7 +11,6 @@ using SystemTools.SystemToolsShared.DependencyInjection;
 using WebAgentShared.LibProjectsApi;
 using WebAgentShared.LibProjectsApi.DependencyInjection;
 using WebSystemTools.ApiKeyIdentity.DependencyInjection;
-using WebSystemTools.ConfigurationEncrypt;
 using WebSystemTools.MediatorTools.DependencyInjection;
 using WebSystemTools.SerilogLogger;
 using WebSystemTools.SignalRMessages.DependencyInjection;

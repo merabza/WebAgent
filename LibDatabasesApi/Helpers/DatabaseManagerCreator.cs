@@ -54,11 +54,12 @@ public static class DatabaseManagerCreator
             return await Task.FromResult(new[] { ProjectsErrors.AppSettingsIsNotCreated });
         }
 
-        OneOf<IDatabaseManager, ErrorOmd[]> databaseManagementClient = await DatabaseManagersFactory.CreateDatabaseManager(
-            appName, logger, false, databaseServerData.DbConnectionName,
-            new DatabaseServerConnections(appSettings.DatabaseServerConnections),
-            new ApiClients(appSettings.ApiClients), httpClientFactory, messagesDataManager, userName,
-            cancellationToken);
+        OneOf<IDatabaseManager, ErrorOmd[]> databaseManagementClient =
+            await DatabaseManagersFactory.CreateDatabaseManager(appName, logger, false,
+                databaseServerData.DbConnectionName,
+                new DatabaseServerConnections(appSettings.DatabaseServerConnections),
+                new ApiClients(appSettings.ApiClients), httpClientFactory, messagesDataManager, userName,
+                cancellationToken);
         return databaseManagementClient;
     }
 }

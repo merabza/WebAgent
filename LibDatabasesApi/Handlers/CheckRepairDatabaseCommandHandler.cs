@@ -17,7 +17,7 @@ using WebAgentShared.LibWebAgentData.ErrorModels;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class CheckRepairDatabaseCommandHandler : ICommandHandler<CheckRepairDatabaseRequestCommand>
+public sealed class CheckRepairDatabaseCommandHandler : ICommandHandlerOmd<CheckRepairDatabaseRequestCommand>
 {
     private readonly IApplication _application;
     private readonly IConfiguration _config;

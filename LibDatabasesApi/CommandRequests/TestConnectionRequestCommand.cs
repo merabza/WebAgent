@@ -4,7 +4,7 @@
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class TestConnectionRequestCommand : ICommand
+public sealed class TestConnectionRequestCommand : ICommandOmd
 {
     public TestConnectionRequestCommand(string? databaseName, string? userName)
     {

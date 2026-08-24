@@ -14,8 +14,8 @@ using WebAgentShared.LibWebAgentData;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class GetDatabaseConnectionNamesCommandHandler : ICommandHandler<GetDatabaseConnectionNamesRequestCommand,
-    string[]>
+public sealed class
+    GetDatabaseConnectionNamesCommandHandler : ICommandHandlerOmd<GetDatabaseConnectionNamesRequestCommand, string[]>
 {
     private readonly IConfiguration _config;
 

@@ -3,7 +3,7 @@ using SystemTools.MediatRMessagingAbstractions;
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class GetDatabaseNamesRequestCommand : ICommand<DatabaseInfoModel[]>
+public sealed class GetDatabaseNamesRequestCommand : ICommandOmd<DatabaseInfoModel[]>
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public GetDatabaseNamesRequestCommand(string? userName)

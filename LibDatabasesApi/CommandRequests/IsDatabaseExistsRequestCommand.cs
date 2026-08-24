@@ -2,7 +2,7 @@
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class IsDatabaseExistsRequestCommand : ICommand<bool>
+public sealed class IsDatabaseExistsRequestCommand : ICommandOmd<bool>
 {
     public IsDatabaseExistsRequestCommand(string databaseName, string? userName)
     {

@@ -2,7 +2,7 @@
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class ExecuteCommandRequestCommand : ICommand
+public sealed class ExecuteCommandRequestCommand : ICommandOmd
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public ExecuteCommandRequestCommand(string databaseName, string? commandText, string? userName)

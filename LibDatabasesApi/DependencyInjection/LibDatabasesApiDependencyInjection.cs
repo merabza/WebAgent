@@ -1,5 +1,4 @@
-﻿using System;
-using LibDatabasesApi.Endpoints.V1;
+﻿using LibDatabasesApi.Endpoints.V1;
 using Microsoft.AspNetCore.Routing;
 using Serilog;
 

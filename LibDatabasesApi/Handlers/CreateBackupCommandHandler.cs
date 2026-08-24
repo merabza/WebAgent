@@ -22,7 +22,7 @@ using WebAgentShared.LibWebAgentData.Models;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class CreateBackupCommandHandler : ICommandHandler<CreateBackupRequestCommand, BackupFileParameters>
+public sealed class CreateBackupCommandHandler : ICommandHandlerOmd<CreateBackupRequestCommand, BackupFileParameters>
 {
     private readonly IApplication _application;
     private readonly IConfiguration _config;
