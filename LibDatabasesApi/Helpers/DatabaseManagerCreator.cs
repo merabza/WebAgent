@@ -3,11 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using ParametersManagement.LibApiClientParameters;
 using ParametersManagement.LibDatabaseParameters;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 using ToolsManagement.DatabasesManagement;
 using WebAgentShared.LibProjectsApi;
 using WebAgentShared.LibWebAgentData;
@@ -18,7 +17,7 @@ namespace LibDatabasesApi.Helpers;
 
 public static class DatabaseManagerCreator
 {
-    public static async ValueTask<OneOf<IDatabaseManager, ErrorOmd[]>> Create(string appName, IConfiguration config,
+    public static async ValueTask<Result<IDatabaseManager>> Create(string appName, IConfiguration config,
         ILogger logger, IHttpClientFactory httpClientFactory, IMessagesDataManager? messagesDataManager,
         string? userName, CancellationToken cancellationToken = default)
     {
@@ -26,14 +25,14 @@ public static class DatabaseManagerCreator
 
         if (appSettings is null)
         {
-            return await Task.FromResult(new[] { ProjectsErrors.AppSettingsIsNotCreated });
+            return ProjectsErrors.AppSettingsIsNotCreated;
         }
 
         if (appSettings.DatabaseServerData is null)
         {
-            ErrorOmd err1 = DbApiErrors.DatabaseSettingsDoesNotSpecified;
-            logger.LogError("{Name}", err1.Name);
-            return new[] { err1 };
+            Error err1 = DbApiErrors.DatabaseSettingsDoesNotSpecified;
+            logger.LogError("{Description}", err1.Description);
+            return err1;
         }
 
         DatabaseServerData? dbServerData = appSettings.DatabaseServerData;
@@ -42,7 +41,7 @@ public static class DatabaseManagerCreator
             messagesDataManager, userName, cancellationToken);
     }
 
-    private static async ValueTask<OneOf<IDatabaseManager, ErrorOmd[]>> GetDatabaseConnectionSettings(string appName,
+    private static async ValueTask<Result<IDatabaseManager>> GetDatabaseConnectionSettings(string appName,
         ILogger logger, IHttpClientFactory httpClientFactory, IConfiguration config,
         DatabaseServerData databaseServerData, IMessagesDataManager? messagesDataManager, string? userName,
         CancellationToken cancellationToken = default)
@@ -51,15 +50,12 @@ public static class DatabaseManagerCreator
 
         if (appSettings is null)
         {
-            return await Task.FromResult(new[] { ProjectsErrors.AppSettingsIsNotCreated });
+            return ProjectsErrors.AppSettingsIsNotCreated;
         }
 
-        OneOf<IDatabaseManager, ErrorOmd[]> databaseManagementClient =
-            await DatabaseManagersFactory.CreateDatabaseManager(appName, logger, false,
-                databaseServerData.DbConnectionName,
-                new DatabaseServerConnections(appSettings.DatabaseServerConnections),
-                new ApiClients(appSettings.ApiClients), httpClientFactory, messagesDataManager, userName,
-                cancellationToken);
-        return databaseManagementClient;
+        return await DatabaseManagersFactory.CreateDatabaseManager(appName, logger, false,
+            databaseServerData.DbConnectionName, new DatabaseServerConnections(appSettings.DatabaseServerConnections),
+            new ApiClients(appSettings.ApiClients), httpClientFactory, messagesDataManager, userName,
+            cancellationToken);
     }
 }

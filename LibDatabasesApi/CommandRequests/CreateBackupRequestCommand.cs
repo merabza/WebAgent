@@ -1,10 +1,10 @@
 ﻿using ParametersManagement.LibDatabaseParameters;
-using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.Application.Abstractions.Messaging;
 using WebAgentContracts.WebAgentDatabasesApiContracts.V1.Responses;
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class CreateBackupRequestCommand : ICommandOmd<BackupFileParameters>
+public sealed class CreateBackupRequestCommand : ICommand<BackupFileParameters>
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public CreateBackupRequestCommand(string databaseName, string dbServerFoldersSetName,

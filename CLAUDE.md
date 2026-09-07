@@ -59,23 +59,27 @@ exposes a secured API for managing SQL databases and deployed apps/services. The
 thin CQRS pipeline:
 
 ```
-Minimal API endpoint  →  MediatR command  →  command handler  →  OneOf<TResult, Error[]>
+Minimal API endpoint  →  ICommand / IQuery  →  ICommandHandler / IQueryHandler  →  Result / Result<T>
 ```
 
 - **Endpoints** (`LibDatabasesApi/Endpoints/V1/DatabasesEndpoints.cs`, and `ProjectsEndpoints` in the
   external `WebAgentShared`) are static classes with `Use…Endpoints` extension methods that map routes
   onto an authorized `RouteGroupBuilder`. Each handler method: reads the caller from
   `ICurrentUserByApiKey`, emits start/finish progress via `IMessagesDataManager` (pushed to clients
-  over **SignalR**), builds a command, `mediator.Send`s it, and `Match`es the `OneOf` result to
-  `TypedResults.Ok` / `BadRequest`.
+  over **SignalR**), builds a command, calls the injected `ICommandHandler<…>` / `IQueryHandler<…>`
+  directly (no MediatR), and `Match`es the `Result` to `TypedResults.Ok` / `BadRequest<Error[]>`
+  (`result.Error.ToErrorArray()` — API clients parse the BadRequest body as an `Error[]` array).
 - **`Program.cs`** is the composition root. It wires Serilog, Swagger, API-key identity, SignalR, and
-  MediatR, then activates each feature's endpoints via its `Use…` extension (`UseLibProjectsApi`,
-  `UseLibDatabasesApi`, `UseSignalRMessagesHub`, …). `AddMediator(...)` registers handlers by scanning
-  the assemblies passed to it (`LibProjectsApi` + `LibDatabasesApi` here) — a new handler in a new
-  assembly won't be found unless that assembly is added to this call.
-- **Error handling**: handlers never throw for expected failures. They return `OneOf<TResult, Error[]>`;
-  `Error` values come from static `*Errors` classes (e.g. `DbApiErrors`, `DatabaseApiClientErrors`,
-  `ProjectsErrors`). Inspect with `.IsT1` / `.AsT0` / `.AsT1`, or fold with `.Match(...)`.
+  the handler pipeline, then activates each feature's endpoints via its `Use…` extension
+  (`UseLibProjectsApi`, `UseLibDatabasesApi`, `UseSignalRMessagesHub`, …). `AddApplication(...)` (from
+  `SystemTools.Application.Abstractions`) registers handlers by scanning the assemblies of the types
+  passed to it and wraps them in validation/logging decorators; `AddFluentValidation(...)` registers the
+  validators (`LibProjectsApi` + `LibDatabasesApi` here) — a new handler or validator in a new assembly
+  won't be found unless that assembly is added to both calls.
+- **Error handling**: handlers never throw for expected failures. They return `Result` / `Result<TResult>`
+  (`SystemTools.SharedKernel`); `Error` values come from static `*Errors` classes (e.g. `DbApiErrors`,
+  `DatabaseApiClientErrors`, `ProjectsErrors`). Inspect with `.IsFailure` / `.Value` / `.Error`, fold
+  with `.Match(...)`; several errors are combined into one `ValidationError` (`ToErrorArray()` flattens it).
 - **Real work is delegated out**: handlers resolve config via `AppSettings.Create(IConfiguration)`,
   then hand off to `ToolsManagement` / `DatabaseTools` (e.g. `DatabaseManagerCreator.Create(...)`
   returns an `IDatabaseManager`; `BaseBackupRestoreTool` performs backups). Handlers contain

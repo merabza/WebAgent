@@ -1,8 +1,8 @@
-﻿using SystemTools.MediatRMessagingAbstractions;
+﻿using SystemTools.Application.Abstractions.Messaging;
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class CheckRepairDatabaseRequestCommand : ICommandOmd
+public sealed class CheckRepairDatabaseRequestCommand : ICommand
 {
     public CheckRepairDatabaseRequestCommand(string databaseName, string? userName)
     {

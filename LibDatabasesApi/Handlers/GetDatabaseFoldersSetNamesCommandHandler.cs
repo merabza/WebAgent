@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,10 +7,10 @@ using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using OneOf;
-using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.Application.Abstractions.Messaging;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
+using ToolsManagement.DatabasesManagement;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -17,7 +18,7 @@ namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class
-    GetDatabaseFoldersSetNamesCommandHandler : ICommandHandlerOmd<GetDatabaseFoldersSetNamesRequestCommand, string[]>
+    GetDatabaseFoldersSetNamesCommandHandler : ICommandHandler<GetDatabaseFoldersSetNamesRequestCommand, string[]>
 {
     private readonly IApplication _application;
     private readonly IConfiguration _config;
@@ -36,20 +37,25 @@ public sealed class
         _application = application;
     }
 
-    public async Task<OneOf<string[], ErrorOmd[]>> Handle(GetDatabaseFoldersSetNamesRequestCommand request,
+    public async Task<Result<string[]>> Handle(GetDatabaseFoldersSetNamesRequestCommand request,
         CancellationToken cancellationToken)
     {
-        var result = await DatabaseManagerCreator.Create(_application.AppName, _config, _logger, _httpClientFactory,
-            _messagesDataManager, request.UserName, cancellationToken);
-        if (result.IsT1)
+        Result<IDatabaseManager> result = await DatabaseManagerCreator.Create(_application.AppName, _config, _logger,
+            _httpClientFactory, _messagesDataManager, request.UserName, cancellationToken);
+        if (result.IsFailure)
         {
-            return result.AsT1.ToArray();
+            return result.Error;
         }
 
-        var databaseManagementClient = result.AsT0;
+        IDatabaseManager databaseManagementClient = result.Value;
 
-        var getDatabaseFoldersSetNamesResult =
+        Result<List<string>> getDatabaseFoldersSetNamesResult =
             await databaseManagementClient.GetDatabaseFoldersSetNames(cancellationToken);
-        return getDatabaseFoldersSetNamesResult.Match<OneOf<string[], ErrorOmd[]>>(f0 => f0.ToArray(), f1 => f1);
+        if (getDatabaseFoldersSetNamesResult.IsFailure)
+        {
+            return getDatabaseFoldersSetNamesResult.Error;
+        }
+
+        return getDatabaseFoldersSetNamesResult.Value.ToArray();
     }
 }

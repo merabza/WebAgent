@@ -1,8 +1,8 @@
-﻿using SystemTools.MediatRMessagingAbstractions;
+﻿using SystemTools.Application.Abstractions.Messaging;
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class UpdateStatisticsRequestCommand : ICommandOmd
+public sealed class UpdateStatisticsRequestCommand : ICommand
 {
     public UpdateStatisticsRequestCommand(string databaseName, string? userName)
     {

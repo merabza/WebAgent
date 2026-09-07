@@ -1,23 +1,20 @@
-﻿using System.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using OneOf;
-using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.Application.Abstractions.Messaging;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 using ToolsManagement.DatabasesManagement;
 using WebAgentShared.LibWebAgentData.ErrorModels;
 
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class CheckRepairDatabaseCommandHandler : ICommandHandlerOmd<CheckRepairDatabaseRequestCommand>
+public sealed class CheckRepairDatabaseCommandHandler : ICommandHandler<CheckRepairDatabaseRequestCommand>
 {
     private readonly IApplication _application;
     private readonly IConfiguration _config;
@@ -36,26 +33,27 @@ public sealed class CheckRepairDatabaseCommandHandler : ICommandHandlerOmd<Check
         _application = application;
     }
 
-    public async Task<OneOf<Unit, ErrorOmd[]>> Handle(CheckRepairDatabaseRequestCommand request,
-        CancellationToken cancellationToken)
+    public async Task<Result> Handle(CheckRepairDatabaseRequestCommand request, CancellationToken cancellationToken)
     {
-        OneOf<IDatabaseManager, ErrorOmd[]> result = await DatabaseManagerCreator.Create(_application.AppName, _config,
-            _logger, _httpClientFactory, _messagesDataManager, request.UserName, cancellationToken);
-        if (result.IsT1)
+        Result<IDatabaseManager> result = await DatabaseManagerCreator.Create(_application.AppName, _config, _logger,
+            _httpClientFactory, _messagesDataManager, request.UserName, cancellationToken);
+        if (result.IsFailure)
         {
-            return result.AsT1.ToArray();
+            return result.Error;
         }
 
-        IDatabaseManager? databaseManagementClient = result.AsT0;
+        IDatabaseManager databaseManagementClient = result.Value;
 
-        if (await databaseManagementClient.CheckRepairDatabase(request.DatabaseName, cancellationToken))
+        Result checkRepairDatabaseResult =
+            await databaseManagementClient.CheckRepairDatabase(request.DatabaseName, cancellationToken);
+        if (checkRepairDatabaseResult.IsSuccess)
         {
-            return new Unit();
+            return Result.Success();
         }
 
-        ErrorOmd err = DbApiErrors.CannotCheckAndRepairDatabase(request.DatabaseName);
-        _logger.LogError("{Name}", err.Name);
+        Error err = DbApiErrors.CannotCheckAndRepairDatabase(request.DatabaseName);
+        _logger.LogError("{Description}", err.Description);
 
-        return new[] { err };
+        return new ValidationError([.. checkRepairDatabaseResult.Error.ToErrorArray(), err]);
     }
 }

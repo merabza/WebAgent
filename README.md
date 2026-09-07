@@ -47,9 +47,9 @@ progress reporting over SignalR.
 | Area | Technology |
 |------|------------|
 | Runtime | .NET 10.0 / ASP.NET Core (Minimal APIs) |
-| Messaging / CQRS | [MediatR](https://github.com/jbogard/MediatR) (`ICommand` / `ICommandHandler`) |
+| Messaging / CQRS | `SystemTools.Application.Abstractions` (`ICommand` / `ICommandHandler`, `IQuery` / `IQueryHandler`; handlers are injected into endpoints directly) |
 | Validation | [FluentValidation](https://fluentvalidation.net/) |
-| Result handling | [OneOf](https://github.com/mcintyre321/OneOf) discriminated unions (`OneOf<TResult, Error[]>`) |
+| Result handling | `Result` / `Result<T>` with `Error` (`SystemTools.SharedKernel`) |
 | Logging | [Serilog](https://serilog.net/) |
 | Real-time | ASP.NET Core SignalR |
 | API docs | Swagger / OpenAPI |
@@ -58,7 +58,7 @@ progress reporting over SignalR.
 
 ### Architecture
 
-The application follows a thin **endpoint → MediatR command → handler** pipeline:
+The application follows a thin **endpoint → command → handler** pipeline:
 
 ```
 HTTP request
@@ -68,14 +68,14 @@ Minimal API endpoint (DatabasesEndpoints / ProjectsEndpoints)
    │   • resolves the caller from the API key (ICurrentUserByApiKey)
    │   • sends start/finish progress messages (IMessagesDataManager → SignalR)
    ▼
-MediatR command (e.g. CreateBackupRequestCommand)
+Command (e.g. CreateBackupRequestCommand), handled by the injected ICommandHandler
    │   • validated by a FluentValidation validator
    ▼
 Command handler (e.g. CreateBackupCommandHandler)
    │   • reads configuration via AppSettings
    │   • delegates the real work to ToolsManagement / DatabaseTools
    ▼
-OneOf<TResult, Error[]>  →  Ok / BadRequest
+Result<TResult>  →  Ok / BadRequest<Error[]>
 ```
 
 This solution contains two local projects; everything else is referenced from sibling repositories
@@ -83,8 +83,8 @@ This solution contains two local projects; everything else is referenced from si
 
 | Project | Description |
 |---------|-------------|
-| `WebAgent` | The web host. Wires up Serilog, Swagger, API-key identity, SignalR, MediatR and the endpoint groups in `Program.cs`. |
-| `LibDatabasesApi` | The database management API library — endpoints, MediatR commands, handlers, validators and mappers for all database operations. |
+| `WebAgent` | The web host. Wires up Serilog, Swagger, API-key identity, SignalR, the command/query handlers and the endpoint groups in `Program.cs`. |
+| `LibDatabasesApi` | The database management API library — endpoints, commands, handlers, validators and mappers for all database operations. |
 
 ### API reference
 
@@ -280,9 +280,9 @@ API-გასაღებით დაცული REST API-ის გავლ�
 | სფერო | ტექნოლოგია |
 |------|------------|
 | Runtime | .NET 10.0 / ASP.NET Core (Minimal APIs) |
-| Messaging / CQRS | [MediatR](https://github.com/jbogard/MediatR) (`ICommand` / `ICommandHandler`) |
+| Messaging / CQRS | `SystemTools.Application.Abstractions` (`ICommand` / `ICommandHandler`, `IQuery` / `IQueryHandler`; handlers are injected into endpoints directly) |
 | ვალიდაცია | [FluentValidation](https://fluentvalidation.net/) |
-| შედეგების დამუშავება | [OneOf](https://github.com/mcintyre321/OneOf) discriminated union-ები (`OneOf<TResult, Error[]>`) |
+| შედეგების დამუშავება | `Result` / `Result<T>` და `Error` (`SystemTools.SharedKernel`) |
 | ლოგირება | [Serilog](https://serilog.net/) |
 | რეალური დრო | ASP.NET Core SignalR |
 | API დოკუმენტაცია | Swagger / OpenAPI |
@@ -291,7 +291,7 @@ API-გასაღებით დაცული REST API-ის გავლ�
 
 ### არქიტექტურა
 
-აპლიკაცია მისდევს თხელ **endpoint → MediatR command → handler** მილსადენს:
+აპლიკაცია მისდევს თხელ **endpoint → command → handler** მილსადენს:
 
 ```
 HTTP მოთხოვნა
@@ -301,14 +301,14 @@ Minimal API endpoint (DatabasesEndpoints / ProjectsEndpoints)
    │   • ამოიცნობს გამომძახებელს API გასაღებიდან (ICurrentUserByApiKey)
    │   • აგზავნის დაწყება/დასრულების პროგრესის შეტყობინებებს (IMessagesDataManager → SignalR)
    ▼
-MediatR command (მაგ. CreateBackupRequestCommand)
+Command (მაგ. CreateBackupRequestCommand), რომელსაც ამუშავებს ინექცირებული ICommandHandler
    │   • მოწმდება FluentValidation ვალიდატორით
    ▼
 Command handler (მაგ. CreateBackupCommandHandler)
    │   • კითხულობს კონფიგურაციას AppSettings-ის გავლით
    │   • რეალურ სამუშაოს გადასცემს ToolsManagement / DatabaseTools-ს
    ▼
-OneOf<TResult, Error[]>  →  Ok / BadRequest
+Result<TResult>  →  Ok / BadRequest<Error[]>
 ```
 
 ეს solution შეიცავს ორ ლოკალურ პროექტს; დანარჩენი ყველაფერი მოთავსებულია გვერდით განთავსებულ
@@ -316,8 +316,8 @@ OneOf<TResult, Error[]>  →  Ok / BadRequest
 
 | პროექტი | აღწერა |
 |---------|--------|
-| `WebAgent` | ვებ-ჰოსტი. `Program.cs`-ში აერთიანებს Serilog-ს, Swagger-ს, API-გასაღების იდენტობას, SignalR-ს, MediatR-ს და endpoint-ების ჯგუფებს. |
-| `LibDatabasesApi` | ბაზების მართვის API ბიბლიოთეკა — endpoint-ები, MediatR command-ები, handler-ები, ვალიდატორები და mapper-ები ბაზის ყველა ოპერაციისთვის. |
+| `WebAgent` | ვებ-ჰოსტი. `Program.cs`-ში აერთიანებს Serilog-ს, Swagger-ს, API-გასაღების იდენტობას, SignalR-ს, command/query handler-ებს და endpoint-ების ჯგუფებს. |
+| `LibDatabasesApi` | ბაზების მართვის API ბიბლიოთეკა — endpoint-ები, command-ები, handler-ები, ვალიდატორები და mapper-ები ბაზის ყველა ოპერაციისთვის. |
 
 ### API ცნობარი
 

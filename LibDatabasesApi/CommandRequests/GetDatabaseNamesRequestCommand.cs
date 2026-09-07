@@ -1,9 +1,9 @@
 ﻿using DatabaseTools.DbTools.Models;
-using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.Application.Abstractions.Messaging;
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class GetDatabaseNamesRequestCommand : ICommandOmd<DatabaseInfoModel[]>
+public sealed class GetDatabaseNamesRequestCommand : ICommand<DatabaseInfoModel[]>
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public GetDatabaseNamesRequestCommand(string? userName)

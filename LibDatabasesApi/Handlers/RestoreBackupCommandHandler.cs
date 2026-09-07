@@ -4,17 +4,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using DatabaseTools.DbTools;
 using LibDatabasesApi.CommandRequests;
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using ParametersManagement.LibApiClientParameters;
 using ParametersManagement.LibDatabaseParameters;
 using ParametersManagement.LibFileParameters.Models;
 using SystemTools.ApiContracts.Errors;
-using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.Application.Abstractions.Messaging;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 using ToolsManagement.DatabasesManagement;
 using ToolsManagement.DatabasesManagement.Models;
 using ToolsManagement.FileManagersMain;
@@ -31,7 +29,7 @@ using WebAgentShared.LibWebAgentData.Models;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class RestoreBackupCommandHandler : ICommandHandlerOmd<RestoreBackupCommandRequestCommand>
+public sealed class RestoreBackupCommandHandler : ICommandHandler<RestoreBackupCommandRequestCommand>
 {
     private readonly IApplication _application;
     private readonly IConfiguration _config;
@@ -49,8 +47,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandlerOmd<RestoreBack
         _application = application;
     }
 
-    public async Task<OneOf<Unit, ErrorOmd[]>> Handle(RestoreBackupCommandRequestCommand request,
-        CancellationToken cancellationToken)
+    public async Task<Result> Handle(RestoreBackupCommandRequestCommand request, CancellationToken cancellationToken)
     {
         var messageLogger = new MessageLogger(_logger, _messagesDataManager, request.UserName, false);
 
@@ -61,7 +58,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandlerOmd<RestoreBack
         if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Prefix) ||
             string.IsNullOrWhiteSpace(request.DateMask) || string.IsNullOrWhiteSpace(request.Suffix))
         {
-            return new[] { ApiErrors.SomeRequestParametersAreNotValid };
+            return ApiErrors.SomeRequestParametersAreNotValid;
         }
 
         await messageLogger.LogInfoAndSendMessage("Create AppSettings", cancellationToken);
@@ -70,7 +67,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandlerOmd<RestoreBack
         var appSettings = AppSettings.Create(_config);
         if (appSettings is null)
         {
-            return new[] { ProjectsErrors.AppSettingsIsNotCreated };
+            return ProjectsErrors.AppSettingsIsNotCreated;
         }
 
         await messageLogger.LogInfoAndSendMessage("Checking database exchange settings", cancellationToken);
@@ -80,7 +77,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandlerOmd<RestoreBack
             appSettings.DatabasesBackupFilesExchangeParameters;
         if (databasesBackupFilesExchangeParameters is null)
         {
-            return new[] { DatabaseApiClientErrors.DatabasesBackupFilesExchangeParametersIsNotConfigured };
+            return DatabaseApiClientErrors.DatabasesBackupFilesExchangeParametersIsNotConfigured;
         }
 
         await messageLogger.LogInfoAndSendMessage("Checking database server settings", cancellationToken);
@@ -89,7 +86,7 @@ public sealed class RestoreBackupCommandHandler : ICommandHandlerOmd<RestoreBack
         DatabaseServerData? databaseServerData = appSettings.DatabaseServerData;
         if (databaseServerData is null)
         {
-            return await Task.FromResult(new[] { DatabaseApiClientErrors.DatabaseServerDataIsNotConfigured });
+            return DatabaseApiClientErrors.DatabaseServerDataIsNotConfigured;
         }
 
         var restoreDatabaseParameters = new DatabaseParameters
@@ -111,18 +108,20 @@ public sealed class RestoreBackupCommandHandler : ICommandHandlerOmd<RestoreBack
 
         await messageLogger.LogInfoAndSendMessage("Create Base Backup Parameters", cancellationToken);
 
-        OneOf<BaseBackupParameters, ErrorOmd[]> createBaseBackupParametersResult =
+        Result<BaseBackupParameters> createBaseBackupParametersResult =
             await createBaseBackupParametersFactory.CreateBaseBackupParameters(_httpClientFactory,
                 restoreDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
                 databasesBackupFilesExchangeParameters, cancellationToken);
 
-        if (createBaseBackupParametersResult.IsT1)
+        if (createBaseBackupParametersResult.IsFailure)
         {
-            return ErrorOmd.RecreateErrors(createBaseBackupParametersResult.AsT1,
-                DatabaseApiClientErrors.BaseBackupParametersIsNotCreated);
+            return new ValidationError([
+                .. createBaseBackupParametersResult.Error.ToErrorArray(),
+                DatabaseApiClientErrors.BaseBackupParametersIsNotCreated
+            ]);
         }
 
-        BaseBackupParameters? createBaseBackupParameters = createBaseBackupParametersResult.AsT0;
+        BaseBackupParameters createBaseBackupParameters = createBaseBackupParametersResult.Value;
 
         await messageLogger.LogInfoAndSendMessage("Create existing Database Backup", cancellationToken);
 
@@ -154,11 +153,11 @@ public sealed class RestoreBackupCommandHandler : ICommandHandlerOmd<RestoreBack
         if (!await destinationBaseBackupRestorer.RestoreDatabaseFromBackup(backupFileParameters,
                 request.DatabaseRecoveryModel ?? EDatabaseRecoveryModel.Full, cancellationToken))
         {
-            return new[] { DbApiErrors.CannotRestoreDatabase(request.DatabaseName, request.Name) };
+            return DbApiErrors.CannotRestoreDatabase(request.DatabaseName, request.Name);
         }
 
         await messageLogger.LogInfoAndSendMessage("Finish Database Restore", cancellationToken);
 
-        return new Unit();
+        return Result.Success();
     }
 }

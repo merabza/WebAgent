@@ -1,22 +1,21 @@
-﻿using System.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using OneOf;
-using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.Application.Abstractions.Messaging;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
+using ToolsManagement.DatabasesManagement;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class IsDatabaseExistsCommandHandler : ICommandHandlerOmd<IsDatabaseExistsRequestCommand, bool>
+public sealed class IsDatabaseExistsCommandHandler : ICommandHandler<IsDatabaseExistsRequestCommand, bool>
 {
     private readonly IApplication _application;
     private readonly IConfiguration _config;
@@ -34,21 +33,18 @@ public sealed class IsDatabaseExistsCommandHandler : ICommandHandlerOmd<IsDataba
         _application = application;
     }
 
-    public async Task<OneOf<bool, ErrorOmd[]>> Handle(IsDatabaseExistsRequestCommand request,
+    public async Task<Result<bool>> Handle(IsDatabaseExistsRequestCommand request,
         CancellationToken cancellationToken)
     {
-        var result = await DatabaseManagerCreator.Create(_application.AppName, _config, _logger, _httpClientFactory,
-            _messagesDataManager, request.UserName, cancellationToken);
-        if (result.IsT1)
+        Result<IDatabaseManager> result = await DatabaseManagerCreator.Create(_application.AppName, _config, _logger,
+            _httpClientFactory, _messagesDataManager, request.UserName, cancellationToken);
+        if (result.IsFailure)
         {
-            return result.AsT1.ToArray();
+            return result.Error;
         }
 
-        var databaseManagementClient = result.AsT0;
+        IDatabaseManager databaseManagementClient = result.Value;
 
-        var isDatabaseExistsResult =
-            await databaseManagementClient.IsDatabaseExists(request.DatabaseName, cancellationToken);
-
-        return isDatabaseExistsResult.Match<OneOf<bool, ErrorOmd[]>>(f0 => f0, f1 => f1);
+        return await databaseManagementClient.IsDatabaseExists(request.DatabaseName, cancellationToken);
     }
 }

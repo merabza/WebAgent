@@ -1,8 +1,8 @@
-﻿using SystemTools.MediatRMessagingAbstractions;
+﻿using SystemTools.Application.Abstractions.Messaging;
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class IsDatabaseExistsRequestCommand : ICommandOmd<bool>
+public sealed class IsDatabaseExistsRequestCommand : ICommand<bool>
 {
     public IsDatabaseExistsRequestCommand(string databaseName, string? userName)
     {

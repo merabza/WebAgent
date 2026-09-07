@@ -1,10 +1,10 @@
-﻿using SystemTools.MediatRMessagingAbstractions;
+﻿using SystemTools.Application.Abstractions.Messaging;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class TestConnectionRequestCommand : ICommandOmd
+public sealed class TestConnectionRequestCommand : ICommand
 {
     public TestConnectionRequestCommand(string? databaseName, string? userName)
     {

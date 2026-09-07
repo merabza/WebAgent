@@ -1,8 +1,8 @@
-﻿using SystemTools.MediatRMessagingAbstractions;
+﻿using SystemTools.Application.Abstractions.Messaging;
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class RecompileProceduresRequestCommand : ICommandOmd
+public sealed class RecompileProceduresRequestCommand : ICommand
 {
     public RecompileProceduresRequestCommand(string databaseName, string? userName)
     {

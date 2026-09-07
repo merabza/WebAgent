@@ -1,16 +1,13 @@
-﻿using System.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using OneOf;
-using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.Application.Abstractions.Messaging;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 using ToolsManagement.DatabasesManagement;
 using WebAgentShared.LibWebAgentData.ErrorModels;
 
@@ -19,7 +16,7 @@ using WebAgentShared.LibWebAgentData.ErrorModels;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class UpdateStatisticsCommandHandler : ICommandHandlerOmd<UpdateStatisticsRequestCommand>
+public sealed class UpdateStatisticsCommandHandler : ICommandHandler<UpdateStatisticsRequestCommand>
 {
     private readonly IApplication _application;
     private readonly IConfiguration _config;
@@ -37,25 +34,26 @@ public sealed class UpdateStatisticsCommandHandler : ICommandHandlerOmd<UpdateSt
         _application = application;
     }
 
-    public async Task<OneOf<Unit, ErrorOmd[]>> Handle(UpdateStatisticsRequestCommand request,
-        CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateStatisticsRequestCommand request, CancellationToken cancellationToken)
     {
-        OneOf<IDatabaseManager, ErrorOmd[]> result = await DatabaseManagerCreator.Create(_application.AppName, _config,
-            _logger, _httpClientFactory, _messagesDataManager, request.UserName, cancellationToken);
-        if (result.IsT1)
+        Result<IDatabaseManager> result = await DatabaseManagerCreator.Create(_application.AppName, _config, _logger,
+            _httpClientFactory, _messagesDataManager, request.UserName, cancellationToken);
+        if (result.IsFailure)
         {
-            return result.AsT1.ToArray();
+            return result.Error;
         }
 
-        IDatabaseManager? databaseManagementClient = result.AsT0;
+        IDatabaseManager databaseManagementClient = result.Value;
 
-        if (await databaseManagementClient.UpdateStatistics(request.DatabaseName, cancellationToken))
+        Result updateStatisticsResult =
+            await databaseManagementClient.UpdateStatistics(request.DatabaseName, cancellationToken);
+        if (updateStatisticsResult.IsSuccess)
         {
-            return new Unit();
+            return Result.Success();
         }
 
-        ErrorOmd err = DbApiErrors.CannotCheckAndRepairDatabase(request.DatabaseName);
-        _logger.LogError("{Name}", err.Name);
-        return new[] { err };
+        Error err = DbApiErrors.CannotUpdateStatistics(request.DatabaseName);
+        _logger.LogError("{Description}", err.Description);
+        return new ValidationError([.. updateStatisticsResult.Error.ToErrorArray(), err]);
     }
 }

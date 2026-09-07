@@ -7,16 +7,17 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using SystemTools.Application.Abstractions;
 using SystemTools.SystemToolsShared.DependencyInjection;
 using WebAgentShared.LibProjectsApi;
 using WebAgentShared.LibProjectsApi.DependencyInjection;
 using WebSystemTools.ApiKeyIdentity.DependencyInjection;
-using WebSystemTools.MediatorTools.DependencyInjection;
 using WebSystemTools.SerilogLogger;
 using WebSystemTools.SignalRMessages.DependencyInjection;
 using WebSystemTools.SignalRMessages.Endpoints.V1;
 using WebSystemTools.SwaggerTools.DependencyInjection;
 using WebSystemTools.TestToolsApi.DependencyInjection;
+using WebSystemTools.ValidationTools.DependencyInjection;
 using WebSystemTools.WindowsServiceTools;
 
 //using AssemblyReference = ApiExceptionHandler.AssemblyReference;
@@ -63,11 +64,13 @@ try
         .AddSignalRMessages(debugLogger)
         //.AddSupportToolsServerRepositories(debugMode)
         //.AddSupportToolsServerPersistence(builder.Configuration, debugMode)
-        .AddMediator(debugLogger,
-            builder.Configuration, 
-            AssemblyReference.Assembly, 
+        .AddApplication(debugLogger,
+            typeof(AssemblyReference),
+            typeof(LibDatabasesApi.AssemblyReference))
+        .AddFluentValidation(debugLogger,
+            AssemblyReference.Assembly,
             LibDatabasesApi.AssemblyReference.Assembly)
-        .AddApplication(x =>
+        .AddApp(x =>
         {
             x.AppName = appName;
         });

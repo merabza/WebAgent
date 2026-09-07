@@ -1,8 +1,8 @@
-﻿using SystemTools.MediatRMessagingAbstractions;
+﻿using SystemTools.Application.Abstractions.Messaging;
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class ExecuteCommandRequestCommand : ICommandOmd
+public sealed class ExecuteCommandRequestCommand : ICommand
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public ExecuteCommandRequestCommand(string databaseName, string? commandText, string? userName)

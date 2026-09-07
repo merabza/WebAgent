@@ -1,9 +1,9 @@
 ﻿using DatabaseTools.DbTools;
-using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.Application.Abstractions.Messaging;
 
 namespace LibDatabasesApi.CommandRequests;
 
-public sealed class RestoreBackupCommandRequestCommand : ICommandOmd
+public sealed class RestoreBackupCommandRequestCommand : ICommand
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public RestoreBackupCommandRequestCommand(string databaseName, string dbServerFoldersSetName, string? prefix,

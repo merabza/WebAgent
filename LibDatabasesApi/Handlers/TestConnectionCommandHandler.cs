@@ -1,26 +1,22 @@
-﻿using System.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using LanguageExt;
 using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using OneOf;
-using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.Application.Abstractions.Messaging;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 using ToolsManagement.DatabasesManagement;
 using WebAgentShared.LibWebAgentData.ErrorModels;
-using Unit = MediatR.Unit;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class TestConnectionCommandHandler : ICommandHandlerOmd<TestConnectionRequestCommand>
+public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectionRequestCommand>
 {
     private readonly IApplication _application;
     private readonly IConfiguration _config;
@@ -38,28 +34,26 @@ public sealed class TestConnectionCommandHandler : ICommandHandlerOmd<TestConnec
         _application = application;
     }
 
-    public async Task<OneOf<Unit, ErrorOmd[]>> Handle(TestConnectionRequestCommand request,
-        CancellationToken cancellationToken)
+    public async Task<Result> Handle(TestConnectionRequestCommand request, CancellationToken cancellationToken)
     {
-        OneOf<IDatabaseManager, ErrorOmd[]> databaseClientCreatorResult =
-            await DatabaseManagerCreator.Create(_application.AppName, _config, _logger, _httpClientFactory,
-                _messagesDataManager, request.UserName, cancellationToken);
-        if (databaseClientCreatorResult.IsT1)
+        Result<IDatabaseManager> databaseClientCreatorResult = await DatabaseManagerCreator.Create(
+            _application.AppName, _config, _logger, _httpClientFactory, _messagesDataManager, request.UserName,
+            cancellationToken);
+        if (databaseClientCreatorResult.IsFailure)
         {
-            return databaseClientCreatorResult.AsT1.ToArray();
+            return databaseClientCreatorResult.Error;
         }
 
-        IDatabaseManager? databaseManagementClient = databaseClientCreatorResult.AsT0;
+        IDatabaseManager databaseManagementClient = databaseClientCreatorResult.Value;
 
-        Option<ErrorOmd[]> testResult =
-            await databaseManagementClient.TestConnection(request.DatabaseName, cancellationToken);
-        if (testResult.IsNone)
+        Result testResult = await databaseManagementClient.TestConnection(request.DatabaseName, cancellationToken);
+        if (testResult.IsSuccess)
         {
-            return new Unit();
+            return Result.Success();
         }
 
-        ErrorOmd err = DbApiErrors.TestConnectionFailed(request.DatabaseName);
-        _logger.LogError("{Name}", err.Name);
-        return await Task.FromResult(ErrorOmd.RecreateErrors((ErrorOmd[])testResult, err));
+        Error err = DbApiErrors.TestConnectionFailed(request.DatabaseName);
+        _logger.LogError("{Description}", err.Description);
+        return new ValidationError([.. testResult.Error.ToErrorArray(), err]);
     }
 }

@@ -1,16 +1,13 @@
-﻿using System.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using LibDatabasesApi.CommandRequests;
 using LibDatabasesApi.Helpers;
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using OneOf;
-using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.Application.Abstractions.Messaging;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 using ToolsManagement.DatabasesManagement;
 using WebAgentShared.LibWebAgentData.ErrorModels;
 
@@ -19,7 +16,7 @@ using WebAgentShared.LibWebAgentData.ErrorModels;
 namespace LibDatabasesApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class ExecuteCommandCommandHandler : ICommandHandlerOmd<ExecuteCommandRequestCommand>
+public sealed class ExecuteCommandCommandHandler : ICommandHandler<ExecuteCommandRequestCommand>
 {
     private readonly IApplication _application;
     private readonly IConfiguration _config;
@@ -37,30 +34,31 @@ public sealed class ExecuteCommandCommandHandler : ICommandHandlerOmd<ExecuteCom
         _application = application;
     }
 
-    public async Task<OneOf<Unit, ErrorOmd[]>> Handle(ExecuteCommandRequestCommand request,
-        CancellationToken cancellationToken)
+    public async Task<Result> Handle(ExecuteCommandRequestCommand request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.CommandText))
         {
-            return await Task.FromResult(new[] { DbApiErrors.CommandTextIsEmpty });
+            return DbApiErrors.CommandTextIsEmpty;
         }
 
-        OneOf<IDatabaseManager, ErrorOmd[]> result = await DatabaseManagerCreator.Create(_application.AppName, _config,
-            _logger, _httpClientFactory, _messagesDataManager, request.UserName, cancellationToken);
-        if (result.IsT1)
+        Result<IDatabaseManager> result = await DatabaseManagerCreator.Create(_application.AppName, _config, _logger,
+            _httpClientFactory, _messagesDataManager, request.UserName, cancellationToken);
+        if (result.IsFailure)
         {
-            return result.AsT1.ToArray();
+            return result.Error;
         }
 
-        IDatabaseManager? databaseManagementClient = result.AsT0;
+        IDatabaseManager databaseManagementClient = result.Value;
 
-        if (await databaseManagementClient.ExecuteCommand(request.CommandText, request.DatabaseName, cancellationToken))
+        Result executeCommandResult = await databaseManagementClient.ExecuteCommand(request.CommandText,
+            request.DatabaseName, cancellationToken);
+        if (executeCommandResult.IsSuccess)
         {
-            return new Unit();
+            return Result.Success();
         }
 
-        ErrorOmd err = DbApiErrors.CouldNotExecuteCommand(request.DatabaseName);
-        _logger.LogError("{Name}", err.Name);
-        return await Task.FromResult(new[] { err });
+        Error err = DbApiErrors.CouldNotExecuteCommand(request.DatabaseName);
+        _logger.LogError("{Description}", err.Description);
+        return new ValidationError([.. executeCommandResult.Error.ToErrorArray(), err]);
     }
 }
