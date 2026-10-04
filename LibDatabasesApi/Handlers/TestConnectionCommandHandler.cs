@@ -36,9 +36,8 @@ public sealed class TestConnectionCommandHandler : ICommandHandler<TestConnectio
 
     public async Task<Result> Handle(TestConnectionRequestCommand request, CancellationToken cancellationToken)
     {
-        Result<IDatabaseManager> databaseClientCreatorResult = await DatabaseManagerCreator.Create(
-            _application.AppName, _config, _logger, _httpClientFactory, _messagesDataManager, request.UserName,
-            cancellationToken);
+        Result<IDatabaseManager> databaseClientCreatorResult = await DatabaseManagerCreator.Create(_application.AppName,
+            _config, _logger, _httpClientFactory, _messagesDataManager, request.UserName, cancellationToken);
         if (databaseClientCreatorResult.IsFailure)
         {
             return databaseClientCreatorResult.Error;
